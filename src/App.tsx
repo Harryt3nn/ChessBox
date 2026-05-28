@@ -4,6 +4,8 @@ import Analytics from './pages/Analytics';
 import Settings from './pages/Settings';
 import TrainingToolkit from './pages/TrainingToolkit';
 
+
+
 const App = () => {
   const [page, setPage] = useState('home');
 
@@ -13,14 +15,40 @@ const App = () => {
   if (page === 'settings') return <Settings onBack={() => setPage('home')} />;
 
  return (
-  <div className="home">
-    <h1>Chess Training Toolkit</h1>
-    <div className="menu">
-      <button onClick={() => setPage('repertoires')}>Edit Repertoires</button>
-      <button onClick={() => setPage('analytics')}>Game Analytics</button>
-      <button onClick={() => setPage('tools')}>Training Toolkit</button>
-      <button onClick={() => setPage('settings')}>Settings</button>
-    </div>
+  <div className="app-layout">
+    <aside className="sidebar">
+      <div className="sidebar-logo">
+        <i className="fa-solid fa-chess-knight"></i>
+        <span>CTT</span>
+      </div>
+      <nav className="sidebar-nav">
+        <button onClick={() => setPage('repertoires')}>
+          <i className="fa-solid fa-book-open"></i>
+          <span>Repertoires</span>
+        </button>
+        <button onClick={() => setPage('analytics')}>
+          <i className="fa-solid fa-chart-line"></i>
+          <span>Analytics</span>
+        </button>
+        <button onClick={() => setPage('tools')}>
+          <i className="fa-solid fa-dumbbell"></i>
+          <span>Training</span>
+        </button>
+      </nav>
+       <div className="sidebar-bottom">
+           <button>
+            <i className="fa-solid fa-house"></i>
+            <span>Home</span>
+          </button>
+          <button onClick={() => setPage('settings')}>
+            <i className="fa-solid fa-gear"></i>
+            <span>Settings</span>
+          </button>
+        </div>
+    </aside>
+    <main className="main-content">
+      <h1>Chess Training Toolkit</h1>
+    </main>
   </div>
 );
 }

@@ -2,7 +2,7 @@
   "name": "ctt",
   "productName": "ctt",
   "version": "1.0.0",
-  "description": "My Electron application description",
+  "description": "Chess Training",
   "main": ".webpack/main",
   "private": true,
   "scripts": {
@@ -44,6 +44,8 @@
     "typescript": "~4.5.4"
   },
   "dependencies": {
+    "@electron/remote": "^2.1.3",
+    "@fortawesome/fontawesome-free": "^7.2.0",
     "@mliebelt/pgn-parser": "^1.4.19",
     "chess.js": "^1.4.0",
     "dagre": "^0.8.5",
