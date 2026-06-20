@@ -1,5 +1,5 @@
 # Chess Training Toolkit — Architecture
-
+cd /mnt/c/Users/harry/Documents/Projects/CTTBox/CTT
 ## Overview
 
 CTT is a desktop app built with **Electron + React + TypeScript** using Electron Forge
@@ -233,4 +233,10 @@ App.tsx  (home screen)
   
 
 CTT (Chess Training Toolkit) is a fully offline desktop app built with Electron + React + TypeScript using Electron Forge (webpack-typescript template). The renderer is sandboxed and communicates with the main process via a window.storage.* IPC bridge (defined in preload, handled in main.ts). All data is stored locally at AppData/Roaming/ctt/ctt-data/ — folders in folders.json, repertoires as individual {id}.json files in repositories/, and all nodes in a single nodes.json map. The data model is Folder → Repertoire (folderId) → Node (repertoireId, children[]). The app is styled dark (chess.com/Lichess aesthetic: #262522 sidebar, #1a1a1a bg, #f0d9b5 accent) with a persistent left sidebar and page navigation via useState<Page> — no router. Users can import opening repertoires from chessgraph.net JSON exports (v3 format: nodes exported as array with childIds, normalised to a Record<id, Node> map with children on import via prepareForImport.ts). Libraries in use: react-chessboard, chess.js, @fortawesome/fontawesome-free, react-toastify. Current pages: EditRepertoires (repertoire file browser — main page), Analytics, TrainingToolkit, Settings. Key components: FolderSelection, RepertoireRow, ImportModal. The onBack prop always navigates to App.tsx home; Settings receives onBack passed through rather than a local setPage.
+
+---
+
+## ANALYSIS BOARD ------------------------------------------------------
+
+---
 

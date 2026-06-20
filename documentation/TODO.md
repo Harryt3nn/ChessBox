@@ -27,3 +27,12 @@
 14. fix spelling mistake in 'EditRepertiores'
 
 15. ensure no inline css
+
+16. chessbase integration??? 
+
+17. different coloured folders
+
+
+
+Chess.com internship:
+

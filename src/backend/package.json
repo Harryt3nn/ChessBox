@@ -1,0 +1,16 @@
+{
+  "name": "ctt-backend",
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "node --loader ts-node/esm server.ts"
+  },
+  "dependencies": {
+    "express": "^4.19.0",
+    "node-fetch": "^3.3.2"
+  },
+  "devDependencies": {
+    "ts-node": "^10.9.2",
+    "typescript": "^5.4.0"
+  }
+}

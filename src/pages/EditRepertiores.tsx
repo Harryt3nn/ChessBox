@@ -456,7 +456,7 @@ const reloadData = async () => {
 
           <button className="btn-outline" onClick={handleImportClick}>
             <i className="fa-solid fa-file-import" />
-            Import from Chess Graph
+            Import JSON
           </button>
         </div>
       </div>

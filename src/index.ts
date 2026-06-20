@@ -87,21 +87,21 @@ ipcMain.handle("storage:importRepertoires", async (_, payload) => {
   return await importRepertoires(payload);
 });
 
-// creation of window object
+// creation of window
 
 const createWindow = (): void => {
   const mainWindow = new BrowserWindow({
     height: 1300,
     width: 1300,
     autoHideMenuBar: true,
-    icon: path.join(__dirname, "../src/Images/icon.ico"),
+    icon: path.join(__dirname, 'public', 'icon.png'),
     webPreferences: {
       preload: MAIN_WINDOW_PRELOAD_WEBPACK_ENTRY,
     },
   });
 
   mainWindow.loadURL(MAIN_WINDOW_WEBPACK_ENTRY);
-  mainWindow.webContents.openDevTools();
+  
 };
 
 app.on("ready", createWindow);

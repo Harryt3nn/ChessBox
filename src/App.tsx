@@ -58,7 +58,7 @@ const App = () => {
         </div>
     </aside>
     <main className="main-content">
-      <h1>Chess Training Toolkit</h1>
+      <h1>Home page coming soon...</h1>
     </main>
   </div>
 );

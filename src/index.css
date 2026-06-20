@@ -1,4 +1,58 @@
 /* src/index.css */
+
+/* ============================================================
+   FLAT CONSTRUCTIVIST NOIR — custom palette
+   Deep navy-plum void + warm cream, with a dual accent system:
+   amber (brand / primary actions) and coral (emphasis / alerts).
+   Sage is reserved exclusively for chess.com connect/success states.
+   ============================================================ */
+:root {
+  /* Surfaces — dark to light */
+  --color-void: #16131f;          /* page background */
+  --color-surface-1: #1f1a2b;     /* sidebar, modal window */
+  --color-surface-2: #2a2438;     /* inputs, cards, move history */
+  --color-surface-3: #352e47;     /* hover states, scrollbar thumb */
+
+  /* Borders */
+  --color-border: #423a56;
+  --color-border-strong: #5c5278;
+
+  /* Text */
+  --color-text-primary: #f0e6d3;    /* headings, logo, active/selected */
+  --color-text-secondary: #c2b8a8;  /* nav labels, body text, card titles */
+  --color-text-tertiary: #9c9286;   /* counts, captions, placeholders */
+  --color-text-faint: #6d6458;      /* move numbers, footers, empty states */
+
+  /* Accent: amber — brand + primary actions */
+  --color-amber: #d99c34;
+  --color-amber-hover: #e8ad4a;
+  --color-amber-rgb: 217, 156, 52;
+
+  /* Accent: coral — emphasis, destructive, error */
+  --color-coral: #c4453f;
+  --color-coral-hover: #d65a52;
+  --color-coral-rgb: 196, 69, 63;
+
+  /* Chess pieces */
+  --color-piece-light: #f0e6d3;
+  --color-piece-dark: #a8889c;
+  --color-piece-dark-rgb: 168, 136, 156;
+
+  /* Sage — reserved for chess.com brand connect/success states only */
+  --color-sage: #7d9b5b;
+  --color-sage-hover: #8fae6a;
+
+  /* Cream RGB, for translucent overlays */
+  --color-cream-rgb: 240, 230, 211;
+
+  /* Ink — dark text used on light/amber/sage buttons */
+  --color-ink: #1b1726;
+
+  /* Board highlights */
+  --highlight-selected: rgba(var(--color-amber-rgb), 0.25);
+  --highlight-dot: radial-gradient(circle, rgba(0, 0, 0, 0.3) 20%, transparent 21%);
+}
+
 * {
   margin: 0;
   padding: 0;
@@ -6,8 +60,8 @@
 }
 
 body {
-  background: #1a1a1a;
-  color: #e0d7d0;
+  background: var(--color-void);
+  color: var(--color-text-secondary);
   font-family: 'Segoe UI', sans-serif;
   height: 100vh;
   overflow: hidden;
@@ -21,11 +75,11 @@ body {
 /* Sidebar */
 .sidebar {
   width: 220px;
-  background: #262522;
+  background: var(--color-surface-1);
   display: flex;
   flex-direction: column;
   padding: 16px 0;
-  border-right: 1px solid #3a3733;
+  border-right: 1px solid var(--color-border);
   flex-shrink: 0;
 }
 
@@ -36,7 +90,7 @@ body {
   padding: 12px 20px 24px;
   font-size: 20px;
   font-weight: 700;
-  color: #f0d9b5;
+  color: var(--color-amber);
 }
 
 .sidebar-logo i {
@@ -59,7 +113,7 @@ body {
   width: 100%;
   padding: 10px 14px;
   background: transparent;
-  color: #b0a090;
+  color: var(--color-text-secondary);
   border: none;
   border-radius: 6px;
   cursor: pointer;
@@ -70,8 +124,8 @@ body {
 
 .sidebar-nav button:hover,
 .sidebar-bottom button:hover {
-  background: #3a3733;
-  color: #f0d9b5;
+  background: var(--color-surface-3);
+  color: var(--color-amber);
 }
 
 .sidebar-nav button i,
@@ -82,7 +136,7 @@ body {
 
 .sidebar-bottom {
   padding: 0 8px;
-  border-top: 1px solid #3a3733;
+  border-top: 1px solid var(--color-border);
   padding-top: 8px;
 }
 
@@ -95,65 +149,14 @@ body {
 
 .main-content h1 {
   font-size: 28px;
-  color: #f0d9b5;
+  color: var(--color-amber);
   margin-bottom: 8px;
 }
 
 .main-content p {
-  color: #888;
+  color: var(--color-text-tertiary);
 }
 
-/* Top bar actions container */
-.topbar-actions {
-  display: flex;
-  gap: 10px;
-}
-
-/* Outline button (New Folder, Import) */
-.btn-outline {
-  padding: 8px 16px;
-  border-radius: 8px;
-  border: 1px solid rgba(255,255,255,0.15);
-  background: transparent;
-  color: #c0b8b0;
-  font-size: 13px;
-  font-weight: 500;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  gap: 7px;
-  transition: border-color 0.15s, color 0.15s;
-}
-
-.btn-outline:hover {
-  border-color: rgba(240,217,181,0.4);
-  color: #f0d9b5;
-}
-
-/* Primary button (New Graph) */
-.btn-primary {
-  padding: 8px 16px;
-  border-radius: 8px;
-  border: none;
-  background: #5b8dd9;
-  color: #fff;
-  font-size: 13px;
-  font-weight: 600;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  gap: 7px;
-  transition: background 0.15s;
-}
-
-.btn-primary:hover {
-  background: #4a7bc8;
-}
-
-.btn-outline i,
-.btn-primary i {
-  font-size: 12px;
-}
 /* Top bar */
 .topbar {
   display: flex;
@@ -171,9 +174,9 @@ body {
 .btn-outline {
   padding: 8px 16px;
   border-radius: 8px;
-  border: 1px solid rgba(255,255,255,0.15);
+  border: 1px solid rgba(var(--color-cream-rgb), 0.15);
   background: transparent;
-  color: #c0b8b0;
+  color: var(--color-text-secondary);
   font-size: 13px;
   font-weight: 500;
   cursor: pointer;
@@ -184,16 +187,16 @@ body {
 }
 
 .btn-outline:hover {
-  border-color: rgba(240,217,181,0.4);
-  color: #f0d9b5;
+  border-color: rgba(var(--color-amber-rgb), 0.4);
+  color: var(--color-amber);
 }
 
 .btn-primary {
   padding: 8px 16px;
   border-radius: 8px;
   border: none;
-  background: #5b8dd9;
-  color: #fff;
+  background: var(--color-amber);
+  color: var(--color-ink);
   font-size: 13px;
   font-weight: 600;
   cursor: pointer;
@@ -204,7 +207,12 @@ body {
 }
 
 .btn-primary:hover {
-  background: #4a7bc8;
+  background: var(--color-amber-hover);
+}
+
+.btn-outline i,
+.btn-primary i {
+  font-size: 12px;
 }
 
 /* Search */
@@ -222,17 +230,17 @@ body {
   left: 14px;
   top: 50%;
   transform: translateY(-50%);
-  color: #6e6560;
+  color: var(--color-text-faint);
   font-size: 13px;
 }
 
 .search-input {
   width: 100%;
   padding: 10px 14px 10px 38px;
-  background: #2a2725;
-  border: 1px solid rgba(255,255,255,0.08);
+  background: var(--color-surface-2);
+  border: 1px solid rgba(var(--color-cream-rgb), 0.08);
   border-radius: 8px;
-  color: #e8e0d5;
+  color: var(--color-text-primary);
   font-size: 13px;
   outline: none;
 }
@@ -246,8 +254,8 @@ body {
   display: flex;
   align-items: center;
   gap: 8px;
-  background: #2a2725;
-  border: 1px solid rgba(240,217,181,0.3);
+  background: var(--color-surface-2);
+  border: 1px solid rgba(var(--color-amber-rgb), 0.3);
   border-radius: 8px;
   padding: 10px 14px;
   max-width: 360px;
@@ -257,7 +265,7 @@ body {
   flex: 1;
   background: none;
   border: none;
-  color: #e8e0d5;
+  color: var(--color-text-primary);
   font-size: 13px;
   outline: none;
 }
@@ -270,7 +278,7 @@ body {
 }
 
 .empty-message {
-  color: #6e6560;
+  color: var(--color-text-faint);
   font-size: 14px;
   margin-top: 40px;
   text-align: center;
@@ -288,7 +296,7 @@ body {
 }
 
 .modal-window {
-  background: #1e1e1e;
+  background: var(--color-surface-1);
   padding: 24px;
   border-radius: 12px;
   width: 480px;
@@ -323,7 +331,7 @@ body {
 .folder-reps {
   margin-left: 24px;
   margin-top: 4px;
-  color: #ccc;
+  color: var(--color-text-secondary);
   font-size: 0.9rem;
 }
 
@@ -336,348 +344,227 @@ body {
   font-style: italic;
 }
 
-/* BoardView */
+/* BoardView layout */
 .board-view-main {
   display: flex;
   gap: 32px;
   padding: 32px;
+  height: 100vh;
+  overflow: hidden;
   align-items: flex-start;
 }
 
 .board-container {
   width: 560px;
   flex-shrink: 0;
+  user-select: none;
 }
 
 .board-panel {
   flex: 1;
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  height: 100%;
+  gap: 12px;
+  overflow: hidden;
 }
 
 .board-panel-title {
   margin: 0;
-  color: #e8e0d5;
+  color: var(--color-text-primary);
+  flex-shrink: 0;
 }
 
 .move-history {
-  background: #2a2725;
+  background: var(--color-surface-2);
   border-radius: 8px;
-  padding: 16px;
-  min-height: 200px;
-  color: #c0b8b0;
+  padding: 12px 16px;
+  color: var(--color-text-secondary);
   font-size: 14px;
-  line-height: 2;
+  line-height: 1.8;
+  flex: 1;
+  overflow-y: auto;
+  min-height: 0;
+}
+
+/* Custom scrollbar to match theme */
+.move-history::-webkit-scrollbar {
+  width: 6px;
+}
+.move-history::-webkit-scrollbar-track {
+  background: transparent;
+}
+.move-history::-webkit-scrollbar-thumb {
+  background: var(--color-surface-3);
+  border-radius: 3px;
+}
+.move-history::-webkit-scrollbar-thumb:hover {
+  background: var(--color-border-strong);
 }
 
 .move-history-empty {
-  color: #6e6560;
+  color: var(--color-text-faint);
+}
+
+/* Move list: one row per move pair "1. e4 e5" */
+.move-row {
+  display: grid;
+  grid-template-columns: 2rem 1fr 1fr;
+  gap: 2px;
+  padding: 2px 0;
 }
 
 .move-number {
-  color: #6e6560;
-  margin-right: 4px;
+  color: var(--color-text-faint);
 }
 
 .move-text {
-  margin-right: 12px;
+  cursor: pointer;
+  padding: 2px 5px;
+  border-radius: 3px;
+  transition: background 0.1s;
 }
 
-.btn-reset {
-  padding: 8px 16px;
-  border-radius: 8px;
-  border: none;
-  background: #5b8dd9;
-  color: #fff;
+.move-text:hover {
+  background: rgba(var(--color-cream-rgb), 0.08);
+}
+
+.move-active {
+  background: var(--highlight-selected);
   font-weight: 600;
-  cursor: pointer;
-  align-self: flex-start;
 }
 
-.btn-reset:hover {
-  background: #4a7bc8;
-}
-
-/* Highlight: selected square (yellow tint) */
-.highlight-selected {
-  background-color: rgba(255, 255, 0, 0.25) !important;
-}
-
-/* Highlight: legal move dot */
-.highlight-dot {
-  background: radial-gradient(circle, rgba(0, 0, 0, 0.3) 20%, transparent 21%) !important;
-}
-
-/* Ensure dot is centered */
-.highlight-dot::before {
-  content: "";
-  display: block;
-  width: 100%;
-  height: 100%;
-}
-
-/* Optional: smooth highlight transitions */
-.highlight-selected,
-.highlight-dot {
-  transition: background 0.15s ease;
-}
-
-/* Selected square highlight (yellow tint, like lichess/chess.com) */
-.highlight-selected {
-  background-color: rgba(255, 255, 0, 0.25) !important;
-}
-
-/* Legal move dot (centered dark dot) */
-.highlight-dot {
-  background: radial-gradient(circle, rgba(0, 0, 0, 0.3) 20%, transparent 21%) !important;
-}
-
-/* Optional: smooth transitions for highlights */
-.highlight-selected,
-.highlight-dot {
-  transition: background 0.15s ease;
-}
-
-:root {
-  --highlight-selected: rgba(255, 255, 0, 0.25);
-  --highlight-dot: radial-gradient(circle, rgba(0, 0, 0, 0.3) 20%, transparent 21%);
-}
-
-/* Folder container */
-.folder-block {
-  margin-bottom: 24px;
-}
-
-/* Header row */
-.folder-header {
+/* Navigation arrow buttons */
+.move-nav {
   display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 6px 0;
-}
-
-/* Folder icon */
-.folder-icon {
-  color: #c0b8b0;
-  width: 16px;
-  cursor: pointer;
-}
-
-/* Folder name text */
-.folder-name {
-  color: #e8e0d5;
-  font-size: 15px;
-}
-
-/* Folder rename input */
-.folder-input {
-  background: none;
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  border-radius: 4px;
-  padding: 2px 6px;
-  color: #e8e0d5;
-  font-size: 14px;
-}
-
-.folder-input-error {
-  border-color: #b55;
-}
-
-/* Buttons (rename/delete) */
-.folder-btn {
-  background: none;
-  border: none;
-  cursor: pointer;
-  padding: 4px;
-}
-
-.folder-btn-rename {
-  color: #c0b8b0;
-}
-
-.folder-btn-delete {
-  color: #a86a6a;
-}
-
-/* Repertoire list */
-.repertoire-list {
-  margin-left: 26px;
-  margin-top: 6px;
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-}
-
-/* Empty state */
-.repertoire-empty {
-  color: #6e6560;
-  font-size: 13px;
-}
-
-/* Container for each repertoire row */
-.rep-row {
-  display: flex;
-  align-items: center;
   gap: 8px;
-  cursor: pointer;
-}
-
-/* Icon */
-.rep-row-icon {
-  color: #9a9080;
-  width: 14px;
-}
-
-/* Name text */
-.rep-row-name {
-  color: #c0b8b0;
-  font-size: 14px;
-}
-
-/* Input when renaming */
-.rep-row-input {
-  background: none;
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  border-radius: 4px;
-  padding: 2px 6px;
-  color: #e8e0d5;
-  font-size: 13px;
-}
-
-/* Knight icon container */
-.knight-icon {
-  width: 32px;
-  height: 32px;
-  border-radius: 6px;
-  display: flex;
-  align-items: center;
   justify-content: center;
   flex-shrink: 0;
 }
 
-/* White knight background + border */
-.knight-white {
-  background: rgba(240, 217, 181, 0.15);
-  border: 1px solid rgba(240, 217, 181, 0.3);
-}
-
-/* Black knight background + border */
-.knight-black {
-  background: rgba(100, 80, 60, 0.25);
-  border: 1px solid rgba(150, 120, 90, 0.3);
-}
-
-/* Icon inside */
-.knight-piece {
-  font-size: 14px;
-}
-
-/* Icon colours */
-.piece-white {
-  color: #f0d9b5;
-}
-
-.piece-black {
-  color: #b58863;
-}
-
-/* InlineEdit — input mode */
-.inline-edit-input {
-  background: rgba(255, 255, 255, 0.08);
-  border: 1px solid rgba(240, 217, 181, 0.4);
+.nav-arrow {
+  background: none;
+  border: 1px solid var(--color-border);
   border-radius: 4px;
-  color: #e8e0d5;
-  padding: 2px 6px;
-  font-size: inherit;
-  font-family: inherit;
-  font-weight: inherit;
-  outline: none;
-}
-
-/* InlineEdit — text mode */
-.inline-edit-text {
-  cursor: text;
-}
-/* ──────────────────────────────────────────────── */
-/* Repertoire Card Container */
-/* ──────────────────────────────────────────────── */
-
-.rep-card {
-  background: #2a2725;
-  border: 1px solid rgba(255, 255, 255, 0.07);
-  border-radius: 10px;
-  padding: 16px 18px;
+  padding: 8px 14px;
   cursor: pointer;
+  color: inherit;
+  font-size: 14px;
+  transition: border-color 0.15s, color 0.15s;
+}
+
+.nav-arrow:hover:not(:disabled) {
+  border-color: var(--color-border-strong);
+  color: var(--color-amber);
+}
+
+.nav-arrow:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+/* Variation switcher */
+.variation-list {
   display: flex;
-  flex-direction: column;
+  flex-wrap: wrap;
+  gap: 6px;
+  padding: 4px 0;
+  font-size: 0.85rem;
+  flex-shrink: 0;
+}
+
+.variation-label {
+  color: var(--color-text-faint);
+}
+
+.variation-item {
+  cursor: pointer;
+  padding: 3px 8px;
+  border-radius: 3px;
+  border: 1px solid var(--color-border);
+  color: var(--color-text-secondary);
+  transition: border-color 0.15s;
+}
+
+.variation-item:hover {
+  border-color: var(--color-border-strong);
+}
+
+.variation-active {
+  border-color: rgba(var(--color-amber-rgb), 0.4);
+  font-weight: 600;
+  color: var(--color-amber);
+}
+
+/* Save / Load / Reset row */
+.board-panel-actions {
+  display: flex;
   gap: 8px;
-  min-height: 110px;
-
-  transition: border-color 0.15s, background 0.15s, transform 0.1s;
+  flex-shrink: 0;
 }
 
-.rep-card:hover {
-  border-color: rgba(240, 217, 181, 0.3);
-  background: #302e2c;
-  transform: translateY(-1px);
-}
-
-/* ──────────────────────────────────────────────── */
-/* Header Row */
-/* ──────────────────────────────────────────────── */
-
-.rep-card-header {
+.btn-secondary {
+  flex: 1;
+  padding: 8px 10px;
+  background: none;
+  border: 1px solid var(--color-border);
+  border-radius: 6px;
+  cursor: pointer;
+  color: var(--color-text-secondary);
+  font-family: 'Segoe UI', sans-serif;
+  font-size: 13px;
   display: flex;
   align-items: center;
-  gap: 10px;
+  justify-content: center;
+  gap: 6px;
+  transition: border-color 0.15s, color 0.15s;
 }
 
-/* Title text inside InlineEdit */
-.rep-card-title {
+.btn-secondary:hover {
+  border-color: var(--color-border-strong);
+  color: var(--color-amber);
+}
+
+.btn-reset {
+  flex: 1;
+  padding: 8px 10px;
+  border-radius: 6px;
+  border: none;
+  background: var(--color-amber);
+  color: var(--color-ink);
+  font-family: 'Segoe UI', sans-serif;
+  font-size: 13px;
   font-weight: 600;
-  font-size: 15px;
-  color: #e8e0d5;
-}
-
-/* ──────────────────────────────────────────────── */
-/* Footer Row */
-/* ──────────────────────────────────────────────── */
-
-.rep-card-footer {
+  cursor: pointer;
   display: flex;
-  justify-content: space-between;
-  margin-top: auto;
-  font-size: 12px;
-  color: #6e6560;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  transition: background 0.15s;
 }
 
-/* ───────────────────────────────────────────── */
-/* Folder Section Wrapper */
-/* ───────────────────────────────────────────── */
+.btn-reset:hover {
+  background: var(--color-amber-hover);
+}
 
+/* Folder container */
 .folder-section {
   margin-bottom: 28px;
 }
-
-/* ───────────────────────────────────────────── */
-/* Header Row */
-/* ───────────────────────────────────────────── */
 
 .folder-section-header {
   display: flex;
   align-items: center;
   gap: 8px;
   margin-bottom: 14px;
-  color: #9a9080;
+  color: var(--color-text-tertiary);
 }
 
-/* Chevron button */
 .folder-chevron {
   background: none;
   border: none;
   cursor: pointer;
-  color: #9a9080;
+  color: var(--color-text-tertiary);
   padding: 0;
   display: flex;
   align-items: center;
@@ -692,28 +579,24 @@ body {
   font-size: 11px;
 }
 
-/* Folder icon */
 .folder-icon {
   font-size: 13px;
+  color: var(--color-text-secondary);
+  width: 16px;
+  cursor: pointer;
 }
 
-/* Folder name (InlineEdit) */
 .folder-section-title {
   font-weight: 600;
   font-size: 14px;
-  color: #c0b8b0;
+  color: var(--color-text-secondary);
 }
 
-/* File count */
 .folder-section-count {
   font-size: 12px;
   margin-left: 2px;
-  color: #6e6560;
+  color: var(--color-text-faint);
 }
-
-/* ───────────────────────────────────────────── */
-/* Grid of Repertoire Cards */
-/* ───────────────────────────────────────────── */
 
 .folder-section-grid {
   display: grid;
@@ -721,9 +604,336 @@ body {
   gap: 12px;
 }
 
-/* Empty message */
 .folder-section-empty {
-  color: #6e6560;
+  color: var(--color-text-faint);
   font-size: 13px;
   padding: 8px 4px;
+}
+
+/* Repertoire card */
+.rep-card {
+  background: var(--color-surface-2);
+  border: 1px solid rgba(var(--color-cream-rgb), 0.07);
+  border-radius: 10px;
+  padding: 16px 18px;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-height: 110px;
+  transition: border-color 0.15s, background 0.15s, transform 0.1s;
+}
+
+.rep-card:hover {
+  border-color: rgba(var(--color-amber-rgb), 0.3);
+  background: var(--color-surface-3);
+  transform: translateY(-1px);
+}
+
+.rep-card-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.rep-card-title {
+  font-weight: 600;
+  font-size: 15px;
+  color: var(--color-text-primary);
+}
+
+.rep-card-footer {
+  display: flex;
+  justify-content: space-between;
+  margin-top: auto;
+  font-size: 12px;
+  color: var(--color-text-faint);
+}
+
+/* Knight icon */
+.knight-icon {
+  width: 32px;
+  height: 32px;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.knight-white {
+  background: rgba(var(--color-cream-rgb), 0.15);
+  border: 1px solid rgba(var(--color-cream-rgb), 0.3);
+}
+
+.knight-black {
+  background: rgba(var(--color-piece-dark-rgb), 0.25);
+  border: 1px solid rgba(var(--color-piece-dark-rgb), 0.35);
+}
+
+.knight-piece {
+  font-size: 14px;
+}
+
+.piece-white { color: var(--color-piece-light); }
+.piece-black { color: var(--color-piece-dark); }
+
+/* InlineEdit */
+.inline-edit-input {
+  background: rgba(var(--color-cream-rgb), 0.08);
+  border: 1px solid rgba(var(--color-amber-rgb), 0.4);
+  border-radius: 4px;
+  color: var(--color-text-primary);
+  padding: 2px 6px;
+  font-size: inherit;
+  font-family: inherit;
+  font-weight: inherit;
+  outline: none;
+}
+
+.inline-edit-text {
+  cursor: text;
+}
+
+/* Folder rows */
+.folder-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 6px 0;
+}
+
+.folder-name {
+  color: var(--color-text-primary);
+  font-size: 15px;
+}
+
+.folder-input {
+  background: none;
+  border: 1px solid rgba(var(--color-cream-rgb), 0.2);
+  border-radius: 4px;
+  padding: 2px 6px;
+  color: var(--color-text-primary);
+  font-size: 14px;
+}
+
+.folder-input-error {
+  border-color: var(--color-coral);
+}
+
+.folder-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 4px;
+}
+
+.folder-btn-rename { color: var(--color-text-secondary); }
+.folder-btn-delete { color: var(--color-coral); }
+
+.repertoire-list {
+  margin-left: 26px;
+  margin-top: 6px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.repertoire-empty {
+  color: var(--color-text-faint);
+  font-size: 13px;
+}
+
+.rep-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+}
+
+.rep-row-icon { color: var(--color-text-tertiary); width: 14px; }
+.rep-row-name { color: var(--color-text-secondary); font-size: 14px; }
+
+.rep-row-input {
+  background: none;
+  border: 1px solid rgba(var(--color-cream-rgb), 0.2);
+  border-radius: 4px;
+  padding: 2px 6px;
+  color: var(--color-text-primary);
+  font-size: 13px;
+}
+
+/* Settings */
+.settings-page {
+  padding: 24px;
+  color: var(--color-text-primary);
+}
+
+.settings-section {
+  margin-top: 20px;
+}
+
+.connect-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 18px;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  border: none;
+  font-size: 15px;
+  transition: transform 0.1s, opacity 0.15s, background 0.2s;
+}
+
+.connect-btn:hover {
+  transform: translateY(-2px);
+  opacity: 0.95;
+}
+
+/* Chess.com brand connection — sage is reserved for this only */
+.chesscom-btn {
+  background: var(--color-sage);
+  color: var(--color-ink);
+}
+
+.chesscom-btn:hover {
+  background: var(--color-sage-hover);
+}
+
+/* Lichess brand connection — cream stamp, distinct from chess.com sage */
+.lichess-btn {
+  background: var(--color-text-primary);  /* #f0e6d3 cream */
+  color: var(--color-ink);                /* #1b1726 dark ink */
+}
+
+.lichess-btn:hover {
+  background: #fff8ef;  
+}
+
+/* Modals */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.modal {
+  background: var(--color-surface-2);
+  padding: 20px;
+  border-radius: 10px;
+  width: 320px;
+  border: 1px solid rgba(var(--color-cream-rgb), 0.1);
+}
+
+.modal-input {
+  width: 100%;
+  padding: 8px;
+  margin-top: 10px;
+  border-radius: 6px;
+  border: 1px solid rgba(var(--color-cream-rgb), 0.2);
+  background: rgba(var(--color-cream-rgb), 0.05);
+  color: var(--color-text-primary);
+}
+
+.modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 16px;
+}
+
+.modal-save {
+  background: var(--color-sage);
+  border: none;
+  padding: 8px 14px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 600;
+  color: var(--color-ink);
+}
+
+.modal-cancel {
+  background: var(--color-surface-3);
+  border: none;
+  padding: 8px 14px;
+  border-radius: 6px;
+  cursor: pointer;
+  color: var(--color-text-secondary);
+}
+
+.modal-success {
+  margin-top: 10px;
+  color: var(--color-sage);
+  font-weight: 600;
+}
+
+.modal-error {
+  margin-top: 10px;
+  color: var(--color-coral);
+  font-weight: 600;
+}
+
+
+
+
+.fen-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 8px;
+}
+
+.fen-label {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--color-text-faint);
+  flex-shrink: 0;
+  font-family: 'Segoe UI', sans-serif; /* matches the rest of the UI */
+}
+
+.fen-bar {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--color-surface-2);
+  border: 1px solid var(--color-border);
+  border-radius: 6px;
+  padding: 6px 10px;
+  transition: border-color 0.15s;
+}
+
+.fen-bar:focus-within {
+  border-color: rgba(var(--color-amber-rgb), 0.5);
+}
+
+.fen-input {
+  flex: 1;
+  background: none;
+  border: none;
+  outline: none;
+  font-family: 'Segoe UI', sans-serif;
+  font-size: 11px;
+  color: var(--color-text-secondary);
+  min-width: 0;
+}
+
+.fen-copy-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--color-text-faint);
+  padding: 2px 4px;
+  flex-shrink: 0;
+  transition: color 0.15s;
+}
+
+.fen-copy-btn:hover {
+  color: var(--color-amber);
 }
