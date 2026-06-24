@@ -1,12 +1,16 @@
 /*src/pages/TrainingToolkit*/
 
-import React, { useState } from 'react';
-import App from '../App';
+
+import { useState } from 'react';
 import Settings from './Settings';
+import { HomeButton } from '../components/buttons/homeButton';
+import { SettingsButton } from '../components/buttons/settingsButton';
+import { BoardButton } from '../components/buttons/boardButton';
+import { ToolsButton } from '../components/buttons/toolsButton';
+import { AnalyticsButton } from '../components/buttons/analyticsButton';
+import { RepertoiresButton } from '../components/buttons/repertoiresButton';
+import type { Page } from '../types/Page';
 
-// returns raw html for training tools page
-
-type Page = 'home' | 'analytics' | 'tools' | 'settings' | 'repertoires' | 'board';
 
 const TrainingToolkit = ({ onBack }: { onBack: () => void }) => {
     const [page, setPage] = useState<Page>('home');
@@ -20,32 +24,14 @@ const TrainingToolkit = ({ onBack }: { onBack: () => void }) => {
         <span>CTT</span>
       </div>
       <nav className="sidebar-nav">
-        <button onClick={() => setPage('repertoires')}>
-          <i className="fa-solid fa-book-open"></i>
-          <span>Repertoires</span>
-        </button>
-        <button onClick={() => setPage('analytics')}>
-          <i className="fa-solid fa-chart-line"></i>
-          <span>Analytics</span>
-        </button>
-        <button onClick={() => setPage('tools')}>
-          <i className="fa-solid fa-dumbbell"></i>
-          <span>Training</span>
-        </button>
-        <button onClick={() => setPage('board')}>
-          <i className="fa-solid fa-chess-board"></i>
-          <span>Board</span>
-        </button>
+        <RepertoiresButton onClick={() => setPage('repertoires')}/>
+        <AnalyticsButton onClick={() => setPage('analytics')}/>
+        <ToolsButton onClick={() => setPage('tools')}/>
+        <BoardButton onClick={() => setPage('board')}/>
       </nav>
       <div className="sidebar-bottom">
-         <button onClick={onBack}>
-            <i className="fa-solid fa-house"></i>
-            <span>Home</span>
-          </button>
-        <button onClick={() => setPage('settings')}>
-          <i className="fa-solid fa-gear"></i>
-          <span>Settings</span>
-        </button>
+         <HomeButton onBack={() => setPage('home')}/>
+         <SettingsButton onClick={() => setPage('settings')}/>
       </div>
     </aside>
     <main className="main-content">

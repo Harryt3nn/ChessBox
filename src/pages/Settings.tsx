@@ -1,6 +1,9 @@
 /*src/pages/Settings.tsx*/
 
-import React, { useState } from 'react';
+
+import { useState } from 'react';
+
+
 
 const Settings = ({ onBack }: { onBack: () => void }) => {
   const [showChessConnect, setShowChessConnect] = useState(false);

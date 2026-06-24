@@ -1,4 +1,4 @@
-/*src/pages/EditRepertiores.tsx*/
+/*src/pages/EditRepertoires.tsx*/
 
 import React, { useState, useEffect, useRef } from 'react';
 import Analytics from './Analytics';

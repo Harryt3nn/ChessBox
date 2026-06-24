@@ -4,33 +4,21 @@ import React, { useState, useCallback, useEffect, useRef, useMemo } from 'react'
 import Settings from './Settings';
 import { Chessboard } from 'react-chessboard';
 import { Chess, Square } from 'chess.js';
+import { HomeButton } from '../components/buttons/homeButton';
+import { SettingsButton } from '../components/buttons/settingsButton';
+import { BoardButton } from '../components/buttons/boardButton';
+import { ToolsButton } from '../components/buttons/toolsButton';
+import { AnalyticsButton } from '../components/buttons/analyticsButton';
+import { RepertoiresButton } from '../components/buttons/repertoiresButton';
+import type { Page } from '../types/Page';
+import type { MoveNode } from '../types/moveNode';
+import type { GameTree } from '../types/gameTree';
 
-type Page = 'home' | 'settings';
-
-// ---------------------------------------------------------------------------
-// GAME TREE TYPES
-// ---------------------------------------------------------------------------
-// The game is stored as a tree of MoveNodes rather than a flat list, allowing
-// for variations. The root is a virtual "before any moves" node — its FEN is
-// the starting position and its move is an empty string. currentPath is the
-// list of node IDs from root down to whatever position is currently displayed.
-// An empty path means we're at the root.
-
-type MoveNode = {
-  id: string;
-  move: string;         // SAN, e.g. "Nf3"
-  fen: string;           // board position AFTER this move
-  children: MoveNode[];  // possible continuations from this position
-};
-
-type GameTree = {
-  root: MoveNode;
-  currentPath: string[];
-};
 
 // ---------------------------------------------------------------------------
 // TREE HELPERS
 // ---------------------------------------------------------------------------
+
 
 // id generator
 let nodeCounter = 0;
@@ -95,6 +83,7 @@ const insertChild = (root: MoveNode, parentId: string, child: MoveNode): MoveNod
   };
 };
 
+
 // ---------------------------------------------------------------------------
 // PGN HELPERS
 // ---------------------------------------------------------------------------
@@ -105,6 +94,8 @@ const insertChild = (root: MoveNode, parentId: string, child: MoveNode): MoveNod
 // Recursively walks the tree, emitting SAN with variations in parentheses.
 // `isWhite` tracks whose move it is; `needsMoveNum` forces a "12..." prefix
 // when resuming the main line right after a variation closes.
+
+
 const generateMoves = (
   node: MoveNode,
   moveNum: number,
@@ -495,14 +486,8 @@ const BoardView = ({ onBack }: { onBack: () => void }) => {
         </div>
         <nav className="sidebar-nav"></nav>
         <div className="sidebar-bottom">
-          <button className="nav-btn" onClick={onBack}>
-            <i className="fa-solid fa-house"></i>
-            <span>Home</span>
-          </button>
-          <button className="nav-btn" onClick={() => setPage('settings')}>
-            <i className="fa-solid fa-gear"></i>
-            <span>Settings</span>
-          </button>
+          <HomeButton onBack={() => setPage('home')}/>
+         <SettingsButton onClick={() => setPage('settings')}/>
         </div>
       </aside>
 
