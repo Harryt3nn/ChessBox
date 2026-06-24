@@ -1,13 +1,12 @@
 /*src/pages/Analytics.tsx*/
 
-import React, { useState } from 'react';
-import App from '../App';
+
+import { useState } from 'react';
 import Settings from './Settings';
 import TrainingToolkit from './TrainingToolkit';
+import { HomeButton } from '../components/homeButton';
+import type {Page} from '../types/Page.ts'
 
-// returns raw html for analytics page
-
-type Page = 'home' | 'analytics' | 'tools' | 'settings' | 'repertoires';
 
 const Analytics = ({ onBack }: { onBack: () => void }) => {
     const [page, setPage] = useState<Page>('home');
@@ -15,23 +14,18 @@ const Analytics = ({ onBack }: { onBack: () => void }) => {
     if (page === 'tools') return <TrainingToolkit onBack={() => setPage('home')} />;
     if (page === 'settings') return <Settings onBack={() => setPage('home')} />;
 
+
     return (
         <div className="app-layout">
-    <aside className="sidebar">
-      <div className="sidebar-logo">
-        <i className="fa-solid fa-chess-queen"></i>
-        <span>CTT</span>
-      </div>
-      <nav className="sidebar-nav">
-      
-      </nav>
-      <div className="sidebar-bottom">
-         <button onClick={onBack}>
-            <i className="fa-solid fa-house"></i>
-            <span>Home</span>
-          </button>
-        <button onClick={() => setPage('settings')}>
-          <i className="fa-solid fa-gear"></i>
+          <aside className="sidebar">
+            <div className="sidebar-logo">
+              <i className="fa-solid fa-chess-queen"></i>
+              <span>CTT</span></div>
+            <nav className="sidebar-nav"></nav>
+            <div className="sidebar-bottom">
+              <HomeButton onBack={onBack}/>
+              <button onClick={() => setPage('settings')}>
+            <i className="fa-solid fa-gear"></i>
           <span>Settings</span>
         </button>
       </div>

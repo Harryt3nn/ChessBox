@@ -32,7 +32,6 @@
 
 17. different coloured folders
 
+18. R6R/3Q4/1Q4Q1/4Q3/2Q4Q/Q4Q2/pp1Q4/kBNN1KB1 w - - 0 1 is a fen of the most available moves. Need a system that can handle an unlimitied number of moves like this without breaking
 
-
-Chess.com internship:
-
+19. left click on the board removes all highlighted sections

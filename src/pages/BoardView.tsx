@@ -1,45 +1,44 @@
-/*src/pages/BoardView.tsx*/
+/* src/pages/BoardView.tsx */
 
-import React, { useState, useCallback, useEffect, useRef } from 'react';
+import React, { useState, useCallback, useEffect, useRef, useMemo } from 'react';
 import Settings from './Settings';
 import { Chessboard } from 'react-chessboard';
 import { Chess, Square } from 'chess.js';
 
 type Page = 'home' | 'settings';
 
-// The game is stored as a tree of MoveNodes rather than a flat list, allowing for variations
+// ---------------------------------------------------------------------------
+// GAME TREE TYPES
+// ---------------------------------------------------------------------------
+// The game is stored as a tree of MoveNodes rather than a flat list, allowing
+// for variations. The root is a virtual "before any moves" node — its FEN is
+// the starting position and its move is an empty string. currentPath is the
+// list of node IDs from root down to whatever position is currently displayed.
+// An empty path means we're at the root.
 
 type MoveNode = {
-  id: string;           
-  move: string;   // SAN     
-  fen: string;          
-  children: MoveNode[]; 
+  id: string;
+  move: string;         // SAN, e.g. "Nf3"
+  fen: string;           // board position AFTER this move
+  children: MoveNode[];  // possible continuations from this position
 };
 
 type GameTree = {
-  root: MoveNode; 
+  root: MoveNode;
   currentPath: string[];
-  // The root is a virtual "before any moves" node
-  // Its FEN is the starting position and its move is empty string.
-  // The path from root to the currently displayed position.
-  // Empty array == root
 };
 
-
-
-
-
-
+// ---------------------------------------------------------------------------
+// TREE HELPERS
+// ---------------------------------------------------------------------------
 
 // id generator
 let nodeCounter = 0;
 const newNodeId = () => `node-${++nodeCounter}`;
 
-
 // generate new game tree, with just a root node
 const createInitialTree = (): GameTree => ({
-  root: 
-  {
+  root: {
     id: 'root',
     move: '',
     fen: new Chess().fen(),
@@ -47,7 +46,6 @@ const createInitialTree = (): GameTree => ({
   },
   currentPath: [],
 });
-
 
 // Walks the tree following the given path and returns the node at the end.
 // Returns root if path is empty.
@@ -61,10 +59,8 @@ const getNodeAtPath = (root: MoveNode, path: string[]): MoveNode => {
   return node;
 };
 
-
 // Returns the FEN at the end of the current path (the position to display)
 const getCurrentFen = (tree: GameTree): string => getNodeAtPath(tree.root, tree.currentPath).fen;
-
 
 // Returns the flat move list along the current path, paired with their node IDs.
 // Used to render the move history panel.
@@ -99,10 +95,79 @@ const insertChild = (root: MoveNode, parentId: string, child: MoveNode): MoveNod
   };
 };
 
+// ---------------------------------------------------------------------------
+// PGN HELPERS
+// ---------------------------------------------------------------------------
+// Unlike getPathMoves (which only follows the single line you're currently
+// viewing), generateMoves walks the WHOLE tree, since a proper PGN needs to
+// include every variation, not just the active line.
 
+// Recursively walks the tree, emitting SAN with variations in parentheses.
+// `isWhite` tracks whose move it is; `needsMoveNum` forces a "12..." prefix
+// when resuming the main line right after a variation closes.
+const generateMoves = (
+  node: MoveNode,
+  moveNum: number,
+  isWhite: boolean,
+  needsMoveNum: boolean = false
+): string => {
+  if (node.children.length === 0) return '';
 
+  const main = node.children[0];
+  const variations = node.children.slice(1);
 
+  let result = '';
 
+  if (isWhite) {
+    result += `${moveNum}. `;
+  } else if (needsMoveNum) {
+    result += `${moveNum}... `;
+  }
+
+  result += main.move + ' ';
+
+  for (const v of variations) {
+    const prefix = isWhite ? `${moveNum}.` : `${moveNum}...`;
+    result += `( ${prefix} ${v.move} `;
+    result += generateMoves(v, isWhite ? moveNum : moveNum + 1, !isWhite, false);
+    result += ') ';
+  }
+
+  result += generateMoves(
+    main,
+    isWhite ? moveNum : moveNum + 1,
+    !isWhite,
+    variations.length > 0
+  );
+
+  return result;
+};
+
+// Builds a full PGN string (headers + movetext) for the given tree.
+const buildPgn = (tree: GameTree): string => {
+  const parts = tree.root.fen.split(' ');
+  const startMoveNum = parseInt(parts[5], 10) || 1;
+  const startIsWhite = parts[1] === 'w';
+  const isStartPos = tree.root.fen === new Chess().fen();
+
+  const headers = [
+    '[Event "?"]',
+    '[Site "?"]',
+    '[Date "????.??.??"]',
+    '[Round "?"]',
+    '[White "?"]',
+    '[Black "?"]',
+    '[Result "*"]',
+    ...(!isStartPos ? [`[FEN "${tree.root.fen}"]`, '[SetUp "1"]'] : []),
+  ].join('\n');
+
+  const moves = generateMoves(tree.root, startMoveNum, startIsWhite);
+  return `${headers}\n\n${moves}*`;
+};
+
+// ---------------------------------------------------------------------------
+// COMPONENT
+// ---------------------------------------------------------------------------
 
 const BoardView = ({ onBack }: { onBack: () => void }) => {
   const [page, setPage] = useState<Page>('home');
@@ -113,33 +178,39 @@ const BoardView = ({ onBack }: { onBack: () => void }) => {
   // Square highlight state for legal move dots and selected piece
   const [highlightedSquares, setHighlightedSquares] = useState<Record<string, string>>({});
   const [selectedSquare, setSelectedSquare] = useState<string | null>(null);
+
+  // Right-click highlight state (separate from legal-move highlights so the
+  // two never clobber each other when merged into customSquareStyles)
   const [rightClickHighlights, setRightClickHighlights] = useState<Record<string, string>>({});
-  const [historyMode, setHistoryMode] = useState<'moves' | 'pgn'>('moves');
 
-
-  const onSquareRightClick = (square: Square) => {
-  const sq = square as string;
-  setRightClickHighlights(prev => {
-    // Toggle — right-clicking an already-highlighted square clears it
-    if (prev[sq]) {
-      const next = { ...prev };
-      delete next[sq];
-      return next;
-    }
-    return { ...prev, [sq]: `rgba(var(--color-coral-rgb), 0.5)` };
-  });
-};
-
+  // Which panel view is active: move list, FEN editor, or PGN viewer
+  const [viewMode, setViewMode] = useState<'san' | 'fen' | 'pgn'>('san');
 
   // Ref for the move history container so we can auto-scroll to the active move
   const moveListRef = useRef<HTMLDivElement>(null);
 
   if (page === 'settings') return <Settings onBack={onBack} />;
 
-  
+  // -------------------------------------------------------------------------
+  // RIGHT-CLICK SQUARE HIGHLIGHTING
+  // -------------------------------------------------------------------------
 
+  const onSquareRightClick = (square: Square) => {
+    const sq = square as string;
+    setRightClickHighlights(prev => {
+      // Toggle — right-clicking an already-highlighted square clears it
+      if (prev[sq]) {
+        const next = { ...prev };
+        delete next[sq];
+        return next;
+      }
+      return { ...prev, [sq]: `rgba(var(--color-coral-rgb), 0.5)` };
+    });
+  };
 
-
+  // -------------------------------------------------------------------------
+  // NAVIGATION
+  // -------------------------------------------------------------------------
 
   // Jump to any node by providing the full path to it
   const goToPath = useCallback((newPath: string[]) => {
@@ -189,6 +260,9 @@ const BoardView = ({ onBack }: { onBack: () => void }) => {
     setSelectedSquare(null);
   }, []);
 
+  // -------------------------------------------------------------------------
+  // ARROW KEY NAVIGATION
+  // -------------------------------------------------------------------------
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -215,19 +289,18 @@ const BoardView = ({ onBack }: { onBack: () => void }) => {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [goBack, goForward, goToStart, goToEnd]);
 
+  // -------------------------------------------------------------------------
+  // AUTO-SCROLL move list to keep the active move visible
+  // -------------------------------------------------------------------------
 
   useEffect(() => {
     const activeEl = moveListRef.current?.querySelector('.move-active');
     activeEl?.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
   }, [tree.currentPath]);
 
-  
-
-
-
-
-
-
+  // -------------------------------------------------------------------------
+  // MAKING MOVES
+  // -------------------------------------------------------------------------
 
   const makeMove = useCallback(
     (from: Square, to: Square): boolean => {
@@ -313,12 +386,9 @@ const BoardView = ({ onBack }: { onBack: () => void }) => {
     setSelectedSquare(sq);
   };
 
-  
-
-
-
-
-
+  // -------------------------------------------------------------------------
+  // SAVE / LOAD / RESET
+  // -------------------------------------------------------------------------
 
   // Export the full game tree as a JSON file.
   // The chess graph page can import this same JSON and render the tree as a graph.
@@ -358,34 +428,45 @@ const BoardView = ({ onBack }: { onBack: () => void }) => {
     setSelectedSquare(null);
   };
 
-  
+  // -------------------------------------------------------------------------
+  // RENDER HELPERS
+  // -------------------------------------------------------------------------
 
-
-
-
-
+  // Merge legal-move dots and right-click highlights into one style map
   const customSquareStyles = Object.fromEntries([
-  ...Object.entries(highlightedSquares).map(([sq, cssVar]) => [sq, { background: cssVar }]),
-  ...Object.entries(rightClickHighlights).map(([sq, color]) => [sq, { background: color }]),
-]);
+    ...Object.entries(highlightedSquares).map(([sq, cssVar]) => [sq, { background: cssVar }]),
+    ...Object.entries(rightClickHighlights).map(([sq, color]) => [sq, { background: color }]),
+  ]);
 
-  // Get the flat move list for the current path, for rendering in the panel
+  // Get the flat move list for the current path, for rendering in the SAN panel
   const pathMoves = getPathMoves(tree.root, tree.currentPath);
+
+  // Full PGN (headers + movetext, ALL variations included) for the PGN panel.
+  // Memoised so it only rebuilds when the tree itself changes — not on every
+  // render (e.g. clicking around to highlight squares doesn't touch `tree`).
+  const pgnText = useMemo(() => buildPgn(tree), [tree]);
 
   // The ID of the node currently at the END of the path (the active move)
   const activeNodeId = tree.currentPath[tree.currentPath.length - 1] ?? null;
 
-  // Group moves into pairs for "1. e4 e5" row layout
+  // Group moves into pairs for "1. e4 e5" row layout.
+  // startMoveNumber comes from the loaded FEN's fullmove field, so a position
+  // loaded mid-game (e.g. move 23) continues numbering from there instead of
+  // restarting at move 1.
   const startMoveNumber = parseInt(tree.root.fen.split(' ')[5], 10) || 1;
 
-const movePairs = [];
-for (let i = 0; i < pathMoves.length; i += 2) {
-  movePairs.push({
-    num: startMoveNumber + Math.floor(i / 2),
-    white: pathMoves[i],
-    black: pathMoves[i + 1],
-  });
-}
+  const movePairs: Array<{
+    num: number;
+    white: { id: string; move: string };
+    black?: { id: string; move: string };
+  }> = [];
+  for (let i = 0; i < pathMoves.length; i += 2) {
+    movePairs.push({
+      num: startMoveNumber + Math.floor(i / 2),
+      white: pathMoves[i],
+      black: pathMoves[i + 1],
+    });
+  }
 
   // Variations: siblings of the currently active node (other moves available at this depth)
   const getCurrentNodeVariations = (): MoveNode[] => {
@@ -400,12 +481,13 @@ for (let i = 0; i < pathMoves.length; i += 2) {
   const canGoBack = tree.currentPath.length > 0;
   const canGoForward = getNodeAtPath(tree.root, tree.currentPath).children.length > 0;
 
+  // -------------------------------------------------------------------------
+  // JSX
+  // -------------------------------------------------------------------------
 
-
-
-  
   return (
     <div className="app-layout">
+      {/* ----------------------------- SIDEBAR ----------------------------- */}
       <aside className="sidebar">
         <div className="sidebar-logo">
           <i className="fa-solid fa-chess-queen"></i>
@@ -425,38 +507,8 @@ for (let i = 0; i < pathMoves.length; i += 2) {
       </aside>
 
       <main className="board-view-main">
-       
-
-       <div className="board-container">
-  <div className="fen-row">
-    <span className="fen-label">FEN</span>
-    <div className="fen-bar">
-      <input
-        className="fen-input"
-        value={getCurrentFen(tree)}
-        onChange={e => {
-          try {
-            const chess = new Chess(e.target.value);
-            setTree({
-              root: { id: 'root', move: '', fen: chess.fen(), children: [] },
-              currentPath: [],
-            });
-            setHighlightedSquares({});
-            setSelectedSquare(null);
-          } catch {}
-        }}
-        spellCheck={false}
-      />
-      <button
-        className="fen-copy-btn"
-        title="Copy FEN"
-        onClick={() => navigator.clipboard.writeText(getCurrentFen(tree))}
-      >
-        <i className="fa-regular fa-copy" />
-      </button>
-    </div>
-  </div>
-
+        {/* ----------------------------- BOARD ----------------------------- */}
+        <div className="board-container">
           <Chessboard
             onSquareRightClick={onSquareRightClick}
             position={getCurrentFen(tree)}
@@ -466,106 +518,182 @@ for (let i = 0; i < pathMoves.length; i += 2) {
             boardWidth={560}
           />
         </div>
+
+        {/* ----------------------------- PANEL ----------------------------- */}
         <div className="board-panel">
-          <button>SAN</button>
-          <button>FEN</button>
-          <button>PGN</button>
-          {/* Move list — one pair per row: "1. e4 e5" */}
-          <div className="move-history" ref={moveListRef}>
-            {movePairs.length === 0 ? (
-              <span className="move-history-empty">No moves yet</span>
-            ) : (
-              movePairs.map(({ num, white, black }) => (
-                <div key={num} className="move-row">
-                  {/* Move number column */}
-                  <span className="move-number">{num}.</span>
-
-                  {/* White's move — click to jump to this position */}
-                  <span
-                    className={`move-text ${white.id === activeNodeId ? 'move-active' : ''}`}
-                    onClick={() => {
-                      const idx = pathMoves.findIndex(m => m.id === white.id);
-                      goToPath(pathMoves.slice(0, idx + 1).map(m => m.id));
-                    }}
-                  >
-                    {white.move}
-                  </span>
-
-                  {/* Black's move — absent if this is the last move and it's white's */}
-                  {black && (
-                    <span
-                      className={`move-text ${black.id === activeNodeId ? 'move-active' : ''}`}
-                      onClick={() => {
-                        const idx = pathMoves.findIndex(m => m.id === black.id);
-                        goToPath(pathMoves.slice(0, idx + 1).map(m => m.id));
-                      }}
-                    >
-                      {black.move}
-                    </span>
-                  )}
-                </div>
-              ))
-            )}
+          {/* View toggle: SAN / FEN / PGN */}
+          <div className="toggle-wrapper">
+            <button
+              className={`san-toggle-btn ${viewMode === 'san' ? 'toggle-active' : ''}`}
+              onClick={() => setViewMode('san')}
+            >
+              SAN
+            </button>
+            <button
+              className={`fen-toggle-btn ${viewMode === 'fen' ? 'toggle-active' : ''}`}
+              onClick={() => setViewMode('fen')}
+            >
+              FEN
+            </button>
+            <button
+              className={`pgn-toggle-btn ${viewMode === 'pgn' ? 'toggle-active' : ''}`}
+              onClick={() => setViewMode('pgn')}
+            >
+              PGN
+            </button>
           </div>
 
-          {/* Variation switcher — only visible when multiple moves exist at this depth */}
-          {hasVariations && (
-            <div className="variation-list">
-              <span className="variation-label">Variations:</span>
-              {variations.map((v, i) => {
-                const parentPath = tree.currentPath.slice(0, -1);
-                const varPath = [...parentPath, v.id];
-                const isActive = v.id === tree.currentPath[tree.currentPath.length - 1];
-                return (
-                  <span
-                    key={v.id}
-                    className={`variation-item ${isActive ? 'variation-active' : ''}`}
-                    onClick={() => goToPath(varPath)}
-                  >
-                    {i === 0 ? 'Main' : `Var ${i}`}: {v.move}
-                  </span>
-                );
-              })}
-            </div>
+          {/* ---------------------- SAN VIEW ---------------------- */}
+          {viewMode === 'san' && (
+            <>
+              {/* Move list — one pair per row: "1. e4 e5" */}
+              <div className="move-history" ref={moveListRef}>
+                {movePairs.length === 0 ? (
+                  <span className="move-history-empty">No moves yet</span>
+                ) : (
+                  movePairs.map(({ num, white, black }) => (
+                    <div key={num} className="move-row">
+                      <span className="move-number">{num}.</span>
+
+                      <span
+                        className={`move-text ${white.id === activeNodeId ? 'move-active' : ''}`}
+                        onClick={() => {
+                          const idx = pathMoves.findIndex(m => m.id === white.id);
+                          goToPath(pathMoves.slice(0, idx + 1).map(m => m.id));
+                        }}
+                      >
+                        {white.move}
+                      </span>
+
+                      {black && (
+                        <span
+                          className={`move-text ${black.id === activeNodeId ? 'move-active' : ''}`}
+                          onClick={() => {
+                            const idx = pathMoves.findIndex(m => m.id === black.id);
+                            goToPath(pathMoves.slice(0, idx + 1).map(m => m.id));
+                          }}
+                        >
+                          {black.move}
+                        </span>
+                      )}
+                    </div>
+                  ))
+                )}
+              </div>
+
+              {/* Variation switcher — only visible when multiple moves exist at this depth */}
+              {hasVariations && (
+                <div className="variation-list">
+                  <span className="variation-label">Variations:</span>
+                  {variations.map((v, i) => {
+                    const parentPath = tree.currentPath.slice(0, -1);
+                    const varPath = [...parentPath, v.id];
+                    const isActive = v.id === tree.currentPath[tree.currentPath.length - 1];
+                    return (
+                      <span
+                        key={v.id}
+                        className={`variation-item ${isActive ? 'variation-active' : ''}`}
+                        onClick={() => goToPath(varPath)}
+                      >
+                        {i === 0 ? 'Main' : `Var ${i}`}: {v.move}
+                      </span>
+                    );
+                  })}
+                </div>
+              )}
+
+              {/* Navigation buttons — arrow keys also work (←→↑↓) */}
+              <div className="move-nav">
+                <button className="nav-arrow" onClick={goToStart} disabled={!canGoBack} title="Start (↑)">
+                  <i className="fa-solid fa-backward-fast"></i>
+                </button>
+                <button className="nav-arrow" onClick={goBack} disabled={!canGoBack} title="Back (←)">
+                  <i className="fa-solid fa-backward-step"></i>
+                </button>
+                <button className="nav-arrow" onClick={goForward} disabled={!canGoForward} title="Forward (→)">
+                  <i className="fa-solid fa-forward-step"></i>
+                </button>
+                <button className="nav-arrow" onClick={goToEnd} disabled={!canGoForward} title="End (↓)">
+                  <i className="fa-solid fa-forward-fast"></i>
+                </button>
+              </div>
+
+              {/* Save / Load / Reset */}
+              <div className="board-panel-actions">
+                <button className="btn-secondary" onClick={saveGame}>
+                  <i className="fa-solid fa-floppy-disk"></i> Save
+                </button>
+
+                {/* File input is hidden; the label acts as the visible button */}
+                <label className="btn-secondary" style={{ cursor: 'pointer' }}>
+                  <i className="fa-solid fa-folder-open"></i> Load
+                  <input type="file" accept=".json" style={{ display: 'none' }} onChange={loadGame} />
+                </label>
+
+                <button className="btn-reset" onClick={resetBoard}>
+                  <i className="fa-solid fa-rotate-left"></i> Reset
+                </button>
+              </div>
+            </>
           )}
 
-          {/* Navigation buttons — arrow keys also work (←→↑↓) */}
-          <div className="move-nav">
-            <button className="nav-arrow" onClick={goToStart} disabled={!canGoBack} title="Start (↑)">
-              <i className="fa-solid fa-backward-fast"></i>
-            </button>
-            <button className="nav-arrow" onClick={goBack} disabled={!canGoBack} title="Back (←)">
-              <i className="fa-solid fa-backward-step"></i>
-            </button>
-            <button className="nav-arrow" onClick={goForward} disabled={!canGoForward} title="Forward (→)">
-              <i className="fa-solid fa-forward-step"></i>
-            </button>
-            <button className="nav-arrow" onClick={goToEnd} disabled={!canGoForward} title="End (↓)">
-              <i className="fa-solid fa-forward-fast"></i>
-            </button>
-          </div>
+          {/* ---------------------- FEN VIEW ---------------------- */}
+          {viewMode === 'fen' && (
+            <>
+              <div className="fen-display">
+                <textarea
+                  className="fen-display-input"
+                  value={getCurrentFen(tree)}
+                  onChange={e => {
+                    try {
+                      const chess = new Chess(e.target.value);
+                      setTree({
+                        root: { id: 'root', move: '', fen: chess.fen(), children: [] },
+                        currentPath: [],
+                      });
+                      setHighlightedSquares({});
+                      setSelectedSquare(null);
+                    } catch {
+                      // Invalid or incomplete FEN mid-type — silently ignore
+                    }
+                  }}
+                  spellCheck={false}
+                />
+              </div>
 
-          {/* Save / Load / Reset */}
-          <div className="board-panel-actions">
-            <button className="btn-secondary" onClick={saveGame}>
-              <i className="fa-solid fa-floppy-disk"></i> Save
-            </button>
+              <div className="board-panel-actions">
+                <button
+                  className="btn-secondary panel-copy-btn"
+                  onClick={() => navigator.clipboard.writeText(getCurrentFen(tree))}
+                >
+                  <i className="fa-regular fa-copy"></i> Copy FEN
+                </button>
+              </div>
+            </>
+          )}
 
-            {/* File input is hidden; the label acts as the visible button */}
-            <label className="btn-secondary" style={{ cursor: 'pointer' }}>
-              <i className="fa-solid fa-folder-open"></i> Load
-              <input
-                type="file"
-                accept=".json"
-                style={{ display: 'none' }}
-                onChange={loadGame}
-              />
-            </label>
+          {/* ---------------------- PGN VIEW ---------------------- */}
+          {viewMode === 'pgn' && (
+            <>
+              <div className="pgn-display">
+                <textarea
+                  className="pgn-display-text"
+                  value={pgnText}
+                  readOnly
+                  spellCheck={false}
+                />
+              </div>
 
-            <button className="btn-reset" onClick={resetBoard}>
-              <i className="fa-solid fa-rotate-left"></i> Reset
-            </button>
-          </div>
+              <div className="board-panel-actions">
+                <button
+                  className="btn-secondary panel-copy-btn"
+                  onClick={() => navigator.clipboard.writeText(pgnText)}
+                >
+                  <i className="fa-regular fa-copy"></i> Copy PGN
+                </button>
+              </div>
+            </>
+          )}
         </div>
       </main>
     </div>

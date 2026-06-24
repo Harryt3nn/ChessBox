@@ -1,5 +1,3 @@
 /*src/types/Page.ts*/
 
-export interface Page{
-    
-}
+export type Page = 'home' | 'analytics' | 'tools' | 'settings' | 'repertoires' | 'board';
