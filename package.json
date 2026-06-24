@@ -1,6 +1,6 @@
 {
-  "name": "ctt",
-  "productName": "ctt",
+  "name": "ChessBox",
+  "productName": "ChessBox",
   "version": "1.0.0",
   "description": "Chess Training",
   "main": ".webpack/main",

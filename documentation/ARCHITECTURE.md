@@ -6,6 +6,24 @@ CTT is a desktop app built with **Electron + React + TypeScript** using Electron
 with the webpack-typescript template. It is fully offline with no backend — all data is
 stored locally on disk.
 
+
+Tech Stack
+{
+  "Electron"
+  "React"
+  "TypeScript"
+  "Fastify"
+  "tRPC"
+  "PostgreSQL"
+  "Prisma ORM"
+  "argon2"
+  "SendGrid"
+  "JWT"
+  "Redis"
+  "AWS"
+  "Docker"
+}
+
 ---
 
 ## Process Model

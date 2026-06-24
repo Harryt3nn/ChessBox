@@ -7,12 +7,14 @@ import Analytics from './pages/Analytics';
 import Settings from './pages/Settings';
 import TrainingToolkit from './pages/TrainingToolkit';
 import BoardView from './pages/BoardView';
+import NoveltyFinder from './pages/NoveltyFinder';
 import { HomeButton } from './components/buttons/homeButton';
 import { SettingsButton } from './components/buttons/settingsButton';
 import { BoardButton } from './components/buttons/boardButton';
 import { ToolsButton } from './components/buttons/toolsButton';
 import { AnalyticsButton } from './components/buttons/analyticsButton';
 import { RepertoiresButton } from './components/buttons/repertoiresButton';
+import { NoveltyFinderButton } from './components/buttons/noveltyFinderButton';
 import type { Page } from './types/Page';
 
 
@@ -24,6 +26,7 @@ const App = () => {
   if (page === 'tools') return <TrainingToolkit onBack={() => setPage('home')} />;
   if (page === 'settings') return <Settings onBack={() => setPage('home')} />;
   if (page === 'board') return <BoardView onBack={() => setPage('home')} />;
+  if (page === 'novelty') return <NoveltyFinder onBack={() => setPage('home')} />;
 
   return (
     <div className="app-layout">
@@ -37,6 +40,7 @@ const App = () => {
           <AnalyticsButton onClick={() => setPage('analytics')}/>
           <ToolsButton onClick = {() => setPage('tools')}/>
           <BoardButton onClick={() => setPage('board')}/>
+          <NoveltyFinderButton onClick={() => setPage('novelty')}/>
         </nav>
         <div className="sidebar-bottom">
           <HomeButton onBack={() => setPage('home')} />
