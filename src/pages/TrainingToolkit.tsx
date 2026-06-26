@@ -11,7 +11,6 @@ import { AnalyticsButton } from '../components/buttons/analyticsButton';
 import { RepertoiresButton } from '../components/buttons/repertoiresButton';
 import type { Page } from '../types/Page';
 
-
 const TrainingToolkit = ({ onBack }: { onBack: () => void }) => {
     const [page, setPage] = useState<Page>('home');
     if (page === 'settings') return <Settings onBack={() => setPage('home')} />;

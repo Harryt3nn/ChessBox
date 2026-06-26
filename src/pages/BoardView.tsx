@@ -171,7 +171,7 @@ const BoardView = ({ onBack }: { onBack: () => void }) => {
   const [rightClickHighlights, setRightClickHighlights] = useState<Record<string, string>>({});
 
   // Which panel view is active: move list, FEN editor, or PGN viewer
-  const [viewMode, setViewMode] = useState<'san' | 'fen' | 'pgn'>('san');
+  const [viewMode, setViewMode] = useState<'fen' | 'pgn'>('pgn');
 
   // Ref for the move history container so we can auto-scroll to the active move
   const moveListRef = useRef<HTMLDivElement>(null);
@@ -504,12 +504,7 @@ const BoardView = ({ onBack }: { onBack: () => void }) => {
         <div className="board-panel">
           {/* View toggle: SAN / FEN / PGN */}
           <div className="toggle-wrapper">
-            <button
-              className={`san-toggle-btn ${viewMode === 'san' ? 'toggle-active' : ''}`}
-              onClick={() => setViewMode('san')}
-            >
-              SAN
-            </button>
+      
             <button
               className={`fen-toggle-btn ${viewMode === 'fen' ? 'toggle-active' : ''}`}
               onClick={() => setViewMode('fen')}
@@ -524,10 +519,8 @@ const BoardView = ({ onBack }: { onBack: () => void }) => {
             </button>
           </div>
 
-          {/* ---------------------- SAN VIEW ---------------------- */}
-          {viewMode === 'san' && (
-            <>
-              {/* Move list — one pair per row: "1. e4 e5" */}
+          
+      {/* Move list — one pair per row: "1. e4 e5" */}
               <div className="move-history" ref={moveListRef}>
                 {movePairs.length === 0 ? (
                   <span className="move-history-empty">No moves yet</span>
@@ -560,12 +553,10 @@ const BoardView = ({ onBack }: { onBack: () => void }) => {
                     </div>
                   ))
                 )}
-              </div>
 
-              {/* Variation switcher — only visible when multiple moves exist at this depth */}
+                {/* Variation switcher — only visible when multiple moves exist at this depth */}
               {hasVariations && (
                 <div className="variation-list">
-                  <span className="variation-label">Variations:</span>
                   {variations.map((v, i) => {
                     const parentPath = tree.currentPath.slice(0, -1);
                     const varPath = [...parentPath, v.id];
@@ -582,6 +573,9 @@ const BoardView = ({ onBack }: { onBack: () => void }) => {
                   })}
                 </div>
               )}
+              </div>
+
+              
 
               {/* Navigation buttons — arrow keys also work (←→↑↓) */}
               <div className="move-nav">
@@ -615,8 +609,6 @@ const BoardView = ({ onBack }: { onBack: () => void }) => {
                   <i className="fa-solid fa-rotate-left"></i> Reset
                 </button>
               </div>
-            </>
-          )}
 
           {/* ---------------------- FEN VIEW ---------------------- */}
           {viewMode === 'fen' && (

@@ -1,10 +1,13 @@
+/* src/storage/MainStorage.ts*/
+
+
 import fs from "fs";
 import path from "path";
 import { app } from "electron";
-
 import type { Folder } from "../types/Folder";
 import type { Repertoire } from "../types/Repertoire";
 import type { Node } from "../types/Node";
+
 
 const DATA_DIR = path.join(app.getPath("userData"), "ctt-data");
 const FOLDERS_PATH = path.join(DATA_DIR, "folders.json");

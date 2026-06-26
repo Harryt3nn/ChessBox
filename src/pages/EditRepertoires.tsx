@@ -9,8 +9,8 @@ import { useMemo } from "react";
 import FolderSelection from "../components/FolderSelection";
 import { validateChessGraphExport } from "../importsAndExports/validateChessGraphExport";
 import { ImportModal } from "../components/ImportModal";
-import { RepList } from "../Storage/RepList";
 import { prepareForImport } from "../importsAndExports/prepareForImport"
+import type { Page } from '../types/Page';
 
 export interface Repertoire {
   id: string;
@@ -31,7 +31,6 @@ export interface Folder {
   updatedAt: number; 
 }
 
-type Page = 'home' | 'analytics' | 'tools' | 'settings';
 
 function timeAgo(timestamp: number): string {
   const diff = Date.now() - timestamp;

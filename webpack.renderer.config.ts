@@ -1,5 +1,7 @@
-import type { Configuration } from 'webpack';
+/*src/webpack.render.config.ts*/
 
+
+import type { Configuration } from 'webpack';
 import { rules } from './webpack.rules';
 import { plugins } from './webpack.plugins';
 

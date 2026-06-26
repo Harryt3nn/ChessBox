@@ -25,17 +25,10 @@ interface FolderSelectionProps {
 // folder names cannot be too long (for optimal display)
 const MAX_FOLDER_NAME = 32;
 
-const FolderSelection: React.FC<FolderSelectionProps> = ({
-  folder,
-  repertoires,
-  onToggle,
-  onRenameFolder,
-  onRenameRepertoire,
-  onSelectRepertoire,
-  onDeleteFolder
-}) => {
-  const [editingFolder, setEditingFolder] = useState(false);
-  const [folderName, setFolderName] = useState(folder.name);
+const FolderSelection: React.FC<FolderSelectionProps> = ({folder, repertoires, onToggle, onRenameFolder, 
+  onRenameRepertoire, onSelectRepertoire, onDeleteFolder
+}) => { const [editingFolder, setEditingFolder] = useState(false);
+  const [folderName, setFolderName] = useState(folder.name); 
   const folderInputRef = useRef<HTMLInputElement>(null);
 
   // name cannot be empty

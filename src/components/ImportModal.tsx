@@ -9,11 +9,8 @@ import { toast } from "react-toastify";
 // selected imports are added to the tree
 // returns raw html
 
-export function ImportModal({
-  data,
-  onClose,
-  reloadData
-}: {
+export function ImportModal({data, onClose, reloadData}: 
+  {
   data: PreparedImportData;
   onClose: () => void;
   reloadData: () => Promise<void>;

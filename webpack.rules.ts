@@ -1,3 +1,6 @@
+/*src/webpack.rules.ts*/
+
+
 import type { ModuleOptions } from 'webpack';
 
 export const rules: Required<ModuleOptions>['rules'] = [
