@@ -16,7 +16,7 @@ Tech Stack
   "tRPC"
   "PostgreSQL"
   "Prisma ORM"
-  "argon2"
+  "hash-wasm"
   "SendGrid"
   "JWT"
   "Redis"
