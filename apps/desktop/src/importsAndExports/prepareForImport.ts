@@ -1,4 +1,4 @@
-/*src/importsAndExports/prepareForImports*/
+/*apps/desktop/src/importsAndExports/prepareForImports*/
 
 import { Node } from "../types/Node";
 import type { Folder } from "../types/Folder";

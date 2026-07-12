@@ -1,4 +1,4 @@
-/* src/storage/RepList.tsx*/
+/*apps/desktop/src/storage/RepList.tsx*/
 
 
 import type { Folder } from "../types/Folder";

@@ -1,4 +1,4 @@
-/*src/components/ImportModal.tsx*/
+/*apps/desktop/src/components/ImportModal.tsx*/
 
 import React, { useState } from "react";
 import type { PreparedImportData } from "../importsAndExports/prepareForImport";

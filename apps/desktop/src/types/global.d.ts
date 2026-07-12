@@ -1,4 +1,4 @@
-/*src/types/global.d.ts*/
+/*apps/desktop/src/types/global.d.ts*/
 
 import type { Folder } from "./Folder";
 import type { Repertoire } from "./Repertoire";

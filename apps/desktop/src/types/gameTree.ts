@@ -1,4 +1,4 @@
-/*src/types/gameTree.ts*/
+/*apps/desktop/src/types/gameTree.ts*/
 
 
 import type { MoveNode } from '../types/moveNode';

@@ -1,4 +1,4 @@
-/*src/webpack.main.config.ts*/
+/*apps/desktop/webpack.main.config.ts*/
 
 
 import type { Configuration } from 'webpack';

@@ -1,4 +1,4 @@
-/* src/pages/BoardView.tsx */
+/*apps/desktop/src/pages/BoardView.tsx */
 
 import React, { useState, useCallback, useEffect, useRef, useMemo } from 'react';
 import Settings from './Settings';
@@ -96,7 +96,7 @@ const generateMoves = (
   node: MoveNode,
   moveNum: number,
   isWhite: boolean,
-  needsMoveNum: boolean = false
+  needsMoveNum = false
 ): string => {
   if (node.children.length === 0) return '';
 

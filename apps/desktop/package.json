@@ -1,5 +1,5 @@
 {
-  "name": "ChessBox",
+  "name": "chessbox-desktop",
   "productName": "ChessBox",
   "version": "1.0.0",
   "description": "Chess Training",
@@ -51,18 +51,13 @@
     "@mliebelt/pgn-parser": "^1.4.19",
     "animejs": "^4.4.1",
     "apify-client": "^2.23.3",
-    "argon2id": "^1.0.1",
-    "bad-words": "^4.0.0",
-    "badwords-list": "^2.0.1-4",
     "chess.js": "^1.4.0",
     "dagre": "^0.8.5",
     "electron-squirrel-startup": "^1.0.1",
-    "hash-wasm": "^4.12.0",
     "react-chessboard": "^4.0.0",
     "react-hot-toast": "^2.6.0",
     "react-toastify": "^11.1.0",
     "reactflow": "^11.11.4",
-    "stockfish": "^18.0.7",
-    "ts-node": "^10.9.2"
+    "stockfish": "^18.0.7"
   }
 }

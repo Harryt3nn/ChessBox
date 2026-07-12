@@ -1,4 +1,4 @@
-/*src/components/logIn.tsx*/
+/*apps/desktop/src/components/logIn.tsx*/
 
 
 import blacklist from "../../config/blacklist.json"

@@ -1,4 +1,4 @@
-/* src/pages/Analytics.tsx */
+/*apps/desktop/src/pages/Analytics.tsx */
 
 
 import { useState } from 'react';

@@ -1,4 +1,4 @@
-/*src/forge.config.ts*/
+/*apps/desktop/forge.config.ts*/
 
 
 import type { ForgeConfig } from '@electron-forge/shared-types';

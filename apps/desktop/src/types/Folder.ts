@@ -1,4 +1,4 @@
-/*src/types/Folder.ts*/
+/*apps/desktop/src/types/Folder.ts*/
 
 export interface Folder {
   id: string;

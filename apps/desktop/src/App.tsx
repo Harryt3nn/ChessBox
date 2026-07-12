@@ -1,4 +1,4 @@
-/*src/App.tsx*/
+/*apps/desktop/src/App.tsx*/
 
 
 import { useState } from 'react';

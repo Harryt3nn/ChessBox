@@ -1,4 +1,4 @@
-/*src/webpack.plugins.ts*/
+/*apps/desktop/webpack.plugins.ts*/
 
 
 import type IForkTsCheckerWebpackPlugin from 'fork-ts-checker-webpack-plugin';

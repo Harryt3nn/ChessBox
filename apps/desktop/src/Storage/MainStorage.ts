@@ -1,4 +1,4 @@
-/* src/storage/MainStorage.ts*/
+/*apps/desktop/src/storage/MainStorage.ts*/
 
 
 import fs from "fs";

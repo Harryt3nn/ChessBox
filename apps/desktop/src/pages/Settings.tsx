@@ -1,4 +1,4 @@
-/*src/pages/Settings.tsx*/
+/*apps/desktop/src/pages/Settings.tsx*/
 
 
 import { useState } from 'react';

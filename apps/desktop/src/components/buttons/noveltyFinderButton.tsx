@@ -1,4 +1,4 @@
-/* src/components/buttons/noveltyFinderButton.tsx */
+/*apps/desktop/src/components/buttons/noveltyFinderButton.tsx */
 
 
 interface NoveltyFinderButtonProps{

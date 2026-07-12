@@ -1,4 +1,4 @@
-/* src/components/buttons/homeButton.tsx */
+/*apps/desktop/src/components/buttons/homeButton.tsx */
 
 
 interface HomeButtonProps {

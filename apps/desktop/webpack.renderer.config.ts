@@ -1,4 +1,4 @@
-/*src/webpack.render.config.ts*/
+/*apps/desktop/webpack.render.config.ts*/
 
 
 import type { Configuration } from 'webpack';

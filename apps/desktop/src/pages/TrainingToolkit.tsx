@@ -1,4 +1,4 @@
-/*src/pages/TrainingToolkit*/
+/*apps/desktop/src/pages/TrainingToolkit*/
 
 
 import { useState } from 'react';

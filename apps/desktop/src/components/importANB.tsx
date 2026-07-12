@@ -1,4 +1,4 @@
-/*src/components/importANB.tsx*/
+/*apps/desktop/src/components/importANB.tsx*/
 
 import React, { useState } from "react";
 import type { PreparedImportData } from "../importsAndExports/prepareForImport";

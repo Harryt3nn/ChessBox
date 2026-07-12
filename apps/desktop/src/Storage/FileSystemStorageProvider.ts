@@ -1,4 +1,4 @@
-/* src/storage/FileSystemStorageProvider.ts*/
+/*apps/desktop/src/storage/FileSystemStorageProvider.ts*/
 
 
 import type { StorageProvider } from "./StorageProvider";

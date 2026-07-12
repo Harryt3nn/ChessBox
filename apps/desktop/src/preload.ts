@@ -1,4 +1,4 @@
-/*src/preload.ts*/
+/*apps/desktop/src/preload.ts*/
 
 
 import { contextBridge, ipcRenderer, } from "electron";

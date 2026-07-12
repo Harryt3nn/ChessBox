@@ -1,4 +1,4 @@
-/*src/pages/EditRepertoires.tsx*/
+/*apps/desktop/src/pages/EditRepertoires.tsx*/
 
 import React, { useState, useEffect, useRef } from 'react';
 import Analytics from './Analytics';
@@ -407,7 +407,7 @@ const reloadData = async () => {
 
       <nav className="sidebar-nav">
         {[
-          { label: 'Repertoires', icon: 'fa-book-open', active: true, onClick: () => {} },
+          { label: 'Repertoires', icon: 'fa-book-open', active: true, onClick: () => {setPage('repertoires')} },
           { label: 'Analytics', icon: 'fa-chart-line', active: false, onClick: () => setPage('analytics') },
           { label: 'Training', icon: 'fa-dumbbell', active: false, onClick: () => setPage('tools') },
         ].map(({ label, icon, active, onClick }) => (

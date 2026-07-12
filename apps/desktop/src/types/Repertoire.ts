@@ -1,4 +1,4 @@
-/*src/types/Repertoire.ts*/
+/*apps/desktop/src/types/Repertoire.ts*/
 
 export interface Repertoire {
   id: string;

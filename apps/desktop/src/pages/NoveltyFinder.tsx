@@ -1,4 +1,4 @@
-/* src/pages/NoveltyFinder.tsx */
+/*apps/desktop/src/pages/NoveltyFinder.tsx */
 
 
 import { useState } from 'react';

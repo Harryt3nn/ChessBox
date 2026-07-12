@@ -1,4 +1,4 @@
-/* src/storage/StorageProvider.ts*/
+/*apps/desktop/src/storage/StorageProvider.ts*/
 
 
 import type { Folder } from "../types/Folder";

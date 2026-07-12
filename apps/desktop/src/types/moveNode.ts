@@ -1,4 +1,4 @@
-/*src/types/moveNode.ts*/
+/*apps/desktop/src/types/moveNode.ts*/
 
 
 export type MoveNode = {

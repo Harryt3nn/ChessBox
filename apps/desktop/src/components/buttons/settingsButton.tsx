@@ -1,4 +1,4 @@
-/* src/components/buttons/settingsButton.tsx */
+/*apps/desktop/src/components/buttons/settingsButton.tsx */
 
 
 interface SettingsButtonProps {

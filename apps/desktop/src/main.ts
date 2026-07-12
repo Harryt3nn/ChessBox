@@ -1,4 +1,4 @@
-/*src/index.ts*/
+/*apps/desktop/src/index.ts*/
 
 import { app, BrowserWindow, ipcMain, dialog, IpcMainInvokeEvent, OpenDialogOptions } from "electron";
 import fs from "fs";

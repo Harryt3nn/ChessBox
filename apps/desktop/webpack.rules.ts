@@ -1,4 +1,4 @@
-/*src/webpack.rules.ts*/
+/*apps/desktop/webpack.rules.ts*/
 
 
 import type { ModuleOptions } from 'webpack';

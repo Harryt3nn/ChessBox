@@ -1,4 +1,4 @@
-/*src/types/ImportPayload.ts*/
+/*apps/desktop/src/types/ImportPayload.ts*/
 import type { PreparedRepertoire } from "../importsAndExports/prepareForImport";
 import type { Node } from "./Node";
 

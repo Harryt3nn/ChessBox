@@ -1,4 +1,4 @@
-/* src/components/FolderSelection.tsx */
+/*apps/desktop/src/components/FolderSelection.tsx */
 
 import React, { useState, useRef } from "react";
 import type { Folder } from "../types/Folder";

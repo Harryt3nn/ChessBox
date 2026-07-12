@@ -1,4 +1,4 @@
-/*src/renderer.tsx*/
+/*apps/desktop/src/renderer.tsx*/
 
 
 import { createRoot } from 'react-dom/client';

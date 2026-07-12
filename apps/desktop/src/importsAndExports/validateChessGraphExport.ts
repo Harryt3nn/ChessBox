@@ -1,4 +1,4 @@
-/*src/importsAndExports/validateChessGraphExports.ts*/
+/*apps/desktop/src/importsAndExports/validateChessGraphExports.ts*/
 
 import type { Node } from "../types/Node";
 

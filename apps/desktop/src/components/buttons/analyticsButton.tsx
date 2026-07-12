@@ -1,4 +1,4 @@
-/* src/components/buttons/analyticsButton.tsx */
+/*apps/desktop/src/components/buttons/analyticsButton.tsx */
 
 
 interface AnalyticsButtonProps {

@@ -1,4 +1,4 @@
-/* src/components/RepertoireRow.tsx */
+/*apps/desktop/src/components/RepertoireRow.tsx */
 
 import React, { useState, useRef } from "react";
 import type { Repertoire } from "../types/Repertoire";
