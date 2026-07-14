@@ -1,13 +1,11 @@
+// apps/desktop/tsconfig.json
 {
+  "extends": "../../tsconfig.base.json",
   "compilerOptions": {
-    "resolveJsonModule": true,
     "target": "ES6",
     "module": "commonjs",
     "jsx": "react-jsx",
-    "strict": true,
-    "esModuleInterop": true,
     "moduleResolution": "node",
-    "skipLibCheck": true,
     "outDir": ".webpack"
   },
   "include": ["src", "config"]

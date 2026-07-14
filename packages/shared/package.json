@@ -1,11 +1,9 @@
 {
-  "name": "chessbox-monorepo",
-  "private": true,
+  "name": "@chessbox/shared",
   "version": "1.0.0",
-  "workspaces": [
-    "apps/*",
-    "packages/*"
-  ],
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "private": false,
   "dependencies": {
     "zod": "^4.4.3"
   }
