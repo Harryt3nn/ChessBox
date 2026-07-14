@@ -15,6 +15,7 @@ import { ToolsButton } from './components/buttons/toolsButton';
 import { AnalyticsButton } from './components/buttons/analyticsButton';
 import { RepertoiresButton } from './components/buttons/repertoiresButton';
 import { NoveltyFinderButton } from './components/buttons/noveltyFinderButton';
+import { LogIn } from './components/logIn';
 import type { Page } from './types/Page';
 
 
