@@ -2,10 +2,11 @@
 {
   "extends": "../../tsconfig.base.json",
   "compilerOptions": {
-    "target": "ES6",
+    "target": "ES2020",
     "module": "commonjs",
+    "moduleResolution": "bundler",
     "jsx": "react-jsx",
-    "moduleResolution": "node",
+    "rootDir": "src",
     "outDir": ".webpack"
   },
   "include": ["src", "config"]

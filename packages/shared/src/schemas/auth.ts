@@ -43,3 +43,24 @@ export const loginOutputSchema = z.object({
   token: z.string(),
 });
 export type LoginOutput = z.infer<typeof loginOutputSchema>;
+
+export const emailSchema = z.string().email();
+
+export const registerInputSchema = z.object({
+  email: emailSchema,
+  username: usernameSchema,
+  password: passwordSchema,
+});
+
+
+export type RegisterInput = z.infer<typeof registerInputSchema>;
+
+export const registerOutputSchema = z.object({
+  user: z.object({
+    id: z.string(),
+    username: z.string(),
+    email: z.string(),
+  }),
+  token: z.string(),
+});
+export type RegisterOutput = z.infer<typeof registerOutputSchema>;

@@ -1,21 +1,31 @@
 /*apps/api/src/index.ts*/
 
-import Fastify from 'fastify'
+
+import Fastify from 'fastify';
+import { fastifyTRPCPlugin } from '@trpc/server/adapters/fastify';
+import { appRouter } from './routers/appRouter';
+import { createContext } from './trpc';
 
 
 const fastify = Fastify({
   logger: true
-})
+});
 
-// declared route for server
 fastify.get('/', async function handler (request, reply) {
-  return { hello: 'world' }
-})
+  return { hello: 'world' };
+});
 
-// running the server
+fastify.register(fastifyTRPCPlugin, {
+  prefix: '/trpc',
+  trpcOptions: {
+    router: appRouter,
+    createContext,
+  },
+});
+
 try {
-  await fastify.listen({ port: 3000 })
+  await fastify.listen({ port: 3000 });
 } catch (err) {
-  fastify.log.error(err)
-  process.exit(1)
+  fastify.log.error(err);
+  process.exit(1);
 }

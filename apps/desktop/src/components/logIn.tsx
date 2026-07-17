@@ -1,42 +1,84 @@
 /*apps/desktop/src/components/logIn.tsx*/
 
 
-import blacklist from "../../../../packages/shared/src/data/blacklist.json"
+import { useState } from "react";
+import { usernameSchema, passwordSchema } from "@chessbox/shared";
+import { trpc, setAuthToken } from '../trpc'
 
-
-const USERNAME_REGEX = /^[A-Za-z0-9_-]{3,20}$/;
-const PASSWORD_REGEX = /^.{8,64}$/;
-
-const combined = [
-  ...blacklist.system,
-  ...blacklist.app,
-  ...blacklist.chess
-].map(w => w.toLowerCase());
 
 export function LogIn() {
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
+  const [errors, setErrors] = useState<{ username?: string; password?: string }>({});
+  const [submitError, setSubmitError] = useState<string | null>(null);
+  const [submitting, setSubmitting] = useState(false);
+
+  function validate() {
+    const usernameResult = usernameSchema.safeParse(username);
+    const passwordResult = passwordSchema.safeParse(password);
+    const newErrors: typeof errors = {};
+
+    if (!usernameResult.success) {
+      newErrors.username = usernameResult.error.issues[0].message;
+    }
+
+    if (!passwordResult.success) {
+      newErrors.password = passwordResult.error.issues[0].message;
+    }
+
+    setErrors(newErrors);
+
+    return usernameResult.success && passwordResult.success;
+  }
+
+  async function handleSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    if (!validate()) return;
+
+    setSubmitError(null);
+    setSubmitting(true);
+
+    try {
+      const result = await trpc.auth.login.mutate({ username, password });
+      setAuthToken(result.token);
+      // TODO: persist token via MainStorage, then navigate away from login
+    } catch (err) {
+      setSubmitError(err instanceof Error ? err.message : "Login failed");
+    } finally {
+      setSubmitting(false);
+    }
+  }
+
   return (
     <div className="modal-backdrop">
       <div className="modal-window">
         <h2>Sign into ChessBox</h2>
 
-       <input
-        type="text"
-        name="username"
-        minLength={3}
-        maxLength={20}
-        pattern="^[A-Za-z0-9_-]+$"
-        required
-        />
+        <form onSubmit={handleSubmit}>
+          <input
+            type="text"
+            name="username"
+            value={username}
+            onChange={(e) => setUsername(e.target.value)}
+            required
+          />
+          {errors.username && <p className="error">{errors.username}</p>}
 
-       <input
-        type="text"
-        name="password"
-        minLength={8}
-        maxLength={64}
-        pattern="^[A-Za-z0-9_-]+$"
-        required
-        />
+          <input
+            type="password"
+            name="password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            required
+          />
+          {errors.password && <p className="error">{errors.password}</p>}
 
+          {submitError && <p className="error">{submitError}</p>}
+
+          <button type="submit" disabled={submitting}>
+            {submitting ? "Signing in..." : "Log In"}
+          </button>
+        </form>
       </div>
     </div>
   );
