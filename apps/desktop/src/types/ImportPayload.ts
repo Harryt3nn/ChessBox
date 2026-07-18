@@ -1,10 +1,12 @@
 /*apps/desktop/src/types/ImportPayload.ts*/
-import type { PreparedRepertoire } from "../importsAndExports/prepareForImport";
+
+
+import type { Repertoire } from "./Repertoire";
 import type { Node } from "./Node";
 
 // defines data shape for importing chess graph repertoires
 
 export type ImportRepertoiresPayload = {
-  repertoires: PreparedRepertoire[];
+  repertoires: Repertoire[];
   nodes: Record<string, Node>;
 };

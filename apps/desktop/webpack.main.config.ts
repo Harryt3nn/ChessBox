@@ -1,22 +1,30 @@
 /*apps/desktop/webpack.main.config.ts*/
 
-
 import type { Configuration } from 'webpack';
 import { rules } from './webpack.rules';
 import { plugins } from './webpack.plugins';
 
+const mainRules = [
+  ...rules,
+  {
+    test: /[/\\]node_modules[/\\].+\.(m?js|node)$/,
+    parser: { amd: false },
+    use: {
+      loader: '@vercel/webpack-asset-relocator-loader',
+      options: {
+        outputAssetBase: 'native_modules',
+      },
+    },
+  },
+];
+
 export const mainConfig: Configuration = {
-  /**
-   * This is the main entry point for your application, it's the first file
-   * that runs in the main process.
-   */
-  entry: './src/main.ts',
-  // Put your normal webpack config below here
+  entry: './src/index.ts',
   module: {
-    rules,
+    rules: mainRules,
   },
   plugins,
   resolve: {
-    extensions: ['.js', '.ts', '.jsx', '.tsx', '.css', '.json'],
+    extensions: ['.js', '.ts', '.jsx', '.tsx', '.json'],
   },
 };

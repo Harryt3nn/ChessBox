@@ -1,12 +1,10 @@
 /*apps/desktop/src/types/global.d.ts*/
 
+
 import type { Folder } from "./Folder";
 import type { Repertoire } from "./Repertoire";
 
 export {};
-
-// extension of global window object to include custom APIs in src/preload/ts
-// functions are IPC safe wrappers around filesystem operations
 
 declare global {
   interface Window {
@@ -20,4 +18,14 @@ declare global {
       importRepertoires(payload: ImportRepertoiresPayload): Promise<{ success: boolean }>;
     };
   }
+}
+
+declare module "*.module.css" {
+  const classes: { [key: string]: string };
+  export default classes;
+}
+
+declare module "*.css" {
+  const content: { [className: string]: string };
+  export default content;
 }

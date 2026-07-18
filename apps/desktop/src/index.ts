@@ -91,14 +91,15 @@ ipcMain.handle("storage:importRepertoires", async (_, payload) => {
 
 const createWindow = (): void => {
   const mainWindow = new BrowserWindow({
-    height: 1300,
-    width: 1300,
-    autoHideMenuBar: true,
-    icon: path.join(__dirname, 'public', 'icon.png'),
-    webPreferences: {
-      preload: MAIN_WINDOW_PRELOAD_WEBPACK_ENTRY,
-    },
-  });
+  height: 1300,
+  width: 1300,
+  autoHideMenuBar: true,
+  icon: path.join(__dirname, 'public', 'icon.png'),
+  webPreferences: {
+    preload: MAIN_WINDOW_PRELOAD_WEBPACK_ENTRY,
+    sandbox: false,
+  },
+});
 
   mainWindow.loadURL(MAIN_WINDOW_WEBPACK_ENTRY);
   

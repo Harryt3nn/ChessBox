@@ -44,7 +44,7 @@
     "node-loader": "^2.1.0",
     "style-loader": "^3.3.4",
     "ts-loader": "^9.5.7",
-    "typescript": "^7.0.2"
+    "typescript": "^5.9.3"
   },
   "dependencies": {
     "@chessbox/shared": "*",
