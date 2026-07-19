@@ -1,0 +1,118 @@
+/*apps/desktop/src/pages/Settings.module.css*/
+
+/* Settings */
+.settings-page {
+  padding: 24px;
+  color: var(--color-text-primary);
+  user-select: none;
+}
+
+.settings-section {
+  margin-top: 20px;
+  user-select: none;
+}
+
+.connect-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 18px;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  border: none;
+  font-size: 15px;
+  transition: transform 0.1s, opacity 0.15s, background 0.2s;
+  user-select: none;
+}
+.connect-btn:hover {
+  transform: translateY(-2px);
+  opacity: 0.95;
+  user-select: none;
+}
+
+/* Chess.com brand connection — sage is reserved for this only */
+.chesscomBtn {
+  background: var(--color-sage);
+  color: var(--color-ink);
+}
+
+.chesscomBtn:hover {
+  background: var(--color-sage-hover);
+}
+
+/* Lichess brand connection — cream stamp, distinct from chess.com sage */
+.lichessBtn {
+  background: var(--color-text-primary);
+  color: var(--color-ink);
+}
+
+.lichessBtn:hover {
+  background: #fff8ef;
+}
+
+/* Modals */
+
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.modal {
+  background: var(--color-surface-2);
+  padding: 20px;
+  border-radius: 10px;
+  width: 320px;
+  border: 1px solid rgba(var(--color-cream-rgb), 0.1);
+}
+
+.modal-input {
+  width: 100%;
+  padding: 8px;
+  margin-top: 10px;
+  border-radius: 6px;
+  border: 1px solid rgba(var(--color-cream-rgb), 0.2);
+  background: rgba(var(--color-cream-rgb), 0.05);
+  color: var(--color-text-primary);
+}
+
+.modal-success {
+  margin-top: 10px;
+  color: var(--color-sage);
+  font-weight: 600;
+}
+.modal-error {
+  margin-top: 10px;
+  color: var(--color-coral);
+  font-weight: 600;
+}
+
+.modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 16px;
+}
+
+.modal-save {
+  background: var(--color-sage);
+  border: none;
+  padding: 8px 14px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 600;
+  color: var(--color-ink);
+}
+
+.modal-cancel {
+  background: var(--color-surface-3);
+  border: none;
+  padding: 8px 14px;
+  border-radius: 6px;
+  cursor: pointer;
+  color: var(--color-text-secondary);
+}

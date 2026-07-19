@@ -2,6 +2,8 @@
 
 import React, { useState, useRef } from "react";
 import type { Repertoire } from "../types/Repertoire";
+import { styleText } from "node:util";
+import styles from './repertoireRow.module.css';
 
 // small UI component for individual graphs inside an opened folder
 // returns raw html
@@ -26,11 +28,9 @@ const RepertoireRow: React.FC<Props> = ({ rep, onRename, onSelect }) => {
 
   //render
   return (
-    <div
-      className="rep-row"
-      onClick={() => onSelect(rep.id)}
-    >
-      <i className="fa-solid fa-chess-board rep-row-icon" />
+    <div className={styles.repRow} onClick={() => onSelect(rep.id)}>
+
+      <i className={`fa-solid fa-chess-board ${styles.repRowIcon}`}/>
 
       {editing ? (
         <input
@@ -45,12 +45,11 @@ const RepertoireRow: React.FC<Props> = ({ rep, onRename, onSelect }) => {
               setName(rep.name);
             }
           }}
-          className="rep-row-input"
+          className={styles.repRowInput}
         />
       ) : (
         <span
-          className="rep-row-name"
-          onDoubleClick={e => {
+          className={styles.repRowName} onDoubleClick= {e => {
             e.stopPropagation();
             setEditing(true);
             setTimeout(() => inputRef.current?.focus(), 0);

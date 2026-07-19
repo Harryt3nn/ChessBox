@@ -3,6 +3,7 @@
 
 import type { Folder } from "../types/Folder";
 import type { Repertoire } from "../types/Repertoire";
+import styles from "./repList.module.css";
 
 interface RepListProps {
   folders: Folder[];
@@ -16,17 +17,17 @@ export function RepList({ folders, repertoires }: RepListProps) {
         const repsInFolder = repertoires.filter(r => r.folderId === folder.id);
 
         return (
-          <div key={folder.id} className="folder-row">
-            <div className="folder-header">
-              <span className="folder-name">{folder.name}</span>
+          <div key={folder.id} className={styles.folderRow}>
+            <div className={styles.folderHeader}>
+              <span className={styles.folderName}>{folder.name}</span>
             </div>
 
-            <div className="folder-reps">
+            <div className={styles.folderReps}>
               {repsInFolder.length === 0 ? (
-                <div className="empty">No repertoires</div>
+                <div className={styles.empty}>No repertoires</div>
               ) : (
                 repsInFolder.map(rep => (
-                  <div key={rep.id} className="rep-preview">
+                  <div key={rep.id} className={styles.repPreview}>
                     • {rep.name} ({rep.side})
                   </div>
                 ))

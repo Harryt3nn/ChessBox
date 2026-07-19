@@ -1,0 +1,28 @@
+/*apps/desktop/src/components/repertoireRow.module.css*/
+
+.rep-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  user-select: none;
+}
+
+.rep-row-icon { 
+    color: var(--color-text-tertiary); width: 14px; 
+
+}
+
+.rep-row-name { 
+    color: var(--color-text-secondary); font-size: 14px;
+}
+
+.rep-row-input {
+  background: none;
+  border: 1px solid rgba(var(--color-cream-rgb), 0.2);
+  border-radius: 4px;
+  padding: 2px 6px;
+  color: var(--color-text-primary);
+  font-size: 13px;
+  user-select: none;
+}

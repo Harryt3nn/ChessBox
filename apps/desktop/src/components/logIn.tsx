@@ -4,6 +4,7 @@
 import { useState } from "react";
 import { usernameSchema, passwordSchema } from "@chessbox/shared";
 import { trpc, setAuthToken } from '../trpc'
+import styles from "./logIn.module.css";
 
 
 export function LogIn() {
@@ -50,8 +51,8 @@ export function LogIn() {
   }
 
   return (
-    <div className="modal-backdrop">
-      <div className="modal-window">
+    <div className={styles.modalBackdrop}>
+      <div className={styles.modalWindow}>
         <h2>Sign into ChessBox</h2>
 
         <form onSubmit={handleSubmit}>

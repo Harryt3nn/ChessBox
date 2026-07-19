@@ -1,5 +1,6 @@
 /*apps/desktop/src/pages/BoardView.tsx */
 
+
 import React, { useState, useCallback, useEffect, useRef, useMemo } from 'react';
 import Settings from './Settings';
 import { Chessboard } from 'react-chessboard';
@@ -9,6 +10,7 @@ import { SettingsButton } from '../components/buttons/settingsButton';
 import type { Page } from '../types/Page';
 import type { MoveNode } from '../types/moveNode';
 import type { GameTree } from '../types/gameTree';
+import styles from './BoardView.module.css';
 
 
 // ---------------------------------------------------------------------------
@@ -468,154 +470,143 @@ const BoardView = ({ onBack }: { onBack: () => void }) => {
   const canGoBack = tree.currentPath.length > 0;
   const canGoForward = getNodeAtPath(tree.root, tree.currentPath).children.length > 0;
 
-  // -------------------------------------------------------------------------
-  // JSX
-  // -------------------------------------------------------------------------
+return (
+  <div className="app-layout">
+    {/* ----------------------------- SIDEBAR ----------------------------- */}
+    <aside className="sidebar">
+      <div className="sidebar-logo">
+        <i className="fa-solid fa-chess-queen"></i>
+        <span>CTT</span>
+      </div>
+      <nav className="sidebar-nav"></nav>
+      <div className="sidebar-bottom">
+        <HomeButton onBack={() => setPage('home')} />
+        <SettingsButton onClick={() => setPage('settings')} />
+      </div>
+    </aside>
 
-  return (
-    <div className="app-layout">
-      {/* ----------------------------- SIDEBAR ----------------------------- */}
-      <aside className="sidebar">
-        <div className="sidebar-logo">
-          <i className="fa-solid fa-chess-queen"></i>
-          <span>CTT</span>
-        </div>
-        <nav className="sidebar-nav"></nav>
-        <div className="sidebar-bottom">
-          <HomeButton onBack={() => setPage('home')}/>
-         <SettingsButton onClick={() => setPage('settings')}/>
-        </div>
-      </aside>
+    {/* ----------------------------- BOARD ----------------------------- */}
+    <main className={styles.boardViewMain}>
+      <div className={styles.boardContainer}>
+        <Chessboard
+          onSquareRightClick={onSquareRightClick}
+          position={getCurrentFen(tree)}
+          onPieceDrop={onPieceDrop}
+          onSquareClick={onSquareClick}
+          customSquareStyles={customSquareStyles}
+          boardWidth={560}
+        />
+      </div>
 
-      <main className="board-view-main">
-        {/* ----------------------------- BOARD ----------------------------- */}
-        <div className="board-container">
-          <Chessboard
-            onSquareRightClick={onSquareRightClick}
-            position={getCurrentFen(tree)}
-            onPieceDrop={onPieceDrop}
-            onSquareClick={onSquareClick}
-            customSquareStyles={customSquareStyles}
-            boardWidth={560}
-          />
+      {/* ----------------------------- PANEL ----------------------------- */}
+      <div className={styles.boardPanel}>
+        {/* View toggle: SAN / FEN / PGN */}
+        <div className={styles.toggleWrapper}>
+          <button
+            className={`${styles.fenToggleBtn} ${viewMode === 'fen' ? styles.toggleActive : ''}`}
+            onClick={() => setViewMode('fen')}
+          >
+            FEN
+          </button>
+          <button
+            className={`${styles.pgnToggleBtn} ${viewMode === 'pgn' ? styles.toggleActive : ''}`}
+            onClick={() => setViewMode('pgn')}
+          >
+            PGN
+          </button>
         </div>
 
-        {/* ----------------------------- PANEL ----------------------------- */}
-        <div className="board-panel">
-          {/* View toggle: SAN / FEN / PGN */}
-          <div className="toggle-wrapper">
-      
-            <button
-              className={`fen-toggle-btn ${viewMode === 'fen' ? 'toggle-active' : ''}`}
-              onClick={() => setViewMode('fen')}
-            >
-              FEN
+        {/* Move list — one pair per row: "1. e4 e5" */}
+        <div className={styles.moveHistory} ref={moveListRef}>
+          {movePairs.length === 0 ? (
+            <span className={styles.moveHistoryEmpty}>No moves yet</span>
+          ) : (
+            movePairs.map(({ num, white, black }) => (
+              <div key={num} className={styles.moveRow}>
+                <span className={styles.moveNumber}>{num}.</span>
+                <span
+                  className={`${styles.moveText} ${white.id === activeNodeId ? styles.moveActive : ''}`}
+                  onClick={() => {
+                    const idx = pathMoves.findIndex(m => m.id === white.id);
+                    goToPath(pathMoves.slice(0, idx + 1).map(m => m.id));
+                  }}
+                >
+                  {white.move}
+                </span>
+
+                {black && (
+                  <span
+                    className={`${styles.moveText} ${black.id === activeNodeId ? styles.moveActive : ''}`}
+                    onClick={() => {
+                      const idx = pathMoves.findIndex(m => m.id === black.id);
+                      goToPath(pathMoves.slice(0, idx + 1).map(m => m.id));
+                    }}
+                  >
+                    {black.move}
+                  </span>
+                )}
+              </div>
+            ))
+          )}
+
+          {/* Variation switcher — only visible when multiple moves exist at this depth */}
+          {hasVariations && (
+            <div className={styles.variationList}>
+              {variations.map((v, i) => {
+                const parentPath = tree.currentPath.slice(0, -1);
+                const varPath = [...parentPath, v.id];
+                const isActive = v.id === tree.currentPath[tree.currentPath.length - 1];
+                return (
+                  <span
+                    key={v.id}
+                    className={`${styles.variationItem} ${isActive ? styles.variationActive : ''}`}
+                    onClick={() => goToPath(varPath)}
+                  >
+                    {i === 0 ? 'Main' : `Var ${i}`}: {v.move}
+                  </span>
+                );
+              })}
+            </div>
+          )}
+
+          {/* Navigation buttons — arrow keys also work (←→↑↓) */}
+          <div className={styles.moveNav}>
+            <button className={styles.navArrow} onClick={goToStart} disabled={!canGoBack} title="Start (↑)">
+              <i className="fa-solid fa-backward-fast"></i>
             </button>
-            <button
-              className={`pgn-toggle-btn ${viewMode === 'pgn' ? 'toggle-active' : ''}`}
-              onClick={() => setViewMode('pgn')}
-            >
-              PGN
+            <button className={styles.navArrow} onClick={goBack} disabled={!canGoBack} title="Back (←)">
+              <i className="fa-solid fa-backward-step"></i>
+            </button>
+            <button className={styles.navArrow} onClick={goForward} disabled={!canGoForward} title="Forward (→)">
+              <i className="fa-solid fa-forward-step"></i>
+            </button>
+            <button className={styles.navArrow} onClick={goToEnd} disabled={!canGoForward} title="End (↓)">
+              <i className="fa-solid fa-forward-fast"></i>
             </button>
           </div>
 
-          
-      {/* Move list — one pair per row: "1. e4 e5" */}
-              <div className="move-history" ref={moveListRef}>
-                {movePairs.length === 0 ? (
-                  <span className="move-history-empty">No moves yet</span>
-                ) : (
-                  movePairs.map(({ num, white, black }) => (
-                    <div key={num} className="move-row">
-                      <span className="move-number">{num}.</span>
+          {/* Save / Load / Reset */}
+          <div className={styles.boardPanelActions}>
+            <button className={styles.btnSecondary} onClick={saveGame}>
+              <i className="fa-solid fa-floppy-disk"></i> Save
+            </button>
 
-                      <span
-                        className={`move-text ${white.id === activeNodeId ? 'move-active' : ''}`}
-                        onClick={() => {
-                          const idx = pathMoves.findIndex(m => m.id === white.id);
-                          goToPath(pathMoves.slice(0, idx + 1).map(m => m.id));
-                        }}
-                      >
-                        {white.move}
-                      </span>
+            <label className={styles.btnSecondary} style={{ cursor: 'pointer' }}>
+              <i className="fa-solid fa-folder-open"></i> Load
+              <input type="file" accept=".json" style={{ display: 'none' }} onChange={loadGame} />
+            </label>
 
-                      {black && (
-                        <span
-                          className={`move-text ${black.id === activeNodeId ? 'move-active' : ''}`}
-                          onClick={() => {
-                            const idx = pathMoves.findIndex(m => m.id === black.id);
-                            goToPath(pathMoves.slice(0, idx + 1).map(m => m.id));
-                          }}
-                        >
-                          {black.move}
-                        </span>
-                      )}
-                    </div>
-                  ))
-                )}
-
-                {/* Variation switcher — only visible when multiple moves exist at this depth */}
-              {hasVariations && (
-                <div className="variation-list">
-                  {variations.map((v, i) => {
-                    const parentPath = tree.currentPath.slice(0, -1);
-                    const varPath = [...parentPath, v.id];
-                    const isActive = v.id === tree.currentPath[tree.currentPath.length - 1];
-                    return (
-                      <span
-                        key={v.id}
-                        className={`variation-item ${isActive ? 'variation-active' : ''}`}
-                        onClick={() => goToPath(varPath)}
-                      >
-                        {i === 0 ? 'Main' : `Var ${i}`}: {v.move}
-                      </span>
-                    );
-                  })}
-                </div>
-              )}
-              </div>
-
-              
-
-              {/* Navigation buttons — arrow keys also work (←→↑↓) */}
-              <div className="move-nav">
-                <button className="nav-arrow" onClick={goToStart} disabled={!canGoBack} title="Start (↑)">
-                  <i className="fa-solid fa-backward-fast"></i>
-                </button>
-                <button className="nav-arrow" onClick={goBack} disabled={!canGoBack} title="Back (←)">
-                  <i className="fa-solid fa-backward-step"></i>
-                </button>
-                <button className="nav-arrow" onClick={goForward} disabled={!canGoForward} title="Forward (→)">
-                  <i className="fa-solid fa-forward-step"></i>
-                </button>
-                <button className="nav-arrow" onClick={goToEnd} disabled={!canGoForward} title="End (↓)">
-                  <i className="fa-solid fa-forward-fast"></i>
-                </button>
-              </div>
-
-              {/* Save / Load / Reset */}
-              <div className="board-panel-actions">
-                <button className="btn-secondary" onClick={saveGame}>
-                  <i className="fa-solid fa-floppy-disk"></i> Save
-                </button>
-
-                {/* File input is hidden; the label acts as the visible button */}
-                <label className="btn-secondary" style={{ cursor: 'pointer' }}>
-                  <i className="fa-solid fa-folder-open"></i> Load
-                  <input type="file" accept=".json" style={{ display: 'none' }} onChange={loadGame} />
-                </label>
-
-                <button className="btn-reset" onClick={resetBoard}>
-                  <i className="fa-solid fa-rotate-left"></i> Reset
-                </button>
-              </div>
+            <button className={styles.btnReset} onClick={resetBoard}>
+              <i className="fa-solid fa-rotate-left"></i> Reset
+            </button>
+          </div>
 
           {/* ---------------------- FEN VIEW ---------------------- */}
           {viewMode === 'fen' && (
             <>
-              <div className="fen-display">
+              <div className={styles.fenDisplay}>
                 <textarea
-                  className="fen-display-input"
+                  className={styles.fenDisplayInput}
                   value={getCurrentFen(tree)}
                   onChange={e => {
                     try {
@@ -634,9 +625,9 @@ const BoardView = ({ onBack }: { onBack: () => void }) => {
                 />
               </div>
 
-              <div className="board-panel-actions">
+              <div className={styles.boardPanelActions}>
                 <button
-                  className="btn-secondary panel-copy-btn"
+                  className={`${styles.btnSecondary} ${styles.panelCopyBtn}`}
                   onClick={() => navigator.clipboard.writeText(getCurrentFen(tree))}
                 >
                   <i className="fa-regular fa-copy"></i> Copy FEN
@@ -648,18 +639,18 @@ const BoardView = ({ onBack }: { onBack: () => void }) => {
           {/* ---------------------- PGN VIEW ---------------------- */}
           {viewMode === 'pgn' && (
             <>
-              <div className="pgn-display">
+              <div className={styles.pgnDisplay}>
                 <textarea
-                  className="pgn-display-text"
+                  className={styles.pgnDisplayText}
                   value={pgnText}
                   readOnly
                   spellCheck={false}
                 />
               </div>
 
-              <div className="board-panel-actions">
+              <div className={styles.boardPanelActions}>
                 <button
-                  className="btn-secondary panel-copy-btn"
+                  className={`${styles.btnSecondary} ${styles.panelCopyBtn}`}
                   onClick={() => navigator.clipboard.writeText(pgnText)}
                 >
                   <i className="fa-regular fa-copy"></i> Copy PGN
@@ -668,9 +659,10 @@ const BoardView = ({ onBack }: { onBack: () => void }) => {
             </>
           )}
         </div>
-      </main>
-    </div>
-  );
-};
+      </div>
+    </main>
+  </div>
+);
+}
 
-export default BoardView;
+export default BoardView

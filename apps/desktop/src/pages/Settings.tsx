@@ -2,8 +2,7 @@
 
 
 import { useState } from 'react';
-
-
+import styles from './Settings.module.css';
 
 const Settings = ({ onBack }: { onBack: () => void }) => {
   const [showChessConnect, setShowChessConnect] = useState(false);
@@ -11,19 +10,16 @@ const Settings = ({ onBack }: { onBack: () => void }) => {
   const [status, setStatus] = useState<"idle" | "success" | "error">("idle");
 
   async function validateChessComUser(username: string) {
-  const res = await fetch(`http://localhost:3001/api/chesscom/${username}`)
-  return res.ok;
-}
+    const res = await fetch(`http://localhost:3001/api/chesscom/${username}`)
+    return res.ok;
+  }
 
   const handleSaveChessUsername = async () => {
     const valid = await validateChessComUser(username);
 
     if (valid) {
       setStatus("success");
-
-      // TODO: Save to filesystem
       console.log("Saving Chess.com username:", username);
-
       setTimeout(() => {
         setShowChessConnect(false);
         setStatus("idle");
@@ -48,11 +44,11 @@ const Settings = ({ onBack }: { onBack: () => void }) => {
         </div>
       </aside>
 
-      <main className="main-content settings-page">
+      <main className={`main-content ${styles.settingsPage}`}>
 
-        <div className="settings-section">
+        <div className={styles.settingsSection}>
           <button
-            className="connect-btn chesscom-btn"
+            className={`${styles.connectBtn} ${styles.chesscomBtn}`}
             onClick={() => setShowChessConnect(true)}
           >
             <i className="fa-solid fa-chess-board"></i>
@@ -60,7 +56,7 @@ const Settings = ({ onBack }: { onBack: () => void }) => {
           </button>
 
           <button
-            className="connect-btn lichess-btn"
+            className={`${styles.connectBtn} ${styles.lichessBtn}`}
             onClick={() => setShowChessConnect(true)}
           >
             <i className="fa-solid fa-chess-board"></i>
@@ -69,31 +65,31 @@ const Settings = ({ onBack }: { onBack: () => void }) => {
         </div>
 
         {showChessConnect && (
-          <div className="modal-overlay">
-            <div className="modal">
+          <div className={styles.modalOverlay}>
+            <div className={styles.modal}>
               <h3>Connect Chess.com</h3>
               <p>Enter your Chess.com username</p>
 
               <input
-                className="modal-input"
+                className={styles.modalInput}
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
-                placeholder="e.g. Harryt3nn"
+                placeholder="e.g. John_Chess123"
               />
 
               {status === "success" && (
-                <div className="modal-success">✓ Account found!</div>
+                <div className={styles.modalSuccess}>✓ Account found!</div>
               )}
 
               {status === "error" && (
-                <div className="modal-error">✗ Username not found</div>
+                <div className={styles.modalError}>✗ Username not found</div>
               )}
 
-              <div className="modal-actions">
-                <button className="modal-save" onClick={handleSaveChessUsername}>
+              <div className={styles.modalActions}>
+                <button className={styles.modalSave} onClick={handleSaveChessUsername}>
                   Save
                 </button>
-                <button className="modal-cancel" onClick={() => setShowChessConnect(false)}>
+                <button className={styles.modalCancel} onClick={() => setShowChessConnect(false)}>
                   Cancel
                 </button>
               </div>
@@ -105,4 +101,4 @@ const Settings = ({ onBack }: { onBack: () => void }) => {
   );
 };
 
-export default Settings
+export default Settings;
