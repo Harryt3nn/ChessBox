@@ -1,5 +1,7 @@
 /*apps/desktop/src/components/buttons/repertoiresButton.tsx */
 
+import styles from "./iconRules.module.css";
+import repertoiresIcon from "../../assets/icons/RookBookIcon.png";
 
 interface RepertoiresButtonProps {
   onClick: () => void;
@@ -9,7 +11,10 @@ interface RepertoiresButtonProps {
 export function RepertoiresButton({onClick}:RepertoiresButtonProps){
     return(
         <button onClick={onClick}>
-          <i className="fa-solid fa-book-open"></i>
+          <img
+        src={repertoiresIcon}
+        className={styles.icon}
+      />
             <span>Repertoires</span>
         </button>
     )

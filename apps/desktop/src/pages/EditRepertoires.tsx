@@ -13,9 +13,16 @@ import { ImportModal } from "../components/ImportModal";
 import { prepareForImport } from "../importsAndExports/prepareForImport"
 import type { Page } from '../types/Page';
 import styles from './EditRepertoires.module.css';
+import Sidebar from '../components/SidebarModule';
+
 
 
 //TODO - Convert functions into components
+
+interface EditRepertoiresProps {
+    page: Page;
+    setPage: (page: Page) => void;
+}
 
 export interface Repertoire {
   id: string;
@@ -226,8 +233,9 @@ function FolderSection({
 
 
 
-const EditRepertoires = ({ onBack }: { onBack: () => void }) => {
-  const [page, setPage] = useState<Page>("home");
+const EditRepertoires = ({ page, setPage }: EditRepertoiresProps) => {
+
+
   const [folders, setFolders] = useState<Folder[]>([]);
   const [repertoires, setRepertoires] = useState<Repertoire[]>([]);
   const [search, setSearch] = useState("");
@@ -284,11 +292,7 @@ const EditRepertoires = ({ onBack }: { onBack: () => void }) => {
   storage.loadRepertoires().then(setRepertoires);
 }, []);
 
-  if (page === 'analytics') return <Analytics onBack={() => setPage('home')} />;
-  if (page === 'tools') return <TrainingToolkit onBack={() => setPage('home')} />;
-  if (page === 'settings') return <Settings onBack={onBack} />;
 
-  
   const toggleFolder = async (id: string) => {
   setFolders(prev => {
     const updated = prev.map(f =>
@@ -402,44 +406,7 @@ const reloadData = async () => {
   // TODO - use components
   return (
   <div className="app-layout">
-
-    {/* Sidebar */}
-
-    <aside className="sidebar">
-      <div className="sidebar-logo">
-        <i className="fa-solid fa-chess-queen" />
-        <span>ChessBox</span>
-      </div>
-
-      <nav className="sidebar-nav">
-        {[
-          { label: 'Repertoires', icon: 'fa-book-open', active: true, onClick: () => {setPage('repertoires')} },
-          { label: 'Analytics', icon: 'fa-chart-line', active: false, onClick: () => setPage('analytics') },
-          { label: 'Training', icon: 'fa-dumbbell', active: false, onClick: () => setPage('tools') },
-        ].map(({ label, icon, active, onClick }) => (
-          <button
-            key={label}
-            className={active ? "nav-btn active" : "nav-btn"}
-            onClick={onClick}
-          >
-            <i className={`fa-solid ${icon}`} />
-            {label}
-          </button>
-        ))}
-      </nav>
-
-      <div className="sidebar-bottom">
-        {[
-          { label: 'Home', icon: 'fa-house', onClick: onBack },
-          { label: 'Settings', icon: 'fa-gear', onClick: () => setPage('settings') },
-        ].map(({ label, icon, onClick }) => (
-          <button key={label} className="nav-btn" onClick={onClick}>
-            <i className={`fa-solid ${icon}`} />
-            {label}
-          </button>
-        ))}
-      </div>
-    </aside>
+    <Sidebar setPage={setPage} />
 
     {/* Main */}
     <main className="main-content">

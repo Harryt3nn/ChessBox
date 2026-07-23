@@ -1,8 +1,6 @@
 /*apps/desktop/src/pages/BoardView.tsx */
 
-
 import React, { useState, useCallback, useEffect, useRef, useMemo } from 'react';
-import Settings from './Settings';
 import { Chessboard } from 'react-chessboard';
 import { Chess, Square } from 'chess.js';
 import { HomeButton } from '../components/buttons/homeButton';
@@ -11,7 +9,13 @@ import type { Page } from '../types/Page';
 import type { MoveNode } from '../types/moveNode';
 import type { GameTree } from '../types/gameTree';
 import styles from './BoardView.module.css';
+import Sidebar from '../components/SidebarModule';
 
+
+interface BoardViewProps {
+    page: Page;
+    setPage: (page: Page) => void;
+}
 
 // ---------------------------------------------------------------------------
 // TREE HELPERS
@@ -158,8 +162,7 @@ const buildPgn = (tree: GameTree): string => {
 // COMPONENT
 // ---------------------------------------------------------------------------
 
-const BoardView = ({ onBack }: { onBack: () => void }) => {
-  const [page, setPage] = useState<Page>('home');
+const BoardView = ({ page, setPage }: BoardViewProps) => {
 
   // The full game tree. All state lives here.
   const [tree, setTree] = useState<GameTree>(createInitialTree);
@@ -178,7 +181,6 @@ const BoardView = ({ onBack }: { onBack: () => void }) => {
   // Ref for the move history container so we can auto-scroll to the active move
   const moveListRef = useRef<HTMLDivElement>(null);
 
-  if (page === 'settings') return <Settings onBack={onBack} />;
 
   // -------------------------------------------------------------------------
   // RIGHT-CLICK SQUARE HIGHLIGHTING
@@ -472,18 +474,7 @@ const BoardView = ({ onBack }: { onBack: () => void }) => {
 
 return (
   <div className="app-layout">
-    {/* ----------------------------- SIDEBAR ----------------------------- */}
-    <aside className="sidebar">
-      <div className="sidebar-logo">
-        <i className="fa-solid fa-chess-queen"></i>
-        <span>ChessBox</span>
-      </div>
-      <nav className="sidebar-nav"></nav>
-      <div className="sidebar-bottom">
-        <HomeButton onBack={() => setPage('home')} />
-        <SettingsButton onClick={() => setPage('settings')} />
-      </div>
-    </aside>
+    <Sidebar setPage={setPage} />
 
     {/* ----------------------------- BOARD ----------------------------- */}
     <main className={styles.boardViewMain}>

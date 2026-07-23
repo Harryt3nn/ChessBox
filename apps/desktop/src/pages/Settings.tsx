@@ -1,16 +1,22 @@
-/*apps/desktop/src/pages/Settings.tsx*/
-
+/* apps/desktop/src/pages/Settings.tsx */
 
 import { useState } from 'react';
+import Sidebar from '../components/SidebarModule';
 import styles from './Settings.module.css';
+import type { Page } from '../types/Page';
 
-const Settings = ({ onBack }: { onBack: () => void }) => {
+interface SettingsProps {
+    page: Page;
+    setPage: (page: Page) => void;
+}
+
+const Settings = ({ page, setPage }: SettingsProps) => {
   const [showChessConnect, setShowChessConnect] = useState(false);
   const [username, setUsername] = useState("");
   const [status, setStatus] = useState<"idle" | "success" | "error">("idle");
 
   async function validateChessComUser(username: string) {
-    const res = await fetch(`http://localhost:3001/api/chesscom/${username}`)
+    const res = await fetch(`http://localhost:3001/api/chesscom/${username}`);
     return res.ok;
   }
 
@@ -31,21 +37,9 @@ const Settings = ({ onBack }: { onBack: () => void }) => {
 
   return (
     <div className="app-layout">
-      <aside className="sidebar">
-        <div className="sidebar-logo">
-          <i className="fa-solid fa-chess-queen"></i>
-          <span>ChessBox</span>
-        </div>
-
-        <nav className="sidebar-nav"></nav>
-
-        <div className="sidebar-bottom">
-          <button onClick={onBack}>Back</button>
-        </div>
-      </aside>
+      <Sidebar setPage={setPage} />
 
       <main className={`main-content ${styles.settingsPage}`}>
-
         <div className={styles.settingsSection}>
           <button
             className={`${styles.connectBtn} ${styles.chesscomBtn}`}
@@ -89,7 +83,10 @@ const Settings = ({ onBack }: { onBack: () => void }) => {
                 <button className={styles.modalSave} onClick={handleSaveChessUsername}>
                   Save
                 </button>
-                <button className={styles.modalCancel} onClick={() => setShowChessConnect(false)}>
+                <button
+                  className={styles.modalCancel}
+                  onClick={() => setShowChessConnect(false)}
+                >
                   Cancel
                 </button>
               </div>

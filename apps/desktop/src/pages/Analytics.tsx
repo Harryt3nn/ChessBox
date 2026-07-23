@@ -1,39 +1,23 @@
-/*apps/desktop/src/pages/Analytics.tsx */
+/* apps/desktop/src/pages/Analytics.tsx */
 
-
-import { useState } from 'react';
-import Settings from './Settings';
-import TrainingToolkit from './TrainingToolkit';
-import { HomeButton } from '../components/buttons/homeButton';
-import { SettingsButton} from '../components/buttons/settingsButton';
+import Sidebar from '../components/SidebarModule';
 import type { Page } from '../types/Page';
 
+interface AnalyticsProps {
+    page: Page;
+    setPage: (page: Page) => void;
+}
 
-const Analytics = ({ onBack }: { onBack: () => void }) => {
-    const [page, setPage] = useState<Page>('home');
-    if (page === 'tools') return <TrainingToolkit onBack={() => setPage('home')} />;
-    if (page === 'settings') return <Settings onBack={() => setPage('home')} />;
+const Analytics = ({ page, setPage }: AnalyticsProps) => {
     return (
-
-
         <div className="app-layout">
-            <aside className="sidebar">
-                <div className="sidebar-logo">
-                    <i className="fa-solid fa-chess-queen"></i>
-                    <span>ChessBox</span>
-                </div>
-                <nav className="sidebar-nav"></nav>
-                <div className="sidebar-bottom">
-                    <HomeButton onBack={onBack}/>
-                    <SettingsButton onClick={onBack}/>
-                </div>
-            </aside>
+            <Sidebar setPage={setPage} />
+
             <main className="main-content">
                 <h1>Analytics</h1>
             </main>
         </div>
     );
 };
-
 
 export default Analytics;
