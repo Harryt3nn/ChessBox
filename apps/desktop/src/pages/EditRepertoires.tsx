@@ -1,23 +1,19 @@
 /*apps/desktop/src/pages/EditRepertoires.tsx*/
 
 
-import React, { useState, useEffect, useRef } from 'react';
-import Analytics from './Analytics';
-import Settings from './Settings';
-import TrainingToolkit from './TrainingToolkit';
+import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { FileSystemStorageProvider } from "../Storage/FileSystemStorageProvider";
-import { useMemo } from "react";
-import FolderSelection from "../components/FolderSelection";
 import { validateChessGraphExport } from "../importsAndExports/validateChessGraphExport";
 import { ImportModal } from "../components/ImportModal";
 import { prepareForImport } from "../importsAndExports/prepareForImport"
 import type { Page } from '../types/Page';
 import styles from './EditRepertoires.module.css';
 import Sidebar from '../components/SidebarModule';
+import { InlineEdit } from "../components/editRepertoireComponents/InlineEdit";
+import { ChessKnightIcon } from "../components/editRepertoireComponents/ChessKnightIcon";
+import { RepertoireCard } from "../components/editRepertoireComponents/RepertoireCard";
+import FolderSelection from "../components/editRepertoireComponents/FolderSelection";
 
-
-
-//TODO - Convert functions into components
 
 interface EditRepertoiresProps {
     page: Page;
@@ -57,180 +53,6 @@ function timeAgo(timestamp: number): string {
 function generateId(): string {
   return crypto.randomUUID();
 }
-
-
-function ChessKnightIcon({ color }: { color: "white" | "black" }) {
-  const isWhite = color === "white";
-
-  return (
-    <div className={`${styles.knightIcon} ${isWhite ? `${styles.knightWhite}` : `${styles.knightBlack}`}`}>
-      <i className={`fa-solid fa-chess-queen knight-piece ${isWhite ? `${styles.pieceWhite}` : `${styles.pieceWhite}`}`} />
-    </div>
-  );
-}
-
-function InlineEdit({
-  value,
-  onSave,
-  style,
-  className,
-}: {
-  value: string;
-  onSave: (v: string) => void;
-  style?: React.CSSProperties;
-  className?: string;
-}) {
-  const [editing, setEditing] = useState(false);
-  const [draft, setDraft] = useState(value);
-  const inputRef = useRef<HTMLInputElement>(null);
-  const cancelledRef = useRef(false);
-
-  useEffect(() => {
-    setDraft(value);
-  }, [value]);
-
-  useEffect(() => {
-    if (editing) inputRef.current?.focus();
-  }, [editing]);
-
-  const commit = () => {
-    if (!cancelledRef.current) {
-      onSave(draft.trim() || value);
-    }
-    cancelledRef.current = false;
-    setEditing(false);
-  };
-
-  if (editing) {
-    return (
-      <input
-        ref={inputRef}
-        value={draft}
-        onChange={(e) => setDraft(e.target.value)}
-        onBlur={commit}
-        onKeyDown={(e) => {
-          if (e.key === "Enter") commit();
-          if (e.key === "Escape") {
-            cancelledRef.current = true;
-            setEditing(false);
-          }
-        }}
-        className={`${styles.inlineEditInput} ${className ?? ""}`}
-        style={style}
-      />
-    );
-  }
-
-  return (
-    <span
-      onDoubleClick={() => {
-        setDraft(value);
-        setEditing(true);
-      }}
-      title="Double-click to rename"
-      className={`${styles.inlineEditText} ${className ?? ""}`}
-      style={style}
-    >
-      {value}
-    </span>
-  );
-}
-
-function RepertoireCard({
-  file,
-  onRename,
-  onSelect,
-}: {
-  file: Repertoire;
-  onRename: (id: string, name: string) => void;
-  onSelect: (id: string) => void;
-}) {
-  return (
-    <div
-      className={styles.redCard}
-      onClick={() => onSelect(file.id)}
-    >
-      <div className={styles.redCardHeader}>
-        <ChessKnightIcon color={file.side} />
-
-        <InlineEdit
-          value={file.name}
-          onSave={(name) => onRename(file.id, name)}
-          style={{ flex: 1 }}
-          className={styles.redCardTitle}
-        />
-      </div>
-
-      <div className={styles.repCardFooter}>
-        <span>Repertoire</span>
-        <span>{timeAgo(file.updatedAt)}</span>
-      </div>
-    </div>
-  );
-}
-
-
-function FolderSection({
-  folder,
-  files,
-  onToggle,
-  onRenameFolder,
-  onRenameFile,
-  onSelectFile,
-}: {
-  folder: Folder;
-  files: Repertoire[];
-  onToggle: (id: string) => void;
-  onRenameFolder: (id: string, name: string) => void;
-  onRenameFile: (fileId: string, name: string) => void;
-  onSelectFile: (fileId: string) => void;
-}) {
-  return (
-    <div className={styles.folderSelection}>
-      {/* Folder header */}
-      <div className={styles.folderSelectionHeader}>
-        <button
-          onClick={() => onToggle(folder.id)}
-          className={`${styles.folderChevron} ${folder.collapsed ? "collapsed" : ""}`}
-        >
-          <i className={`fa-solid fa-chevron-down ${styles.folderChevronIcon}`} />
-        </button>
-
-        <i className={`fa-solid fa-folder ${styles.folderIcon}`} />
-
-        <InlineEdit
-          value={folder.name}
-          onSave={(name) => onRenameFolder(folder.id, name)}
-          className={styles.folderSelectionTitle}
-        />
-
-        <span className={styles.folderSelectionCount}>{files.length}</span>
-      </div>
-
-      {/* Cards grid */}
-      {!folder.collapsed && (
-        <div className={styles.folderSectionGrid}>
-          {files.length === 0 && (
-            <div className={styles.folderSectionEmpty}>
-              No repertoires in this folder
-            </div>
-          )}
-
-          {files.map((file) => (
-            <RepertoireCard
-              key={file.id}
-              file={file}
-              onRename={(fileId, name) => onRenameFile(fileId, name)}
-              onSelect={onSelectFile}
-            />
-          ))}
-        </div>
-      )}
-    </div>
-  );
-}
-
-
 
 
 const EditRepertoires = ({ page, setPage }: EditRepertoiresProps) => {
@@ -403,8 +225,7 @@ const reloadData = async () => {
 
 
   // ── Render ─────────────────────────────────────────────────────────────────
-  // TODO - use components
-  return (
+return (
   <div className="app-layout">
     <Sidebar setPage={setPage} />
 
@@ -428,16 +249,19 @@ const reloadData = async () => {
         </div>
       </div>
 
+
       {/* Search */}
       <div className={styles.searchContainer}>
         <div className={styles.searchWrapper}>
           <i className="fa-solid fa-magnifying-glass search-icon" />
           <input
-            className={styles.searchInput} value={search}
+            className={styles.searchInput}
+            value={search}
             onChange={e => setSearch(e.target.value)}
             placeholder="Search repertoires..."/>
         </div>
       </div>
+
 
       {/* New folder inline input */}
       {creatingFolder && (
@@ -450,40 +274,40 @@ const reloadData = async () => {
               onChange={e => setNewFolderName(e.target.value)}
               placeholder="Folder name..."
               onKeyDown={e => {
-                if (e.key === 'Enter') createFolder();
-                if (e.key === 'Escape') setCreatingFolder(false);
-              }}
-              onBlur={createFolder}
-            />
+                if (e.key === "Enter") createFolder();
+                if (e.key === "Escape") setCreatingFolder(false);}}
+              onBlur={createFolder}/>
           </div>
         </div>
       )}
 
+
+
       {/* Folder list */}
       <div className={styles.folderList}>
         {filtered.length === 0 ? (
-    <div className={styles.emptyMessage}>No repertoires found.</div>
+          <div className={styles.emptyMessage}>No repertoires found.</div>
         ) : (
-      filtered.map(folder => (
-      <FolderSelection
-        key={folder.id}
-        folder={folder}
-        repertoires={folder.filteredRepertoires}
-        onToggle={toggleFolder}
-        onRenameFolder={renameFolder}
-        onRenameRepertoire={renameRepertoire}
-        onSelectRepertoire={selectRepertoire}
-        onDeleteFolder={deleteFolder}/>
-        ))
-      )}
-    </div>
-      </main>
-        {showImportModal && pendingImportData && (
-        <ImportModal data={pendingImportData} onClose={() => 
-          setShowImportModal(false)}
-          reloadData={reloadData}/>
-      )}
-    </div>
-    );
-  };
-export default EditRepertoires
+          filtered.map(folder => (
+            <FolderSelection
+              key={folder.id}
+              folder={folder}
+              repertoires={folder.filteredRepertoires}
+              onToggle={toggleFolder}
+              onRenameFolder={renameFolder}
+              onRenameRepertoire={renameRepertoire}
+              onSelectRepertoire={selectRepertoire}
+              onDeleteFolder={deleteFolder}/>)))}
+      </div>
+    </main>
+
+
+
+    {showImportModal && pendingImportData && (
+      <ImportModal
+        data={pendingImportData}
+        onClose={() => setShowImportModal(false)}
+        reloadData={reloadData}/>)}
+  </div>
+);
+};export default EditRepertoires;

@@ -1,10 +1,10 @@
-/*apps/desktop/src/components/FolderSelection.tsx */
+/*apps/desktop/src/components/editRepertoireComponents/FolderSelection.tsx */
 
 import React, { useState, useRef } from "react";
-import type { Folder } from "../types/Folder";
-import type { Repertoire } from "../types/Repertoire";
-import RepertoireRow from "./RepertoireRow";
-import styles from "./FolderSelection.module.css";
+import type { Folder } from "../../types/Folder";
+import type { Repertoire } from "../../types/Repertoire";
+import RepertoireRow from "../RepertoireRow";
+import styles from "./FolderSection.module.css";
 
 // UI component to display available 'folders' (JSON objects)
 // ensures folders can collapse

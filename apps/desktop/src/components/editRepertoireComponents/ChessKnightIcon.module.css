@@ -1,0 +1,38 @@
+/*apps/src/desktop/components/editRepertoireComponents/ChessKnightIcon.module.css*/
+
+/* Knight icon */
+.knight-icon {
+  width: 32px;
+  height: 32px;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  user-select: none;
+}
+
+.knight-white {
+  background: rgba(var(--color-cream-rgb), 0.15);
+  border: 1px solid rgba(var(--color-cream-rgb), 0.3);
+  user-select: none;
+}
+
+.knight-black {
+  background: rgba(var(--color-piece-dark-rgb), 0.25);
+  border: 1px solid rgba(var(--color-piece-dark-rgb), 0.35);
+  user-select: none;
+}
+
+.knight-piece {
+  font-size: 14px;
+  user-select: none;
+}
+
+.piece-white { 
+    color: var(--color-piece-light); 
+}
+
+.piece-black { 
+    color: var(--color-piece-dark); 
+}

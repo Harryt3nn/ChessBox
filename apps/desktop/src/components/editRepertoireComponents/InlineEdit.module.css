@@ -1,0 +1,20 @@
+/*apps/desktop/src/components/editRepertoireComponents/InlineEdit.module.css*/
+
+/* InlineEdit */
+.inline-edit-input {
+  background: rgba(var(--color-cream-rgb), 0.08);
+  border: 1px solid rgba(var(--color-amber-rgb), 0.4);
+  border-radius: 4px;
+  color: var(--color-text-primary);
+  padding: 2px 6px;
+  font-size: inherit;
+  font-family: inherit;
+  font-weight: inherit;
+  outline: none;
+  user-select: none;
+}
+
+.inline-edit-text {
+  cursor: text;
+  user-select: none;
+}
