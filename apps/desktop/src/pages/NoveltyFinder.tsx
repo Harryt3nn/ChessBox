@@ -14,7 +14,7 @@ const NoveltyFinder = ({ page, setPage }: NoveltyFinderProps) => {
             <Sidebar setPage={setPage} />
 
             <main className="main-content">
-                <h1>Novelty Finder</h1>
+                <h1>Novelty Finder coming soon...</h1>
             </main>
         </div>
     );
