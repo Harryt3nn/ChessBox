@@ -12,6 +12,13 @@ function signToken(userId: string) {
   return jwt.sign({ sub: userId }, process.env.JWT_SECRET!, { expiresIn: '7d' });
 }
 
+// Constant-format hash used to verify against when no user is found, so
+// login takes the same ~300ms whether or not the username exists. Any
+// valid-format hash works here — the password inside doesn't matter.
+const DUMMY_HASH =
+  '$argon2id$v=19$m=65536,t=3,p=1$AAAAAAAAAAAAAAAAAAAAAA$AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA';
+
+
 export const authRouter = router({
   register: publicProcedure
     .input(registerInputSchema)
@@ -48,7 +55,7 @@ export const authRouter = router({
 
       const valid = user
         ? await verifyPassword(input.password, user.passwordHash)
-        : await verifyPassword(input.password, '$argon2id$v=19$m=65536,t=3,p=1$AAAAAAAAAAAAAAAAAAAAAA$AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA');
+        : await verifyPassword(input.password, DUMMY_HASH);
 
       if (!user || !valid) {
         throw new TRPCError({ code: 'UNAUTHORIZED', message: 'Invalid credentials' });

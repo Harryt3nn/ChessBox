@@ -408,7 +408,7 @@ const reloadData = async () => {
     <aside className="sidebar">
       <div className="sidebar-logo">
         <i className="fa-solid fa-chess-queen" />
-        <span>CTT</span>
+        <span>ChessBox</span>
       </div>
 
       <nav className="sidebar-nav">

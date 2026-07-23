@@ -34,7 +34,7 @@ const Settings = ({ onBack }: { onBack: () => void }) => {
       <aside className="sidebar">
         <div className="sidebar-logo">
           <i className="fa-solid fa-chess-queen"></i>
-          <span>CTT</span>
+          <span>ChessBox</span>
         </div>
 
         <nav className="sidebar-nav"></nav>
