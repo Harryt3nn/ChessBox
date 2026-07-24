@@ -104,3 +104,21 @@
   margin-top: -8px;
   user-select: none;
 }
+
+.modeToggle {
+  display: block;
+  width: 100%;
+  margin-top: 16px;
+  background: none;
+  border: none;
+  color: var(--color-text-tertiary);
+  font-size: 12px;
+  text-align: center;
+  cursor: pointer;
+  user-select: none;
+  transition: color 0.15s;
+}
+
+.modeToggle:hover {
+  color: var(--color-amber);
+}

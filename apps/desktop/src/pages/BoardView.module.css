@@ -288,3 +288,62 @@
 .panelCopyBtn {
   flex: 1;
 }
+
+/* Scrollable move list only — no longer contains nav/actions/FEN/PGN */
+.moveListScroll {
+  background: var(--color-surface-2);
+  border: 1px solid var(--color-border);
+  clip-path: polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px);
+  padding: 12px 16px;
+  color: var(--color-text-secondary);
+  font-size: 14px;
+  line-height: 1.8;
+  flex: 1;
+  overflow-y: auto;
+  min-height: 0;
+}
+
+.moveListScroll::-webkit-scrollbar {
+  width: 6px;
+}
+
+.moveListScroll::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.moveListScroll::-webkit-scrollbar-thumb {
+  background: var(--color-surface-3);
+}
+
+.moveListScroll::-webkit-scrollbar-thumb:hover {
+  background: var(--color-border-strong);
+}
+
+/* Always-visible FEN/PGN box, pinned at the bottom of the panel */
+.dataPanel {
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  height: 180px;
+}
+
+.fenDisplay,
+.pgnDisplay {
+  background: var(--color-surface-2);
+  border: 1px solid var(--color-border);
+  clip-path: polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px);
+  padding: 12px 16px;
+  color: var(--color-text-secondary);
+  font-size: 14px;
+  line-height: 1.8;
+  flex: 1;
+  overflow-y: auto;
+  min-height: 0;
+}
+
+.boardPanelActions {
+  display: flex;
+  gap: 8px;
+  flex-shrink: 0;
+}

@@ -488,9 +488,9 @@ return (
           boardWidth={560}/>
       </div>
 
-      {/* ----------------------------- PANEL ----------------------------- */}
+    {/* ----------------------------- PANEL ----------------------------- */}
       <div className={styles.boardPanel}>
-        {/* FEN / PGN */}
+        {/* FEN / PGN toggle */}
         <div className={styles.toggleWrapper}>
           <button
             className={`${styles.fenToggleBtn} ${viewMode === 'fen' ? styles.toggleActive : ''}`}
@@ -504,8 +504,8 @@ return (
           </button>
         </div>
 
-        {/* Move list — one pair per row: "1. e4 e5" */}
-        <div className={styles.moveHistory} ref={moveListRef}>
+        {/* Scrollable move list — grows/shrinks, own scrollbar */}
+        <div className={styles.moveListScroll} ref={moveListRef}>
           {movePairs.length === 0 ? (
             <span className={styles.moveHistoryEmpty}>No moves yet</span>
           ) : (
@@ -530,7 +530,6 @@ return (
                   </span>)}
               </div>)))}
 
-          {/* Variation switcher — only visible when multiple moves exist at this depth */}
           {hasVariations && (
             <div className={styles.variationList}>
               {variations.map((v, i) => {
@@ -548,40 +547,42 @@ return (
               })}
             </div>
           )}
+        </div>
 
-          {/* Navigation buttons — arrow keys also work (←→↑↓) */}
-          <div className={styles.moveNav}>
-            <button className={styles.navArrow} onClick={goToStart} disabled={!canGoBack} title="Start (↑)">
-              <i className="fa-solid fa-backward-fast"></i>
-            </button>
-            <button className={styles.navArrow} onClick={goBack} disabled={!canGoBack} title="Back (←)">
-              <i className="fa-solid fa-backward-step"></i>
-            </button>
-            <button className={styles.navArrow} onClick={goForward} disabled={!canGoForward} title="Forward (→)">
-              <i className="fa-solid fa-forward-step"></i>
-            </button>
-            <button className={styles.navArrow} onClick={goToEnd} disabled={!canGoForward} title="End (↓)">
-              <i className="fa-solid fa-forward-fast"></i>
-            </button>
-          </div>
+        {/* Navigation buttons — fixed, not part of the scroll */}
+        <div className={styles.moveNav}>
+          <button className={styles.navArrow} onClick={goToStart} disabled={!canGoBack} title="Start (↑)">
+            <i className="fa-solid fa-backward-fast"></i>
+          </button>
+          <button className={styles.navArrow} onClick={goBack} disabled={!canGoBack} title="Back (←)">
+            <i className="fa-solid fa-backward-step"></i>
+          </button>
+          <button className={styles.navArrow} onClick={goForward} disabled={!canGoForward} title="Forward (→)">
+            <i className="fa-solid fa-forward-step"></i>
+          </button>
+          <button className={styles.navArrow} onClick={goToEnd} disabled={!canGoForward} title="End (↓)">
+            <i className="fa-solid fa-forward-fast"></i>
+          </button>
+        </div>
 
-          {/* Save / Load / Reset */}
-          <div className={styles.boardPanelActions}>
-            <button className={styles.btnSecondary} onClick={saveGame}>
-              <i className="fa-solid fa-floppy-disk"></i> Save
-            </button>
+        {/* Save / Load / Reset — fixed, not part of the scroll */}
+        <div className={styles.boardPanelActions}>
+          <button className={styles.btnSecondary} onClick={saveGame}>
+            <i className="fa-solid fa-floppy-disk"></i> Save
+          </button>
 
-            <label className={styles.btnSecondary} style={{ cursor: 'pointer' }}>
-              <i className="fa-solid fa-folder-open"></i> Load
-              <input type="file" accept=".json" style={{ display: 'none' }} onChange={loadGame} />
-            </label>
+          <label className={styles.btnSecondary} style={{ cursor: 'pointer' }}>
+            <i className="fa-solid fa-folder-open"></i> Load
+            <input type="file" accept=".json" style={{ display: 'none' }} onChange={loadGame} />
+          </label>
 
-            <button className={styles.btnReset} onClick={resetBoard}>
-              <i className="fa-solid fa-rotate-left"></i> Reset
-            </button>
-          </div>
+          <button className={styles.btnReset} onClick={resetBoard}>
+            <i className="fa-solid fa-rotate-left"></i> Reset
+          </button>
+        </div>
 
-          {/* ---------------------- FEN VIEW ---------------------- */}
+        {/* FEN / PGN box — always pinned at the bottom, own internal scroll */}
+        <div className={styles.dataPanel}>
           {viewMode === 'fen' && (
             <>
               <div className={styles.fenDisplay}>
@@ -604,15 +605,14 @@ return (
                   spellCheck={false}/>
               </div>
 
-              <div className={styles.boardPanelActions}>
-                <button
-                  className={`${styles.btnSecondary} ${styles.panelCopyBtn}`}
-                  onClick={() => navigator.clipboard.writeText(getCurrentFen(tree))}>
-                  <i className="fa-regular fa-copy"></i> Copy FEN
-                </button>
-              </div></>)}
+              <button
+                className={`${styles.btnSecondary} ${styles.panelCopyBtn}`}
+                onClick={() => navigator.clipboard.writeText(getCurrentFen(tree))}>
+                <i className="fa-regular fa-copy"></i> Copy FEN
+              </button>
+            </>
+          )}
 
-          {/* ---------------------- PGN VIEW ---------------------- */}
           {viewMode === 'pgn' && (
             <>
               <div className={styles.pgnDisplay}>
@@ -623,15 +623,16 @@ return (
                   spellCheck={false}/>
               </div>
 
-              <div className={styles.boardPanelActions}>
-                <button
-                  className={`${styles.btnSecondary} ${styles.panelCopyBtn}`}
-                  onClick={() => navigator.clipboard.writeText(pgnText)}>
-                  <i className="fa-regular fa-copy"></i> Copy PGN
-                </button>
-              </div></>)}
+              <button
+                className={`${styles.btnSecondary} ${styles.panelCopyBtn}`}
+                onClick={() => navigator.clipboard.writeText(pgnText)}>
+                <i className="fa-regular fa-copy"></i> Copy PGN
+              </button>
+            </>
+          )}
         </div>
       </div>
     </main>
-  </div>);}
+  </div>
+  );}
 export default BoardView

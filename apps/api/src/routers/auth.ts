@@ -9,7 +9,7 @@ import { router, publicProcedure, protectedProcedure } from '../trpc';
 
 
 function signToken(userId: string) {
-  return jwt.sign({ sub: userId }, process.env.JWT_SECRET!, { expiresIn: '7d' });
+  return jwt.sign({ sub: userId }, process.env.JWT_SECRET!, { expiresIn: '3d' });
 }
 
 // Constant-format hash used to verify against when no user is found, so

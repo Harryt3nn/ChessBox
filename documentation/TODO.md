@@ -38,6 +38,8 @@
 
 20. Switch from font awesome to flaticon SVG images
 
+21. Add email verification + reset password + forgot password
+
 
 Worth doing before September
 .env.example — five minutes, and it's the first thing anyone cloning your repo (including an interviewer) will look for. Nothing kills a portfolio project faster than a reviewer cloning it and immediately hitting the exact debugging spiral we just went through.
