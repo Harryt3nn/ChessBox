@@ -13,12 +13,7 @@ import {
 import type { Folder } from "../types/Folder";
 import type { Repertoire } from "../types/Repertoire";
 import type { Node } from "../types/Node";
-
-export interface ImportPayload {
-  folders: Folder[];
-  repertoires: Repertoire[];
-  nodes: Record<string, Node>;
-}
+import type { ImportRepertoiresPayload } from "../types/ImportPayload";
 
 function mergeFolders(existing: Folder[], incoming: Folder[]): Folder[] {
   const map = new Map(existing.map(f => [f.id, f]));
@@ -36,7 +31,7 @@ function mergeRepertoires(existing: Repertoire[], incoming: Repertoire[]): Reper
   return [...map.values()];
 }
 
-export async function importRepertoires(payload: ImportPayload): Promise<{ success: true }> {
+export async function importRepertoires(payload: ImportRepertoiresPayload): Promise<{ success: true }> {
   const { folders, repertoires, nodes } = payload;
 
   const existingFolders = await loadFolders();

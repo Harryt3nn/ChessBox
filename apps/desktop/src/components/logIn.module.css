@@ -1,0 +1,106 @@
+/*apps/desktop/src/components/logIn.module.css*/
+
+.modalBackdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.55);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 999;
+  user-select: none;
+}
+
+.modalWindow {
+  background: var(--color-surface-1);
+  border: 1px solid var(--color-border-strong);
+  clip-path: polygon(14px 0, 100% 0, 100% calc(100% - 14px), calc(100% - 14px) 100%, 0 100%, 0 14px);
+  padding: 32px;
+  width: 480px;
+  max-height: 80vh;
+  overflow-y: auto;
+  box-shadow: 0 0 32px rgba(0, 0, 0, 0.5);
+  user-select: none;
+}
+
+.modalWindow h2 {
+  color: var(--color-amber);
+  font-size: 20px;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  margin-bottom: 24px;
+  text-align: center;
+  user-select: none;
+}
+
+.modalWindow form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.modalWindow input {
+  width: 100%;
+  padding: 10px 14px;
+  background: var(--color-surface-2);
+  border: 1px solid var(--color-border);
+  color: var(--color-text-primary);
+  font-size: 14px;
+  font-family: 'Segoe UI', sans-serif;
+  outline: none;
+  transition: border-color 0.15s;
+  user-select: text;
+}
+
+.modalWindow input:focus {
+  border-color: var(--color-amber);
+}
+
+.modalWindow button[type="submit"] {
+  margin-top: 8px;
+  padding: 10px 16px;
+  border: none;
+  clip-path: polygon(6px 0, 100% 0, 100% calc(100% - 6px), calc(100% - 6px) 100%, 0 100%, 0 6px);
+  background: var(--color-amber);
+  color: var(--color-ink);
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: background 0.15s;
+  user-select: none;
+}
+
+.modalWindow button[type="submit"]:hover:not(:disabled) {
+  background: var(--color-amber-hover);
+}
+
+.modalWindow button[type="submit"]:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.modalWindow label {
+  color: var(--color-text-secondary);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  margin-bottom: -8px;
+  user-select: none;
+}
+
+.app-layout.locked {
+  pointer-events: none;
+  user-select: none;
+}
+
+.error {
+  color: var(--color-coral);
+  font-size: 12px;
+  margin-top: -8px;
+  user-select: none;
+}

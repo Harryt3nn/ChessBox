@@ -7,12 +7,14 @@ import { trpc, setAuthToken } from '../trpc'
 import styles from "./logIn.module.css";
 
 
-export function LogIn() {
+export function LogIn({ onSuccess }: { onSuccess: () => void }) {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [errors, setErrors] = useState<{ username?: string; password?: string }>({});
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
+
+  
 
   function validate() {
     const usernameResult = usernameSchema.safeParse(username);
@@ -42,7 +44,8 @@ export function LogIn() {
     try {
       const result = await trpc.auth.login.mutate({ username, password });
       setAuthToken(result.token);
-      // TODO: persist token via MainStorage, then navigate away from login
+      await window.storage.saveAuthToken(result.token);
+      onSuccess();
     } catch (err) {
       setSubmitError(err instanceof Error ? err.message : "Login failed");
     } finally {
@@ -56,25 +59,29 @@ export function LogIn() {
         <h2>Sign into ChessBox</h2>
 
         <form onSubmit={handleSubmit}>
+          <label htmlFor="username">Username</label>
           <input
+            id="username"
             type="text"
             name="username"
             value={username}
             onChange={(e) => setUsername(e.target.value)}
             required
           />
-          {errors.username && <p className="error">{errors.username}</p>}
+          {errors.username && <p className={styles.error}>{errors.username}</p>}
 
+          <label htmlFor="password">Password</label>
           <input
+            id="password"
             type="password"
             name="password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             required
           />
-          {errors.password && <p className="error">{errors.password}</p>}
+          {errors.password && <p className={styles.error}>{errors.password}</p>}
 
-          {submitError && <p className="error">{submitError}</p>}
+          {submitError && <p className={styles.error}>{submitError}</p>}
 
           <button type="submit" disabled={submitting}>
             {submitting ? "Signing in..." : "Log In"}

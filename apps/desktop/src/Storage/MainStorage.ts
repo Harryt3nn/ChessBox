@@ -3,7 +3,7 @@
 
 import fs from "fs";
 import path from "path";
-import { app } from "electron";
+import { app, safeStorage } from "electron";
 import type { Folder } from "../types/Folder";
 import type { Repertoire } from "../types/Repertoire";
 import type { Node } from "../types/Node";
@@ -13,6 +13,42 @@ const DATA_DIR = path.join(app.getPath("userData"), "ctt-data");
 const FOLDERS_PATH = path.join(DATA_DIR, "folders.json");
 const REPS_DIR = path.join(DATA_DIR, "repositories");
 const NODES_PATH = path.join(DATA_DIR, "nodes.json");
+const AUTH_TOKEN_PATH = path.join(DATA_DIR, "auth.token");
+
+// Api
+
+export async function saveAuthToken(token: string): Promise<void> {
+  ensureDirs();
+  if (!safeStorage.isEncryptionAvailable()) {
+    throw new Error("OS-level encryption is not available on this machine");
+  }
+  const encrypted = safeStorage.encryptString(token);
+  await fs.promises.writeFile(AUTH_TOKEN_PATH, encrypted);
+}
+
+export async function loadAuthToken(): Promise<string | null> {
+  ensureDirs();
+  try {
+    const encrypted = await fs.promises.readFile(AUTH_TOKEN_PATH);
+    if (!safeStorage.isEncryptionAvailable()) return null;
+    return safeStorage.decryptString(encrypted);
+  } catch {
+    return null;
+  }
+}
+
+export async function clearAuthToken(): Promise<void> {
+  ensureDirs();
+  try {
+    await fs.promises.unlink(AUTH_TOKEN_PATH);
+  } catch {
+    // no-op if it never existed
+  }
+}
+
+
+// Filesystem
+
 
 function ensureDirs() {
   if (!fs.existsSync(DATA_DIR)) fs.mkdirSync(DATA_DIR, { recursive: true });

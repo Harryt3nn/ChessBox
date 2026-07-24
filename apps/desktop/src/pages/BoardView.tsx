@@ -485,24 +485,21 @@ return (
           onPieceDrop={onPieceDrop}
           onSquareClick={onSquareClick}
           customSquareStyles={customSquareStyles}
-          boardWidth={560}
-        />
+          boardWidth={560}/>
       </div>
 
       {/* ----------------------------- PANEL ----------------------------- */}
       <div className={styles.boardPanel}>
-        {/* View toggle: SAN / FEN / PGN */}
+        {/* FEN / PGN */}
         <div className={styles.toggleWrapper}>
           <button
             className={`${styles.fenToggleBtn} ${viewMode === 'fen' ? styles.toggleActive : ''}`}
-            onClick={() => setViewMode('fen')}
-          >
+            onClick={() => setViewMode('fen')}>
             FEN
           </button>
           <button
             className={`${styles.pgnToggleBtn} ${viewMode === 'pgn' ? styles.toggleActive : ''}`}
-            onClick={() => setViewMode('pgn')}
-          >
+            onClick={() => setViewMode('pgn')}>
             PGN
           </button>
         </div>
@@ -519,9 +516,7 @@ return (
                   className={`${styles.moveText} ${white.id === activeNodeId ? styles.moveActive : ''}`}
                   onClick={() => {
                     const idx = pathMoves.findIndex(m => m.id === white.id);
-                    goToPath(pathMoves.slice(0, idx + 1).map(m => m.id));
-                  }}
-                >
+                    goToPath(pathMoves.slice(0, idx + 1).map(m => m.id));}}>
                   {white.move}
                 </span>
 
@@ -530,15 +525,10 @@ return (
                     className={`${styles.moveText} ${black.id === activeNodeId ? styles.moveActive : ''}`}
                     onClick={() => {
                       const idx = pathMoves.findIndex(m => m.id === black.id);
-                      goToPath(pathMoves.slice(0, idx + 1).map(m => m.id));
-                    }}
-                  >
+                      goToPath(pathMoves.slice(0, idx + 1).map(m => m.id));}}>
                     {black.move}
-                  </span>
-                )}
-              </div>
-            ))
-          )}
+                  </span>)}
+              </div>)))}
 
           {/* Variation switcher — only visible when multiple moves exist at this depth */}
           {hasVariations && (
@@ -551,8 +541,7 @@ return (
                   <span
                     key={v.id}
                     className={`${styles.variationItem} ${isActive ? styles.variationActive : ''}`}
-                    onClick={() => goToPath(varPath)}
-                  >
+                    onClick={() => goToPath(varPath)}>
                     {i === 0 ? 'Main' : `Var ${i}`}: {v.move}
                   </span>
                 );
@@ -612,20 +601,16 @@ return (
                       // Invalid or incomplete FEN mid-type — silently ignore
                     }
                   }}
-                  spellCheck={false}
-                />
+                  spellCheck={false}/>
               </div>
 
               <div className={styles.boardPanelActions}>
                 <button
                   className={`${styles.btnSecondary} ${styles.panelCopyBtn}`}
-                  onClick={() => navigator.clipboard.writeText(getCurrentFen(tree))}
-                >
+                  onClick={() => navigator.clipboard.writeText(getCurrentFen(tree))}>
                   <i className="fa-regular fa-copy"></i> Copy FEN
                 </button>
-              </div>
-            </>
-          )}
+              </div></>)}
 
           {/* ---------------------- PGN VIEW ---------------------- */}
           {viewMode === 'pgn' && (
@@ -635,25 +620,18 @@ return (
                   className={styles.pgnDisplayText}
                   value={pgnText}
                   readOnly
-                  spellCheck={false}
-                />
+                  spellCheck={false}/>
               </div>
 
               <div className={styles.boardPanelActions}>
                 <button
                   className={`${styles.btnSecondary} ${styles.panelCopyBtn}`}
-                  onClick={() => navigator.clipboard.writeText(pgnText)}
-                >
+                  onClick={() => navigator.clipboard.writeText(pgnText)}>
                   <i className="fa-regular fa-copy"></i> Copy PGN
                 </button>
-              </div>
-            </>
-          )}
+              </div></>)}
         </div>
       </div>
     </main>
-  </div>
-);
-}
-
+  </div>);}
 export default BoardView

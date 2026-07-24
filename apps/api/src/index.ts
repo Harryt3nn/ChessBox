@@ -2,6 +2,7 @@
 
 
 import Fastify from 'fastify';
+import cors from '@fastify/cors';
 import { fastifyTRPCPlugin } from '@trpc/server/adapters/fastify';
 import { appRouter } from './routers/appRouter';
 import { createContext } from './trpc';
@@ -9,6 +10,10 @@ import { createContext } from './trpc';
 
 const fastify = Fastify({
   logger: true
+});
+
+await fastify.register(cors, {
+  origin: true, // reflects the request's own origin — fine for local dev
 });
 
 fastify.get('/', async function handler (request, reply) {

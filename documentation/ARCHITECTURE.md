@@ -1,5 +1,5 @@
 # Chess Training Toolkit — Architecture
-cd /mnt/c/Users/harry/Documents/Projects/CTTBox/CTT
+
 ## Overview
 
 CTT is a desktop app built with **Electron + React + TypeScript** using Electron Forge

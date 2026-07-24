@@ -18,23 +18,26 @@
 
 10. add peice sounds!
 
-11. finalise logo and display
+11. finalise logo and display, with changeable colour schemes
 
-12. make 'uncategorized unable to delete
+12. -------------------------------------
 
 13. CURRENT: basic analysis board (without stockfish, adding that later. For now, is a way to test out features with the react chessboard (v4)). Features to add: move history, stockfish move analysis, highlight legal captures, toggle on or off highlighting legal moves, flip board, board cosmetics
 
 14. fix spelling mistake in 'EditRepertiores'
 
-15. ensure no inline css
+15. ---------------------------------------
 
-16. chessbase integration??? 
+16. ---------------------------------------
 
 17. different coloured folders
 
-18. R6R/3Q4/1Q4Q1/4Q3/2Q4Q/Q4Q2/pp1Q4/kBNN1KB1 w - - 0 1 is a fen of the most available moves. Need a system that can handle an unlimitied number of moves like this without breaking
+18. -----------------------------------------
 
 19. left click on the board removes all highlighted sections
+
+20. Switch from font awesome to flaticon SVG images
+
 
 Worth doing before September
 .env.example — five minutes, and it's the first thing anyone cloning your repo (including an interviewer) will look for. Nothing kills a portfolio project faster than a reviewer cloning it and immediately hitting the exact debugging spiral we just went through.

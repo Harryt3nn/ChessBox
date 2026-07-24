@@ -33,4 +33,13 @@ contextBridge.exposeInMainWorld("storage", {
 
   importRepertoires: (payload: ImportRepertoiresPayload) =>
     ipcRenderer.invoke("storage:importRepertoires", payload),
+
+  saveAuthToken: (token: string): Promise<void> =>
+    ipcRenderer.invoke("storage:saveAuthToken", token),
+
+  loadAuthToken: (): Promise<string | null> =>
+    ipcRenderer.invoke("storage:loadAuthToken"),
+
+  clearAuthToken: (): Promise<void> =>
+    ipcRenderer.invoke("storage:clearAuthToken")
 });

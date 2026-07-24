@@ -2,58 +2,48 @@
 
 
 /* ============================================================
-   FLAT CONSTRUCTIVIST NOIR — custom palette
-   Deep navy-plum void + warm cream, with a dual accent system:
-   amber (brand / primary actions) and coral (emphasis / alerts).
-   Sage is reserved exclusively for chess.com connect/success states.
+   ART DECO — custom palette
+   Black lacquer + brass void, with a jewel-tone accent system:
+   brass/gold (primary actions) and garnet (emphasis / alerts).
+   Emerald is reserved exclusively for chess.com connect/success states.
    ============================================================ */
 :root {
-  /* Surfaces — dark to light */
-  --color-void: #16131f;          /* page background */
-  --color-surface-1: #1f1a2b;     /* sidebar, modal window */
-  --color-surface-2: #2a2438;     /* inputs, cards, move history */
-  --color-surface-3: #352e47;     /* hover states, scrollbar thumb */
+  /* Surfaces — lighter charcoal-emerald ramp */
+  --color-void: #333e37;
+  --color-surface-1: #3d4941;
+  --color-surface-2: #48544b;
+  --color-surface-3: #535f55;
 
-  /* Borders */
-  --color-border: #423a56;
-  --color-border-strong: #5c5278;
+  --color-border: #748075;
+  --color-border-strong: #96a297;
 
-  /* Text */
-  --color-text-primary: #f0e6d3;    /* headings, logo, active/selected */
-  --color-text-secondary: #c2b8a8;  /* nav labels, body text, card titles */
-  --color-text-tertiary: #9c9286;   /* counts, captions, placeholders */
-  --color-text-faint: #6d6458;      /* move numbers, footers, empty states */
+  --color-text-primary: #f2e9d8;
+  --color-text-secondary: #d6cbb5;
+  --color-text-tertiary: #ada38a;
+  --color-text-faint: #857c66;
 
-  /* Accent: amber — brand + primary actions */
-  --color-amber: #d99c34;
-  --color-amber-hover: #e8ad4a;
-  --color-amber-rgb: 217, 156, 52;
+  --color-amber: #c9a24b;
+  --color-amber-hover: #d9b562;
+  --color-amber-rgb: 201, 162, 75;
 
-  /* Accent: coral — emphasis, destructive, error */
-  --color-coral: #c4453f;
-  --color-coral-hover: #d65a52;
-  --color-coral-rgb: 196, 69, 63;
+  --color-coral: #8c2f39;
+  --color-coral-hover: #a83f4a;
+  --color-coral-rgb: 140, 47, 57;
 
-  /* Chess pieces */
-  --color-piece-light: #f0e6d3;
-  --color-piece-dark: #a8889c;
-  --color-piece-dark-rgb: 168, 136, 156;
+  --color-piece-light: #f2e9d8;
+  --color-piece-dark: #3c4a44;
+  --color-piece-dark-rgb: 60, 74, 68;
 
-  /* Sage — reserved for chess.com brand connect/success states only */
-  --color-sage: #7d9b5b;
-  --color-sage-hover: #8fae6a;
+  --color-sage: #1f6b52;
+  --color-sage-hover: #2c8265;
 
-  /* Cream RGB, for translucent overlays */
-  --color-cream-rgb: 240, 230, 211;
+  --color-cream-rgb: 242, 233, 216;
+  --color-ink: #17201a;
 
-  /* Ink — dark text used on light/amber/sage buttons */
-  --color-ink: #1b1726;
-
-  /* Board highlights */
   --highlight-selected: rgba(var(--color-amber-rgb), 0.25);
   --highlight-dot: radial-gradient(circle, rgba(0, 0, 0, 0.3) 20%, transparent 21%);
-  user-select: none;
 }
+
 
 * {
   margin: 0;

@@ -1,6 +1,5 @@
 /*apps/desktop/forge.config.ts*/
 
-
 import type { ForgeConfig } from '@electron-forge/shared-types';
 import { MakerSquirrel } from '@electron-forge/maker-squirrel';
 import { MakerZIP } from '@electron-forge/maker-zip';
@@ -12,7 +11,6 @@ import { FusesPlugin } from '@electron-forge/plugin-fuses';
 import { FuseV1Options, FuseVersion } from '@electron/fuses';
 import { mainConfig } from './webpack.main.config';
 import { rendererConfig } from './webpack.renderer.config';
-
 
 const config: ForgeConfig = {
   packagerConfig: {
@@ -28,21 +26,23 @@ const config: ForgeConfig = {
   plugins: [
     new AutoUnpackNativesPlugin({}),
     new WebpackPlugin({
-      mainConfig,
-      renderer: {
-        config: rendererConfig,
-        entryPoints: [
-          {
-            html: './src/index.html',
-            js: './src/renderer.tsx',
-            name: 'main_window',
-            preload: {
-              js: './src/preload.ts',
-            },
-          },
-        ],
+  mainConfig,
+  devContentSecurityPolicy:
+    "default-src 'self' 'unsafe-inline' 'unsafe-eval' data:; connect-src 'self' http://localhost:3001 ws://localhost:3000",
+  renderer: {
+    config: rendererConfig,
+    entryPoints: [
+      {
+        html: './src/index.html',
+        js: './src/renderer.tsx',
+        name: 'main_window',
+        preload: {
+          js: './src/preload.ts',
+        },
       },
-    }),
+    ],
+  },
+}),
     // Fuses are used to enable/disable various Electron functionality
     // at package time, before code signing the application
     new FusesPlugin({

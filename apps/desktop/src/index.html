@@ -1,12 +1,19 @@
-
+<!--apps/desktop/src/index.html-->
 <!doctype html>
 <html>
   <head>
     <link rel="icon" type="image/png" href="/public/icons/icon.png" />
     <meta charset="UTF-8" />
+   <meta
+  http-equiv="Content-Security-Policy"
+  content="default-src 'self' 'unsafe-inline' 'unsafe-eval' data:; connect-src 'self' http://localhost:3001 ws://localhost:3000; img-src 'self' data: https://marker-test-12345.invalid"/>
     <title>ChessBox</title>
   </head>
   <body>
     <div id="root"></div>
   </body>
 </html>
+
+
+<!-- TODO: tighten CSP before packaging — unsafe-eval and the webpack-dev-server
+     websocket origin are dev-only requirements, not needed in production -->
