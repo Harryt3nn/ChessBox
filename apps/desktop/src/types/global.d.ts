@@ -24,6 +24,7 @@ declare global {
     },
      api: {
       importLichess(username: string): Promise<ImportResult>;
+      importChesscom(username: string): Promise<ImportResult>;
     };
   }
 }

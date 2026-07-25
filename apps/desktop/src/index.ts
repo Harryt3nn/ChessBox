@@ -5,6 +5,7 @@ import fs from "fs";
 import path from "path";
 import type { ImportRepertoiresPayload } from "./types/ImportPayload";
 import { importRepertoires } from "./Storage/ImportService";
+import { importChesscom } from "./Storage/ChesscomImporter";
 import { importLichess } from "./Storage/LichessImporter";
 import {
   loadFolders,
@@ -55,10 +56,25 @@ ipcMain.handle(
 
 ipcMain.handle("import-lichess", async (_event, username: string) => {
   try {
-    await importLichess(username);
-    return { ok: true };
+    const result = await importLichess(username);
+    return result;
   } catch (err) {
     console.error("Lichess import failed:", err);
+
+    if (err instanceof Error) {
+      return { ok: false, error: err.message };
+    }
+
+    return { ok: false, error: String(err) };
+  }
+});
+
+ipcMain.handle("import-chesscom", async (_event, username: string) => {
+  try {
+    const result = await importChesscom(username);
+    return result;
+  } catch (err) {
+    console.error("Chess.com import failed:", err);
 
     if (err instanceof Error) {
       return { ok: false, error: err.message };

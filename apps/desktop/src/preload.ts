@@ -47,5 +47,7 @@ contextBridge.exposeInMainWorld("storage", {
 
 contextBridge.exposeInMainWorld("api", {
   importLichess: (username: string) =>
-    ipcRenderer.invoke("import-lichess", username)
+    ipcRenderer.invoke("import-lichess", username),
+  importChesscom: (username: string) =>
+    ipcRenderer.invoke("import-chesscom", username)
 });

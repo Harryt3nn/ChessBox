@@ -18,7 +18,7 @@ import type { inferRouterOutputs } from '@trpc/server';
 import type { AppRouter } from '@chessbox/shared/router';
 
 type RouterOutput = inferRouterOutputs<AppRouter>;
-type User = RouterOutput["user"]["me"];
+type User = RouterOutput["auth"]["me"];
 
 const App = () => {
   const [page, setPage] = useState<Page>('home');
@@ -27,12 +27,12 @@ const App = () => {
   const [currentUser, setCurrentUser] = useState<User | null>(null);
 
   useEffect(() => {
-  restoreAuthToken().then(({ success, user }) => {
-    setIsAuthed(success);
-    setCurrentUser(user);
-    setAuthChecked(true);
-  });
-}, []);
+    restoreAuthToken().then(({ success, user }) => {
+      setIsAuthed(success);
+      setCurrentUser(user);
+      setAuthChecked(true);
+    });
+  }, []);
 
   function renderPage() {
     if (page === 'analytics') return <Analytics page={page} setPage={setPage} />;
@@ -41,7 +41,7 @@ const App = () => {
     if (page === 'settings') return <Settings page={page} setPage={setPage} />;
     if (page === 'board') return <BoardView page={page} setPage={setPage} />;
     if (page === 'novelty') return <NoveltyFinder page={page} setPage={setPage} currentUser={currentUser} />;
-     if (page === 'profile') return <Profile page={page} setPage={setPage} onLogout={() => setIsAuthed(false)} isAuthed={isAuthed} />;
+    if (page === 'profile') return <Profile page={page} setPage={setPage} onLogout={() => { setIsAuthed(false); setCurrentUser(null); }} isAuthed={isAuthed} />;
     if (page === 'community') return <Community page={page} setPage={setPage} />;
 
     return (
@@ -63,7 +63,10 @@ const App = () => {
       </div>
 
       {authChecked && !isAuthed && (
-        <LogIn onSuccess={() => setIsAuthed(true)} />
+        <LogIn onSuccess={(user) => {
+          setIsAuthed(true);
+          setCurrentUser(user);
+        }} />
       )}
     </>
   );

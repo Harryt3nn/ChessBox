@@ -5,10 +5,15 @@ import { useState } from "react";
 import { usernameSchema, passwordSchema, emailSchema } from "@chessbox/shared";
 import { trpc, setAuthToken } from '../trpc'
 import styles from "./logIn.module.css";
+import type { inferRouterOutputs } from '@trpc/server';
+import type { AppRouter } from '@chessbox/shared/router';
+
+type RouterOutput = inferRouterOutputs<AppRouter>;
+type User = RouterOutput["auth"]["me"];
 
 type Mode = "login" | "register";
 
-export function LogIn({ onSuccess }: { onSuccess: () => void }) {
+export function LogIn({ onSuccess }: { onSuccess: (user: User) => void }) {
   const [mode, setMode] = useState<Mode>("login");
 
   const [username, setUsername] = useState("");
@@ -57,7 +62,7 @@ export function LogIn({ onSuccess }: { onSuccess: () => void }) {
     setSubmitError(null);
   }
 
-  async function handleSubmit(e: React.FormEvent) {
+   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     if (!validate()) return;
 
@@ -72,7 +77,9 @@ export function LogIn({ onSuccess }: { onSuccess: () => void }) {
 
       setAuthToken(result.token);
       await window.storage.saveAuthToken(result.token);
-      onSuccess();
+
+      const user = await trpc.auth.me.query();
+      onSuccess(user);
     } catch (err) {
       setSubmitError(err instanceof Error ? err.message : `${mode === "login" ? "Login" : "Sign up"} failed`);
     } finally {

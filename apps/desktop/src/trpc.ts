@@ -26,12 +26,7 @@ export async function restoreAuthToken() {
   setAuthToken(token);
 
   try {
-    // 1. Check token validity
-    await trpc.auth.me.query();
-
-    // 2. Fetch the actual user object
-    const user = await trpc.user.me.query();
-
+    const user = await trpc.auth.me.query();
     return { success: true, user };
   } catch {
     setAuthToken(null);

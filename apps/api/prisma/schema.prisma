@@ -17,6 +17,6 @@ model User {
   email        String   @unique
   passwordHash String
   createdAt    DateTime @default(now())
-  lichessName  String?  @unique
-  chesscomName String?  @unique
+  lichessName String?
+  chesscomName String?
 }
