@@ -4,6 +4,7 @@
 import { contextBridge, ipcRenderer, } from "electron";
 import type { Folder } from "./types/Folder";
 import type { Repertoire } from "./types/Repertoire";
+import type { ImportResult } from "./types/ImportResults";
 import { ImportRepertoiresPayload } from "./types/ImportPayload";
 
 
@@ -42,4 +43,9 @@ contextBridge.exposeInMainWorld("storage", {
 
   clearAuthToken: (): Promise<void> =>
     ipcRenderer.invoke("storage:clearAuthToken")
+});
+
+contextBridge.exposeInMainWorld("api", {
+  importLichess: (username: string) =>
+    ipcRenderer.invoke("import-lichess", username)
 });

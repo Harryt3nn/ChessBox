@@ -3,6 +3,7 @@
 
 import type { Folder } from "./Folder";
 import type { Repertoire } from "./Repertoire";
+import type { ImportResult } from "./ImportResult";
 import type { ImportRepertoiresPayload } from "./ImportPayload";
 
 export {};
@@ -20,6 +21,9 @@ declare global {
       saveAuthToken(token: string): Promise<void>;
       loadAuthToken(): Promise<string | null>;
       clearAuthToken(): Promise<void>;
+    },
+     api: {
+      importLichess(username: string): Promise<ImportResult>;
     };
   }
 }

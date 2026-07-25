@@ -14,18 +14,25 @@ import Sidebar from "./components/SidebarModule";
 import { LogIn } from './components/logIn';
 import { restoreAuthToken } from './trpc';
 import type { Page } from './types/Page';
+import type { inferRouterOutputs } from '@trpc/server';
+import type { AppRouter } from '@chessbox/shared/router';
+
+type RouterOutput = inferRouterOutputs<AppRouter>;
+type User = RouterOutput["user"]["me"];
 
 const App = () => {
   const [page, setPage] = useState<Page>('home');
   const [authChecked, setAuthChecked] = useState(false);
   const [isAuthed, setIsAuthed] = useState(false);
+  const [currentUser, setCurrentUser] = useState<User | null>(null);
 
   useEffect(() => {
-    restoreAuthToken().then((success) => {
-      setIsAuthed(success);
-      setAuthChecked(true);
-    });
-  }, []);
+  restoreAuthToken().then(({ success, user }) => {
+    setIsAuthed(success);
+    setCurrentUser(user);
+    setAuthChecked(true);
+  });
+}, []);
 
   function renderPage() {
     if (page === 'analytics') return <Analytics page={page} setPage={setPage} />;
@@ -33,8 +40,8 @@ const App = () => {
     if (page === 'tools') return <TrainingToolkit page={page} setPage={setPage} />;
     if (page === 'settings') return <Settings page={page} setPage={setPage} />;
     if (page === 'board') return <BoardView page={page} setPage={setPage} />;
-    if (page === 'novelty') return <NoveltyFinder page={page} setPage={setPage} />;
-     if (page === 'profile') return <Profile page={page} setPage={setPage} onLogout={() => setIsAuthed(false)} />;
+    if (page === 'novelty') return <NoveltyFinder page={page} setPage={setPage} currentUser={currentUser} />;
+    if (page === 'profile') return <Profile page={page} setPage={setPage} onLogout={() => setIsAuthed(false)} />;
     if (page === 'community') return <Community page={page} setPage={setPage} />;
 
     return (

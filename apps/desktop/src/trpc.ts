@@ -19,19 +19,23 @@ export const trpc = createTRPCClient<AppRouter>({
   ],
 });
 
-export async function restoreAuthToken(): Promise<boolean> {
+export async function restoreAuthToken() {
   const token = await window.storage.loadAuthToken();
-  if (!token) return false;
+  if (!token) return { success: false, user: null };
 
   setAuthToken(token);
 
   try {
+    // 1. Check token validity
     await trpc.auth.me.query();
-    return true;
+
+    // 2. Fetch the actual user object
+    const user = await trpc.user.me.query();
+
+    return { success: true, user };
   } catch {
-    // token invalid/expired — clear it so we don't keep retrying a dead token
     setAuthToken(null);
     await window.storage.clearAuthToken();
-    return false;
+    return { success: false, user: null };
   }
 }

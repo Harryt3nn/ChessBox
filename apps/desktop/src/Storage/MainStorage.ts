@@ -1,5 +1,4 @@
-/*apps/desktop/src/storage/MainStorage.ts*/
-
+/* apps/desktop/src/storage/MainStorage.ts */
 
 import fs from "fs";
 import path from "path";
@@ -8,14 +7,52 @@ import type { Folder } from "../types/Folder";
 import type { Repertoire } from "../types/Repertoire";
 import type { Node } from "../types/Node";
 
+/* -------------------------------------------------------
+   PATHS
+------------------------------------------------------- */
 
-const DATA_DIR = path.join(app.getPath("userData"), "ctt-data");
+const DATA_DIR = path.join(app.getPath("userData"), "ChessBox-data");
+
 const FOLDERS_PATH = path.join(DATA_DIR, "folders.json");
-const REPS_DIR = path.join(DATA_DIR, "repositories");
+const REPS_DIR = path.join(DATA_DIR, "repertoires");
 const NODES_PATH = path.join(DATA_DIR, "nodes.json");
 const AUTH_TOKEN_PATH = path.join(DATA_DIR, "auth.token");
 
-// Api
+// New game directories
+const GAMES_DIR = path.join(DATA_DIR, "games");
+const LICHESS_DIR = path.join(GAMES_DIR, "lichess");
+const CHESSCOM_DIR = path.join(GAMES_DIR, "chesscom");
+
+/* -------------------------------------------------------
+   DIRECTORY INITIALIZATION
+------------------------------------------------------- */
+
+export function ensureDirs() {
+  // Base data directory
+  if (!fs.existsSync(DATA_DIR)) fs.mkdirSync(DATA_DIR, { recursive: true });
+
+  // Repertoires
+  if (!fs.existsSync(REPS_DIR)) fs.mkdirSync(REPS_DIR, { recursive: true });
+
+  // Folders.json
+  if (!fs.existsSync(FOLDERS_PATH)) {
+    fs.writeFileSync(FOLDERS_PATH, JSON.stringify({ folders: [] }, null, 2));
+  }
+
+  // Nodes.json
+  if (!fs.existsSync(NODES_PATH)) {
+    fs.writeFileSync(NODES_PATH, JSON.stringify({}, null, 2));
+  }
+
+  // Game directories
+  if (!fs.existsSync(GAMES_DIR)) fs.mkdirSync(GAMES_DIR, { recursive: true });
+  if (!fs.existsSync(LICHESS_DIR)) fs.mkdirSync(LICHESS_DIR, { recursive: true });
+  if (!fs.existsSync(CHESSCOM_DIR)) fs.mkdirSync(CHESSCOM_DIR, { recursive: true });
+}
+
+/* -------------------------------------------------------
+   AUTH TOKEN
+------------------------------------------------------- */
 
 export async function saveAuthToken(token: string): Promise<void> {
   ensureDirs();
@@ -42,24 +79,13 @@ export async function clearAuthToken(): Promise<void> {
   try {
     await fs.promises.unlink(AUTH_TOKEN_PATH);
   } catch {
-    // no-op if it never existed
+    // ignore if missing
   }
 }
 
-
-// Filesystem
-
-
-function ensureDirs() {
-  if (!fs.existsSync(DATA_DIR)) fs.mkdirSync(DATA_DIR, { recursive: true });
-  if (!fs.existsSync(REPS_DIR)) fs.mkdirSync(REPS_DIR, { recursive: true });
-  if (!fs.existsSync(FOLDERS_PATH)) {
-    fs.writeFileSync(FOLDERS_PATH, JSON.stringify({ folders: [] }, null, 2));
-  }
-  if (!fs.existsSync(NODES_PATH)) {
-    fs.writeFileSync(NODES_PATH, JSON.stringify({}, null, 2));
-  }
-}
+/* -------------------------------------------------------
+   FOLDERS
+------------------------------------------------------- */
 
 export async function loadFolders(): Promise<Folder[]> {
   ensureDirs();
@@ -75,6 +101,10 @@ export async function saveFolders(folders: Folder[]): Promise<void> {
     "utf8"
   );
 }
+
+/* -------------------------------------------------------
+   REPERTOIRES
+------------------------------------------------------- */
 
 export async function loadRepertoires(): Promise<Repertoire[]> {
   ensureDirs();
@@ -102,6 +132,10 @@ export async function saveRepertoires(repertoires: Repertoire[]): Promise<void> 
   }
 }
 
+/* -------------------------------------------------------
+   NODES
+------------------------------------------------------- */
+
 export async function loadNodes(): Promise<Record<string, Node>> {
   ensureDirs();
   try {
@@ -120,3 +154,18 @@ export async function saveNodes(nodes: Record<string, Node>): Promise<void> {
     "utf8"
   );
 }
+
+/* -------------------------------------------------------
+   EXPORT PATH CONSTANTS
+------------------------------------------------------- */
+
+export {
+  DATA_DIR,
+  FOLDERS_PATH,
+  REPS_DIR,
+  NODES_PATH,
+  AUTH_TOKEN_PATH,
+  GAMES_DIR,
+  LICHESS_DIR,
+  CHESSCOM_DIR
+};

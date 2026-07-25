@@ -5,6 +5,7 @@ import fs from "fs";
 import path from "path";
 import type { ImportRepertoiresPayload } from "./types/ImportPayload";
 import { importRepertoires } from "./Storage/ImportService";
+import { importLichess } from "./Storage/LichessImporter";
 import {
   loadFolders,
   saveFolders,
@@ -51,6 +52,21 @@ ipcMain.handle(
   "storage:importRepertoires",
   (_event, payload: ImportRepertoiresPayload) => importRepertoires(payload)
 );
+
+ipcMain.handle("import-lichess", async (_event, username: string) => {
+  try {
+    await importLichess(username);
+    return { ok: true };
+  } catch (err) {
+    console.error("Lichess import failed:", err);
+
+    if (err instanceof Error) {
+      return { ok: false, error: err.message };
+    }
+
+    return { ok: false, error: String(err) };
+  }
+});
 
 ipcMain.handle("storage:saveAuthToken", (_event, token: string) => saveAuthToken(token));
 
