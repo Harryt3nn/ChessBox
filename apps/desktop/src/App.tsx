@@ -41,7 +41,7 @@ const App = () => {
     if (page === 'settings') return <Settings page={page} setPage={setPage} />;
     if (page === 'board') return <BoardView page={page} setPage={setPage} />;
     if (page === 'novelty') return <NoveltyFinder page={page} setPage={setPage} currentUser={currentUser} />;
-    if (page === 'profile') return <Profile page={page} setPage={setPage} onLogout={() => setIsAuthed(false)} />;
+     if (page === 'profile') return <Profile page={page} setPage={setPage} onLogout={() => setIsAuthed(false)} isAuthed={isAuthed} />;
     if (page === 'community') return <Community page={page} setPage={setPage} />;
 
     return (

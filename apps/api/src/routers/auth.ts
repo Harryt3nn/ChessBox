@@ -67,11 +67,11 @@ export const authRouter = router({
       };
     }),
 
-  me: protectedProcedure
+   me: protectedProcedure
     .query(async ({ ctx }) => {
       const user = await ctx.prisma.user.findUnique({
         where: { id: ctx.userId },
-        select: { id: true, username: true, email: true },
+        select: { id: true, username: true, email: true, lichessName: true, chesscomName: true },
       });
 
       if (!user) {
