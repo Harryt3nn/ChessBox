@@ -30,6 +30,8 @@ export type UserMinAggregateOutputType = {
   email: string | null
   passwordHash: string | null
   createdAt: Date | null
+  lichessName: string | null
+  chesscomName: string | null
 }
 
 export type UserMaxAggregateOutputType = {
@@ -38,6 +40,8 @@ export type UserMaxAggregateOutputType = {
   email: string | null
   passwordHash: string | null
   createdAt: Date | null
+  lichessName: string | null
+  chesscomName: string | null
 }
 
 export type UserCountAggregateOutputType = {
@@ -46,6 +50,8 @@ export type UserCountAggregateOutputType = {
   email: number
   passwordHash: number
   createdAt: number
+  lichessName: number
+  chesscomName: number
   _all: number
 }
 
@@ -56,6 +62,8 @@ export type UserMinAggregateInputType = {
   email?: true
   passwordHash?: true
   createdAt?: true
+  lichessName?: true
+  chesscomName?: true
 }
 
 export type UserMaxAggregateInputType = {
@@ -64,6 +72,8 @@ export type UserMaxAggregateInputType = {
   email?: true
   passwordHash?: true
   createdAt?: true
+  lichessName?: true
+  chesscomName?: true
 }
 
 export type UserCountAggregateInputType = {
@@ -72,6 +82,8 @@ export type UserCountAggregateInputType = {
   email?: true
   passwordHash?: true
   createdAt?: true
+  lichessName?: true
+  chesscomName?: true
   _all?: true
 }
 
@@ -153,6 +165,8 @@ export type UserGroupByOutputType = {
   email: string
   passwordHash: string
   createdAt: Date
+  lichessName: string | null
+  chesscomName: string | null
   _count: UserCountAggregateOutputType | null
   _min: UserMinAggregateOutputType | null
   _max: UserMaxAggregateOutputType | null
@@ -182,6 +196,8 @@ export type UserWhereInput = {
   email?: Prisma.StringFilter<"User"> | string
   passwordHash?: Prisma.StringFilter<"User"> | string
   createdAt?: Prisma.DateTimeFilter<"User"> | Date | string
+  lichessName?: Prisma.StringNullableFilter<"User"> | string | null
+  chesscomName?: Prisma.StringNullableFilter<"User"> | string | null
 }
 
 export type UserOrderByWithRelationInput = {
@@ -190,18 +206,22 @@ export type UserOrderByWithRelationInput = {
   email?: Prisma.SortOrder
   passwordHash?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
+  lichessName?: Prisma.SortOrderInput | Prisma.SortOrder
+  chesscomName?: Prisma.SortOrderInput | Prisma.SortOrder
 }
 
 export type UserWhereUniqueInput = Prisma.AtLeast<{
   id?: string
   username?: string
   email?: string
+  lichessName?: string
+  chesscomName?: string
   AND?: Prisma.UserWhereInput | Prisma.UserWhereInput[]
   OR?: Prisma.UserWhereInput[]
   NOT?: Prisma.UserWhereInput | Prisma.UserWhereInput[]
   passwordHash?: Prisma.StringFilter<"User"> | string
   createdAt?: Prisma.DateTimeFilter<"User"> | Date | string
-}, "id" | "username" | "email">
+}, "id" | "username" | "email" | "lichessName" | "chesscomName">
 
 export type UserOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
@@ -209,6 +229,8 @@ export type UserOrderByWithAggregationInput = {
   email?: Prisma.SortOrder
   passwordHash?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
+  lichessName?: Prisma.SortOrderInput | Prisma.SortOrder
+  chesscomName?: Prisma.SortOrderInput | Prisma.SortOrder
   _count?: Prisma.UserCountOrderByAggregateInput
   _max?: Prisma.UserMaxOrderByAggregateInput
   _min?: Prisma.UserMinOrderByAggregateInput
@@ -223,6 +245,8 @@ export type UserScalarWhereWithAggregatesInput = {
   email?: Prisma.StringWithAggregatesFilter<"User"> | string
   passwordHash?: Prisma.StringWithAggregatesFilter<"User"> | string
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"User"> | Date | string
+  lichessName?: Prisma.StringNullableWithAggregatesFilter<"User"> | string | null
+  chesscomName?: Prisma.StringNullableWithAggregatesFilter<"User"> | string | null
 }
 
 export type UserCreateInput = {
@@ -231,6 +255,8 @@ export type UserCreateInput = {
   email: string
   passwordHash: string
   createdAt?: Date | string
+  lichessName?: string | null
+  chesscomName?: string | null
 }
 
 export type UserUncheckedCreateInput = {
@@ -239,6 +265,8 @@ export type UserUncheckedCreateInput = {
   email: string
   passwordHash: string
   createdAt?: Date | string
+  lichessName?: string | null
+  chesscomName?: string | null
 }
 
 export type UserUpdateInput = {
@@ -247,6 +275,8 @@ export type UserUpdateInput = {
   email?: Prisma.StringFieldUpdateOperationsInput | string
   passwordHash?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  lichessName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  chesscomName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 export type UserUncheckedUpdateInput = {
@@ -255,6 +285,8 @@ export type UserUncheckedUpdateInput = {
   email?: Prisma.StringFieldUpdateOperationsInput | string
   passwordHash?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  lichessName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  chesscomName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 export type UserCreateManyInput = {
@@ -263,6 +295,8 @@ export type UserCreateManyInput = {
   email: string
   passwordHash: string
   createdAt?: Date | string
+  lichessName?: string | null
+  chesscomName?: string | null
 }
 
 export type UserUpdateManyMutationInput = {
@@ -271,6 +305,8 @@ export type UserUpdateManyMutationInput = {
   email?: Prisma.StringFieldUpdateOperationsInput | string
   passwordHash?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  lichessName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  chesscomName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 export type UserUncheckedUpdateManyInput = {
@@ -279,6 +315,8 @@ export type UserUncheckedUpdateManyInput = {
   email?: Prisma.StringFieldUpdateOperationsInput | string
   passwordHash?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  lichessName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  chesscomName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 export type UserCountOrderByAggregateInput = {
@@ -287,6 +325,8 @@ export type UserCountOrderByAggregateInput = {
   email?: Prisma.SortOrder
   passwordHash?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
+  lichessName?: Prisma.SortOrder
+  chesscomName?: Prisma.SortOrder
 }
 
 export type UserMaxOrderByAggregateInput = {
@@ -295,6 +335,8 @@ export type UserMaxOrderByAggregateInput = {
   email?: Prisma.SortOrder
   passwordHash?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
+  lichessName?: Prisma.SortOrder
+  chesscomName?: Prisma.SortOrder
 }
 
 export type UserMinOrderByAggregateInput = {
@@ -303,6 +345,8 @@ export type UserMinOrderByAggregateInput = {
   email?: Prisma.SortOrder
   passwordHash?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
+  lichessName?: Prisma.SortOrder
+  chesscomName?: Prisma.SortOrder
 }
 
 export type StringFieldUpdateOperationsInput = {
@@ -313,6 +357,10 @@ export type DateTimeFieldUpdateOperationsInput = {
   set?: Date | string
 }
 
+export type NullableStringFieldUpdateOperationsInput = {
+  set?: string | null
+}
+
 
 
 export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -321,6 +369,8 @@ export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   email?: boolean
   passwordHash?: boolean
   createdAt?: boolean
+  lichessName?: boolean
+  chesscomName?: boolean
 }, ExtArgs["result"]["user"]>
 
 export type UserSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -329,6 +379,8 @@ export type UserSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   email?: boolean
   passwordHash?: boolean
   createdAt?: boolean
+  lichessName?: boolean
+  chesscomName?: boolean
 }, ExtArgs["result"]["user"]>
 
 export type UserSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -337,6 +389,8 @@ export type UserSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   email?: boolean
   passwordHash?: boolean
   createdAt?: boolean
+  lichessName?: boolean
+  chesscomName?: boolean
 }, ExtArgs["result"]["user"]>
 
 export type UserSelectScalar = {
@@ -345,9 +399,11 @@ export type UserSelectScalar = {
   email?: boolean
   passwordHash?: boolean
   createdAt?: boolean
+  lichessName?: boolean
+  chesscomName?: boolean
 }
 
-export type UserOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "username" | "email" | "passwordHash" | "createdAt", ExtArgs["result"]["user"]>
+export type UserOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "username" | "email" | "passwordHash" | "createdAt" | "lichessName" | "chesscomName", ExtArgs["result"]["user"]>
 
 export type $UserPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "User"
@@ -358,6 +414,8 @@ export type $UserPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     email: string
     passwordHash: string
     createdAt: Date
+    lichessName: string | null
+    chesscomName: string | null
   }, ExtArgs["result"]["user"]>
   composites: {}
 }
@@ -786,6 +844,8 @@ export interface UserFieldRefs {
   readonly email: Prisma.FieldRef<"User", 'String'>
   readonly passwordHash: Prisma.FieldRef<"User", 'String'>
   readonly createdAt: Prisma.FieldRef<"User", 'DateTime'>
+  readonly lichessName: Prisma.FieldRef<"User", 'String'>
+  readonly chesscomName: Prisma.FieldRef<"User", 'String'>
 }
     
 

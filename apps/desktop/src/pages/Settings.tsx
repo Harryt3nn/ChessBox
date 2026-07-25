@@ -2,35 +2,39 @@
 
 import { useState } from 'react';
 import Sidebar from '../components/SidebarModule';
+import { trpc } from '../trpc';
 import styles from './Settings.module.css';
 import type { Page } from '../types/Page';
 
 interface SettingsProps {
-    page: Page;
-    setPage: (page: Page) => void;
+  page: Page;
+  setPage: (page: Page) => void;
 }
 
 const Settings = ({ page, setPage }: SettingsProps) => {
   const [showChessConnect, setShowChessConnect] = useState(false);
+  const [service, setService] = useState<"chesscom" | "lichess" | null>(null);
   const [username, setUsername] = useState("");
   const [status, setStatus] = useState<"idle" | "success" | "error">("idle");
 
-  async function validateChessComUser(username: string) {
-    const res = await fetch(`http://localhost:3001/api/chesscom/${username}`);
-    return res.ok;
-  }
+  const handleSave = async () => {
+    if (!service) return;
 
-  const handleSaveChessUsername = async () => {
-    const valid = await validateChessComUser(username);
+    try {
+      if (service === "chesscom") {
+        await trpc.connections.connectChesscom.mutate({ username });
+      } else {
+        await trpc.connections.connectLichess.mutate({ username });
+      }
 
-    if (valid) {
       setStatus("success");
-      console.log("Saving Chess.com username:", username);
       setTimeout(() => {
         setShowChessConnect(false);
         setStatus("idle");
+        setUsername("");
+        setService(null);
       }, 1200);
-    } else {
+    } catch {
       setStatus("error");
     }
   };
@@ -43,7 +47,10 @@ const Settings = ({ page, setPage }: SettingsProps) => {
         <div className={styles.settingsSection}>
           <button
             className={`${styles.connectBtn} ${styles.chesscomBtn}`}
-            onClick={() => setShowChessConnect(true)}
+            onClick={() => {
+              setService("chesscom");
+              setShowChessConnect(true);
+            }}
           >
             <i className="fa-solid fa-chess-board"></i>
             Connect Chess.com
@@ -51,7 +58,10 @@ const Settings = ({ page, setPage }: SettingsProps) => {
 
           <button
             className={`${styles.connectBtn} ${styles.lichessBtn}`}
-            onClick={() => setShowChessConnect(true)}
+            onClick={() => {
+              setService("lichess");
+              setShowChessConnect(true);
+            }}
           >
             <i className="fa-solid fa-chess-board"></i>
             Connect Lichess
@@ -61,14 +71,25 @@ const Settings = ({ page, setPage }: SettingsProps) => {
         {showChessConnect && (
           <div className={styles.modalOverlay}>
             <div className={styles.modal}>
-              <h3>Connect Chess.com</h3>
-              <p>Enter your Chess.com username</p>
+              <h3>
+                {service === "chesscom"
+                  ? "Connect Chess.com"
+                  : "Connect Lichess"}
+              </h3>
+
+              <p>
+                Enter your {service === "chesscom" ? "Chess.com" : "Lichess"} username
+              </p>
 
               <input
                 className={styles.modalInput}
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
-                placeholder="e.g. John_Chess123"
+                placeholder={
+                  service === "chesscom"
+                    ? "e.g. John_Chess123"
+                    : "e.g. MagnusCarlsen"
+                }
               />
 
               {status === "success" && (
@@ -80,12 +101,17 @@ const Settings = ({ page, setPage }: SettingsProps) => {
               )}
 
               <div className={styles.modalActions}>
-                <button className={styles.modalSave} onClick={handleSaveChessUsername}>
+                <button className={styles.modalSave} onClick={handleSave}>
                   Save
                 </button>
                 <button
                   className={styles.modalCancel}
-                  onClick={() => setShowChessConnect(false)}
+                  onClick={() => {
+                    setShowChessConnect(false);
+                    setStatus("idle");
+                    setUsername("");
+                    setService(null);
+                  }}
                 >
                   Cancel
                 </button>
@@ -98,4 +124,4 @@ const Settings = ({ page, setPage }: SettingsProps) => {
   );
 };
 
-export default Settings;
+export default Settings

@@ -1,5 +1,4 @@
-/*apps/api/src/index.ts*/
-
+/* apps/api/src/index.ts */
 
 import Fastify from 'fastify';
 import cors from '@fastify/cors';
@@ -7,18 +6,11 @@ import { fastifyTRPCPlugin } from '@trpc/server/adapters/fastify';
 import { appRouter } from './routers/appRouter';
 import { createContext } from './trpc';
 
+const fastify = Fastify({ logger: true });
 
-const fastify = Fastify({
-  logger: true
-});
+await fastify.register(cors, { origin: true });
 
-await fastify.register(cors, {
-  origin: true, // reflects the request's own origin — fine for local dev
-});
-
-fastify.get('/', async function handler (request, reply) {
-  return { hello: 'world' };
-});
+fastify.get('/', async () => ({ hello: 'world' }));
 
 fastify.register(fastifyTRPCPlugin, {
   prefix: '/trpc',
@@ -29,7 +21,7 @@ fastify.register(fastifyTRPCPlugin, {
 });
 
 try {
-  await fastify.listen({ port: 3001 }); 
+  await fastify.listen({ port: 3001 });
 } catch (err) {
   fastify.log.error(err);
   process.exit(1);

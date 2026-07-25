@@ -52,3 +52,38 @@ Everything in my last message beyond those — Vault, Turborepo, Redis-backed se
 The one exception: if the "problem in your real life" ChessBox solves involves genuinely sensitive data beyond login credentials (e.g., real payment info, other people's data), that changes the risk calculus and I'd want to know more specifically what before advising further.
 What actually moves the needle for a year-in-industry application
 Beyond the code itself: a short case-study writeup (even just a section in the README) — "I hit this exact debugging problem, here's why it happened, here's the fix" — of something like the env-loading/import-order bug we just solved together is genuinely great material. It's a real, non-trivial ESM/Node subtlety, and being able to explain it clearly is a stronger signal than the code that fixed it. Most students can't articulate why import order matters in ESM; you now can, from lived experience.
+
+
+Before v1 Launch (required)
+Security — the load-bearing items
+ Rate limit auth.login — highest priority security item. No limit currently exists; someone could brute-force a known username's password. Add @fastify/rate-limit, apply a strict limit here specifically (e.g. 5 attempts / 15 min / IP).
+ Rate limit auth.register — prevent scripted account-creation spam.
+ Rate limit connections.connectLichess / connectChesscom — these proxy to third-party APIs; unbounded calls could get your server (or its IP) rate-limited or blocked by Lichess/Chess.com.
+ Tighten CSP before packaging — both TODO comments already in the code (index.html and forge.config.ts's devContentSecurityPolicy) need addressing: drop 'unsafe-eval' and the ws://localhost:3000 dev-server entry, since neither should exist outside of local development.
+ Lock down CORS origin: true — currently reflects any origin, fine for local dev, not for anything real. Replace with an explicit check once you know your packaged app's actual origin behavior.
+Auth / accounts
+ Password reset flow — no way for a user to recover a forgotten password currently. Table stakes for a real signup system.
+ Email confirmation — verify the email address at signup is real and owned by the registrant. Lower urgency than password reset, but expected of "real" auth.
+Core functionality gaps
+ importANB.tsx is incomplete — comment in the file itself says it's a partially-finished copy of ImportModal.tsx; the selection UI is missing entirely and the import button can never be enabled as currently written. Needs finishing or removing from the UI if not ready.
+ Icon set — Flaticon Premium SVGs still needed (folder-plus, plus, import, magnifying glass, chevron, pencil, trash, knight). Blocking a fully polished UI. Grab licenses + PDFs while subscribed.
+ Homepage — currently a placeholder ("Home page coming soon..."). Needs real content before this looks like a finished v1.
+ Profile page — currently a stub with just a plain logout button. Decide minimum viable content for v1 (even just displaying username/email/connected accounts would round it out).
+Polish / correctness
+ Fix .moveActive auto-scroll selector bug in BoardView.tsx — querySelector('.move-active') will never match a CSS Modules class; the "scroll to active move" behavior likely silently does nothing. Swap to a data-active attribute.
+ Style importANB.tsx / ImportModal.tsx — both currently use unstyled literal classNames with no CSS module wired up at all.
+ Rename importANB → ImportANB — lowercase component name works but risks confusing JSX/DOM-element resolution and trips some lint configs.
+After v1 Launch (ongoing hobbyist work)
+Security hardening (deeper, not launch-blocking)
+ Consider helmet or equivalent security-headers middleware on Fastify for defense-in-depth beyond CSP alone.
+ Revisit JWT expiry/refresh strategy — currently a flat 7-day token with no refresh mechanism; fine for v1, but a refresh-token flow would be a nicer long-term UX (avoids full re-login every week).
+ Audit npm audit findings periodically — 56+ vulnerabilities showing in current dependency tree; triage rather than ignore over time.
+Features
+ Signup-flow polish — currently minimal viable toggle-based form; consider clearer inline validation feedback, password strength indicator, etc.
+ Theme switching (cream/noir data-theme structure already scaffolded in index.css but not wired to a settings UI toggle yet).
+ Expand Settings/Profile pages beyond MVP once v1 ships and real usage surfaces what's actually needed.
+ Revisit ImportRepertoiresPayload/ImportService.ts for any further drift now that the type de-duplication is done — keep an eye out for new fields added to one without the other.
+Codebase hygiene
+ Confirm .gitignore covers apps/api/src/generated/, compiled .js/.d.ts output, and packages/shared/dist/ — these have been accidentally wiped by git clean -fd more than once this project; ignoring them properly prevents future confusion, and regenerating (prisma generate, build script) is cheap.
+ Document the electron hoisting workaround (manual Copy-Item into apps/desktop/node_modules/electron) somewhere so future npm install runs that break it are a known, fast fix rather than a repeat multi-hour debug session.
+ Consider consolidating apps/api/src/index.ts's IPC-adjacent duplication patterns (already partly cleaned up) as the API surface grows.
