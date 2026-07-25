@@ -19,11 +19,14 @@ interface ChesscomGame {
   pgn: string;
   end_time: number;
   uuid: string;
+  time_class: string;
 }
 
 interface ChesscomGamesResponse {
   games: ChesscomGame[];
 }
+
+const ALLOWED_TIME_CLASSES = new Set(["blitz", "rapid"]);
 
 export async function importChesscom(username: string): Promise<ChesscomImportResult> {
   ensureDirs();
@@ -54,6 +57,7 @@ export async function importChesscom(username: string): Promise<ChesscomImportRe
 
       for (const game of gamesData.games) {
         if (!game.pgn || !game.uuid) continue;
+        if (!ALLOWED_TIME_CLASSES.has(game.time_class)) continue;
 
         const filePath = path.join(userDir, `${game.uuid}.pgn`);
         await fs.promises.writeFile(filePath, game.pgn, "utf8");
