@@ -1,6 +1,5 @@
 /*apps/desktop/src/storage/ImportService.ts*/
 
-
 import {
   loadFolders,
   saveFolders,

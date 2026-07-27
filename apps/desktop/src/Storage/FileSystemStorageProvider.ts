@@ -1,11 +1,10 @@
 /*apps/desktop/src/storage/FileSystemStorageProvider.ts*/
 
-
 import type { StorageProvider } from "./StorageProvider";
 import type { Folder } from "../types/Folder";
 import type { Repertoire } from "../types/Repertoire";
-
 export class FileSystemStorageProvider implements StorageProvider {
+  
   async loadFolders(): Promise<Folder[]> {
     return await window.storage.loadFolders();
   }

@@ -1,10 +1,7 @@
 /*apps/desktop/src/components/buttons/repVisButton.tsx */
-
-
 interface RepVisButtonProps {
   onClick: () => void;
 }
-
 
 export function RepVisButton({onClick}:RepVisButtonProps){
     return(

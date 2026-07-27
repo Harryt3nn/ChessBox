@@ -1,12 +1,10 @@
 /*apps/api/src/routers/auth.ts*/
 
-
 import { TRPCError } from '@trpc/server';
 import jwt from 'jsonwebtoken';
 import { loginInputSchema, registerInputSchema } from '@chessbox/shared';
 import { hashPassword, verifyPassword } from '../auth/password';
 import { router, publicProcedure, protectedProcedure } from '../trpc';
-
 
 function signToken(userId: string) {
   return jwt.sign({ sub: userId }, process.env.JWT_SECRET!, { expiresIn: '3d' });
@@ -17,7 +15,6 @@ function signToken(userId: string) {
 // valid-format hash works here — the password inside doesn't matter.
 const DUMMY_HASH =
   '$argon2id$v=19$m=65536,t=3,p=1$AAAAAAAAAAAAAAAAAAAAAA$AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA';
-
 
 export const authRouter = router({
   register: publicProcedure

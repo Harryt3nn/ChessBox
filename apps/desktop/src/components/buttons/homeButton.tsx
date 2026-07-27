@@ -7,7 +7,6 @@ interface HomeButtonProps {
   onClick: () => void;
 }
 
-
 export function HomeButton({ onClick }: HomeButtonProps) {
   return (
     <button onClick={onClick}>

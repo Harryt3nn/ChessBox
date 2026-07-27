@@ -2,11 +2,9 @@
 
 import styles from "./iconRules.module.css";
 import repertoiresIcon from "../../assets/icons/RookBookIcon.png";
-
 interface RepertoiresButtonProps {
   onClick: () => void;
 }
-
 
 export function RepertoiresButton({onClick}:RepertoiresButtonProps){
     return(

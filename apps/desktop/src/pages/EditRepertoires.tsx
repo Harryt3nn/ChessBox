@@ -1,12 +1,13 @@
 /*apps/desktop/src/pages/EditRepertoires.tsx*/
 
-
-import React, { useState, useEffect, useRef, useMemo } from 'react';
+import { useState, useEffect, useRef, useMemo } from 'react';
 import { FileSystemStorageProvider } from "../Storage/FileSystemStorageProvider";
 import { validateChessGraphExport } from "../importsAndExports/validateChessGraphExport";
 import { ImportModal } from "../components/ImportModal";
 import { prepareForImport } from "../importsAndExports/prepareForImport"
 import type { Page } from '../types/Page';
+import type { Repertoire } from '../types/Repertoire'
+import type { Folder } from '../types/Folder'
 import styles from './EditRepertoires.module.css';
 import Sidebar from '../components/SidebarModule';
 import { InlineEdit } from "../components/editRepertoireComponents/InlineEdit";
@@ -14,50 +15,16 @@ import { ChessKnightIcon } from "../components/editRepertoireComponents/ChessKni
 import { RepertoireCard } from "../components/editRepertoireComponents/RepertoireCard";
 import FolderSelection from "../components/editRepertoireComponents/FolderSelection";
 
-
 interface EditRepertoiresProps {
     page: Page;
     setPage: (page: Page) => void;
-}
-
-export interface Repertoire {
-  id: string;
-  name: string;
-  side: "white" | "black";
-  rootNodeId: string;
-  folderId: string | null;
-  createdAt: number; 
-  updatedAt: number; 
-}
-
-export interface Folder {
-  id: string;
-  name: string;
-  sortOrder: number;
-  collapsed: boolean;
-  createdAt: number; 
-  updatedAt: number; 
-}
-
-
-function timeAgo(timestamp: number): string {
-  const diff = Date.now() - timestamp;
-  const mins = Math.floor(diff / 60000);
-  if (mins < 60) return `${mins}m ago`;
-  const hrs = Math.floor(mins / 60);
-  if (hrs < 24) return `${hrs}h ago`;
-  const days = Math.floor(hrs / 24);
-  return `${days}d ago`;
 }
 
 function generateId(): string {
   return crypto.randomUUID();
 }
 
-
 const EditRepertoires = ({ page, setPage }: EditRepertoiresProps) => {
-
-
   const [folders, setFolders] = useState<Folder[]>([]);
   const [repertoires, setRepertoires] = useState<Repertoire[]>([]);
   const [search, setSearch] = useState("");
@@ -70,31 +37,30 @@ const EditRepertoires = ({ page, setPage }: EditRepertoiresProps) => {
   
 
   const handleImportClick = async () => {
-  const filePaths = await window.storage.openFileDialog({
+    const filePaths = await window.storage.openFileDialog({
     filters: [{ name: "JSON Files", extensions: ["json"] }]
   });
 
   if (!filePaths || filePaths.length === 0) return;
 
+  
   const filePath = filePaths[0];
-
   const fileContents = await window.storage.readFile(filePath);
+  let parsed: any;
+  const error = validateChessGraphExport(parsed);
+
+
   if (!fileContents) {
     alert("Could not read file.");
     return;
   }
 
-  let parsed: any;
-  try {
-    parsed = JSON.parse(fileContents);
-  } catch {
-    alert("File is not valid JSON.");
+  try {parsed = JSON.parse(fileContents);}
+   catch {alert("File is not in a valid format.");
     return;
   }
-
-  const error = validateChessGraphExport(parsed);
-  if (error) {
-    alert("Invalid ChessGraph export: " + error);
+ 
+  if (error) {alert("Invalid ChessGraph export: " + error);
     return;
   }
 
@@ -104,17 +70,14 @@ const EditRepertoires = ({ page, setPage }: EditRepertoiresProps) => {
   setShowImportModal(true);
 };
 
-
-  useEffect(() => {
+useEffect(() => {
     if (creatingFolder) newFolderRef.current?.focus();
   }, [creatingFolder]);
-
   useEffect(() => {
-  storage.loadFolders().then(setFolders);
-  storage.loadRepertoires().then(setRepertoires);
-}, []);
-
-
+    storage.loadFolders().then(setFolders);
+    storage.loadRepertoires().then(setRepertoires);
+  }, []);
+  
   const toggleFolder = async (id: string) => {
   setFolders(prev => {
     const updated = prev.map(f =>
@@ -125,8 +88,7 @@ const EditRepertoires = ({ page, setPage }: EditRepertoiresProps) => {
   });
 };
 
-
-  const renameFolder = async (id: string, name: string) => {
+const renameFolder = async (id: string, name: string) => {
   setFolders(prev => {
     const updated = prev.map(f =>
       f.id === id ? { ...f, name, updatedAt: Date.now() } : f
@@ -136,18 +98,16 @@ const EditRepertoires = ({ page, setPage }: EditRepertoiresProps) => {
   });
 };
 
-  const renameRepertoire = async (repId: string, name: string) => {
+const renameRepertoire = async (repId: string, name: string) => {
   setRepertoires(prev => {
-    const updated = prev.map(r =>
-      r.id === repId ? { ...r, name, updatedAt: Date.now() } : r
-    );
+    const updated = prev.map(r => r.id === repId ? { ...r, name, updatedAt: Date.now() } : r);
     const rep = updated.find(r => r.id === repId);
     if (rep) storage.saveRepertoire(rep);
     return updated;
   });
 };
 
-  const createFolder = async () => {
+const createFolder = async () => {
   const name = newFolderName.trim() || "New Folder";
   const newFolder = {
     id: generateId(),
@@ -157,71 +117,52 @@ const EditRepertoires = ({ page, setPage }: EditRepertoiresProps) => {
     createdAt: Date.now(),
     updatedAt: Date.now()
   };
-
+  
   setFolders(prev => {
     const updated = [...prev, newFolder];
     storage.saveFolders(updated);
     return updated;
   });
-
   setNewFolderName("");
   setCreatingFolder(false);
 };
 
-  const selectRepertoire = (repId: string) => {
-  console.log("Selected repertoire:", repId);
-  // later: open viewer/editor
+const selectRepertoire = (repId: string) => { // later: open viewer/editor
+  console.log("Selected repertoire:", repId); 
 };
 
 const deleteFolder = async (folderId: string) => {
-    const updatedFolders = folders.filter(f => f.id !== folderId);
-    const updatedRepertoires = repertoires.map(rep =>
-      rep.folderId === folderId ? { ...rep, folderId: null } : rep
-    );
+  const updatedFolders = folders.filter(f => f.id !== folderId);
+  const updatedRepertoires = repertoires.map(rep =>
+    rep.folderId === folderId ? { ...rep, folderId: null } : rep);
     await storage.saveFolders(updatedFolders);
-    for (const rep of updatedRepertoires) {
-      await storage.saveRepertoire(rep);
-    }
+    for (const rep of updatedRepertoires) {await storage.saveRepertoire(rep);}
     setFolders(updatedFolders);
     setRepertoires(updatedRepertoires);
   };
-
   const UNCATEGORISED_FOLDER: Folder = {
-  id: '__uncategorised__',
-  name: 'Uncategorised',
-  collapsed: false,
-  sortOrder: 9999,
-  createdAt: 0,
-  updatedAt: 0,
+    id: '__uncategorised__',
+    name: 'Uncategorised',
+    collapsed: false,
+    sortOrder: 9999,
+    createdAt: 0,
+    updatedAt: 0,
+  };
+  const reloadData = async () => {
+    const loadedFolders = await storage.loadFolders();
+    const loadedRepertoires = await storage.loadRepertoires();
+    console.log("folders", loadedFolders);
+    console.log("repertoires", loadedRepertoires);
+    setFolders([...loadedFolders.filter(f => f.id !== '__uncategorised__'),UNCATEGORISED_FOLDER,]);
+    setRepertoires(loadedRepertoires);
 };
 
-const reloadData = async () => {
-  const loadedFolders = await storage.loadFolders();
-  const loadedRepertoires = await storage.loadRepertoires();
-
-  console.log("folders", loadedFolders);
-  console.log("repertoires", loadedRepertoires);
-
-  setFolders([
-    ...loadedFolders.filter(f => f.id !== '__uncategorised__'),
-    UNCATEGORISED_FOLDER,
-  ]);
-  setRepertoires(loadedRepertoires);
-};
-
- const filtered = folders
-  .map(folder => ({
-    ...folder,
-    filteredRepertoires: repertoires.filter(r =>
-      (folder.id === '__uncategorised__' ? r.folderId === null : r.folderId === folder.id) &&
-      (search.trim() === '' || r.name.toLowerCase().includes(search.toLowerCase()))
-    ),
-  }))
-  .filter(folder =>
-    search.trim() === '' ||
+const filtered = folders.map(folder => ({...folder, filteredRepertoires: repertoires.filter(r => (
+  folder.id === '__uncategorised__' ? r.folderId === null : r.folderId === folder.id) &&(
+    search.trim() === '' || r.name.toLowerCase().includes(search.toLowerCase()))),}))
+    .filter(folder => search.trim() === '' ||
     folder.name.toLowerCase().includes(search.toLowerCase()) ||
-    folder.filteredRepertoires.length > 0
-  );
+    folder.filteredRepertoires.length > 0);
 
 
   // ── Render ─────────────────────────────────────────────────────────────────
@@ -311,4 +252,3 @@ return (
   </div>
 );
 };export default EditRepertoires;
-

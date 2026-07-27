@@ -5,6 +5,7 @@ import path from "path";
 import readline from "readline";
 import { Readable } from "stream";
 import { ensureDirs, LICHESS_DIR } from "./MainStorage";
+import { pgnToJson } from "./PGNtoJSON";
 
 export interface LichessImportResult {
   ok: boolean;

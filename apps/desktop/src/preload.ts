@@ -1,12 +1,9 @@
 /*apps/desktop/src/preload.ts*/
 
-
 import { contextBridge, ipcRenderer, } from "electron";
 import type { Folder } from "./types/Folder";
 import type { Repertoire } from "./types/Repertoire";
-import type { ImportResult } from "./types/ImportResults";
 import { ImportRepertoiresPayload } from "./types/ImportPayload";
-
 
 // the only place where the renderer can communicate with main processes
 // renderer cannot access Node.js APIs directly

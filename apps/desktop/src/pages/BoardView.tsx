@@ -11,7 +11,6 @@ import type { GameTree } from '../types/gameTree';
 import styles from './BoardView.module.css';
 import Sidebar from '../components/SidebarModule';
 
-
 interface BoardViewProps {
     page: Page;
     setPage: (page: Page) => void;

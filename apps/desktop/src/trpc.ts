@@ -1,6 +1,5 @@
 /* apps/desktop/src/trpc.ts */
 
-
 import type { AppRouter } from '@chessbox/shared/router';
 import { createTRPCClient, httpBatchLink } from '@trpc/client';
 

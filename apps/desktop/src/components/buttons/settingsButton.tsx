@@ -2,11 +2,9 @@
 
 import styles from "./iconRules.module.css";
 import settingsIcon from "../../assets/icons/SettingsIcon.png";
-
 interface SettingsButtonProps {
   onClick: () => void;
 }
-
 
 export function SettingsButton({onClick}:SettingsButtonProps){
     return(

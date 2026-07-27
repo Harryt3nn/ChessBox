@@ -1,6 +1,5 @@
 /*apps/api/src/routers/connection.ts*/
 
-
 import { TRPCError } from '@trpc/server';
 import { connectLichessInputSchema, connectChesscomInputSchema } from '@chessbox/shared';
 import { router, protectedProcedure } from '../trpc';

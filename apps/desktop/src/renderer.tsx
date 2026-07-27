@@ -1,6 +1,5 @@
 /*apps/desktop/src/renderer.tsx*/
 
-
 import { createRoot } from 'react-dom/client';
 import App from './App';
 import './index.css';

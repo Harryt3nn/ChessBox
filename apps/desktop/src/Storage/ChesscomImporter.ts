@@ -60,6 +60,12 @@ export async function importChesscom(username: string): Promise<ChesscomImportRe
         if (!ALLOWED_TIME_CLASSES.has(game.time_class)) continue;
 
         const filePath = path.join(userDir, `${game.uuid}.pgn`);
+
+        // skip if file already exists
+        if (fs.existsSync(filePath)) {
+          continue;
+        }
+
         await fs.promises.writeFile(filePath, game.pgn, "utf8");
         gamesImported++;
       }

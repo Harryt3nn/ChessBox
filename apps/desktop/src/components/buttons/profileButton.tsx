@@ -2,7 +2,6 @@
 
 import styles from "./iconRules.module.css";
 import profileIcon from "../../assets/icons/ProfileIcon.png";
-
 interface ProfileButtonProps{
     onClick: () => void
 }

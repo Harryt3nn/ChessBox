@@ -2,11 +2,9 @@
 
 import styles from "./iconRules.module.css";
 import trainingIcon from "../../assets/icons/TrainingIcon.png";
-
 interface ToolsButtonProps {
   onClick: () => void;
 }
-
 
 export function ToolsButton({onClick}:ToolsButtonProps){
     return (
