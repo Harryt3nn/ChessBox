@@ -1,7 +1,7 @@
 /*apps/desktop/src/components/buttons/analyticsButton.tsx */
 
 import styles from "./iconRules.module.css";
-import analyticsIcon from "../../assets/icons/AnalyticsPawnIcon.png";
+import analyticsIcon from "../../assets/icons/029-strategy.png";
 
 interface AnalyticsButtonProps {
   onClick: () => void;

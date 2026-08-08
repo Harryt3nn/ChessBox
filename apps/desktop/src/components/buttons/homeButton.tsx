@@ -1,7 +1,7 @@
 /*apps/desktop/src/components/buttons/homeButton.tsx */
 
 import styles from "./iconRules.module.css";
-import homeIcon from "../../assets/icons/ChessBoxLogo.png";
+import homeIcon from "../../assets/icons/001-timer.png";
 
 interface HomeButtonProps {
   onClick: () => void;

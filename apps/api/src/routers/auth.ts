@@ -17,9 +17,7 @@ const DUMMY_HASH =
   '$argon2id$v=19$m=65536,t=3,p=1$AAAAAAAAAAAAAAAAAAAAAA$AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA';
 
 export const authRouter = router({
-  register: publicProcedure
-    .input(registerInputSchema)
-    .mutation(async ({ input, ctx }) => {
+  register: publicProcedure.input(registerInputSchema).mutation(async ({ input, ctx }) => {
       const existing = await ctx.prisma.user.findFirst({
         where: { OR: [{ email: input.email }, { username: input.username }] },
       });
@@ -43,13 +41,16 @@ export const authRouter = router({
       };
     }),
 
-  login: publicProcedure
-    .input(loginInputSchema)
-    .mutation(async ({ input, ctx }) => {
-      const user = await ctx.prisma.user.findUnique({
-        where: { username: input.username },
-      });
-
+  login: publicProcedure.input(loginInputSchema).mutation(async ({ input, ctx }) => {
+    let user;
+    try{
+       user = await ctx.prisma.user.findUnique(
+        {where: { username: input.username }});
+    }
+    catch(err){
+      console.error('Login error:', err);
+      throw err;
+    }
       const valid = user
         ? await verifyPassword(input.password, user.passwordHash)
         : await verifyPassword(input.password, DUMMY_HASH);

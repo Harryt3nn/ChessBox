@@ -6,12 +6,13 @@
   "main": ".webpack/main",
   "private": true,
   "scripts": {
-    "start": "electron-forge start",
-    "package": "electron-forge package",
-    "make": "electron-forge make",
-    "publish": "electron-forge publish",
-    "lint": "eslint --ext .ts,.tsx ."
-  },
+  "postinstall": "node -e \"try{const fs=require('fs');const p='node_modules/electron';if(!fs.existsSync(p)){fs.symlinkSync('../../../node_modules/electron', p, 'junction')}}catch(e){console.warn('Electron junction skipped:', e.message)}\"",
+  "start": "electron-forge start",
+  "package": "electron-forge package",
+  "make": "electron-forge make",
+  "publish": "electron-forge publish",
+  "lint": "eslint --ext .ts,.tsx ."
+},
   "keywords": [],
   "author": {
     "name": "Harry Tennant",
@@ -61,6 +62,6 @@
     "react-hot-toast": "^2.6.0",
     "react-toastify": "^11.1.0",
     "reactflow": "^11.11.4",
-    "stockfish": "^18.0.7"
+    "stockfish": "^18.0.8"
   }
 }

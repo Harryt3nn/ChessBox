@@ -15,6 +15,8 @@ import { ChessKnightIcon } from "../components/editRepertoireComponents/ChessKni
 import { RepertoireCard } from "../components/editRepertoireComponents/RepertoireCard";
 import FolderSelection from "../components/editRepertoireComponents/FolderSelection";
 
+
+
 interface EditRepertoiresProps {
     page: Page;
     setPage: (page: Page) => void;

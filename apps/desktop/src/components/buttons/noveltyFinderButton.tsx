@@ -1,7 +1,7 @@
 /*apps/desktop/src/components/buttons/noveltyFinderButton.tsx */
 
 import styles from "./iconRules.module.css";
-import noveltyIcon from "../../assets/icons/novelty.png";
+import noveltyIcon from "../../assets/icons/020-chess.png";
 interface NoveltyFinderButtonProps{
     onClick: () => void
 }

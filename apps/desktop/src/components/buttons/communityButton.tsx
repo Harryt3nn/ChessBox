@@ -1,7 +1,7 @@
 /*apps/desktop/src/components/buttons/communityButton.tsx*/
 
 import styles from "./iconRules.module.css";
-import communityIcon from "../../assets/icons/FriendsIcon.png";
+import communityIcon from "../../assets/icons/018-chess.png";
 
 interface CommunityButtonProps{
     onClick: () => void

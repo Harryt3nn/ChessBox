@@ -1,7 +1,7 @@
 /*apps/desktop/src/components/buttons/toolsButton.tsx */
 
 import styles from "./iconRules.module.css";
-import trainingIcon from "../../assets/icons/TrainingIcon.png";
+import trainingIcon from "../../assets/icons/007-king.png";
 interface ToolsButtonProps {
   onClick: () => void;
 }

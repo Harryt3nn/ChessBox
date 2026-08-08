@@ -1,7 +1,7 @@
 /*apps/desktop/src/components/buttons/profileButton.tsx*/
 
 import styles from "./iconRules.module.css";
-import profileIcon from "../../assets/icons/ProfileIcon.png";
+import profileIcon from "../../assets/icons/008-chess.png";
 interface ProfileButtonProps{
     onClick: () => void
 }

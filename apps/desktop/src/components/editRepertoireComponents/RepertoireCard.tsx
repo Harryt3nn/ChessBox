@@ -3,7 +3,7 @@
 import { InlineEdit } from "./InlineEdit";
 import { ChessKnightIcon } from "./ChessKnightIcon";
 import styles from "./RepertoireCard.module.css";
-import type { Repertoire } from "../../pages/EditRepertoires";
+import type { Repertoire } from "../../types/Repertoire";
 
 function timeAgo(timestamp: number): string {
   const diff = Date.now() - timestamp;

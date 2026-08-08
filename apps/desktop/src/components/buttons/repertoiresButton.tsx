@@ -1,7 +1,7 @@
 /*apps/desktop/src/components/buttons/repertoiresButton.tsx */
 
 import styles from "./iconRules.module.css";
-import repertoiresIcon from "../../assets/icons/RookBookIcon.png";
+import repertoiresIcon from "../../assets/icons/015-chess.png";
 interface RepertoiresButtonProps {
   onClick: () => void;
 }
