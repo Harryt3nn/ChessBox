@@ -11,5 +11,17 @@ services:
     volumes:
       - pgdata:/var/lib/postgresql/data
 
+  api:
+    build:
+      context: .
+      dockerfile: apps/api/Dockerfile
+    restart: unless-stopped
+    ports:
+      - "3001:3001"
+    environment:
+      DATABASE_URL: postgresql://chessbox:devpassword@postgres:5432/chessbox
+    depends_on:
+      - postgres
+
 volumes:
   pgdata:

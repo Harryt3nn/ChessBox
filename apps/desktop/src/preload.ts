@@ -48,3 +48,4 @@ contextBridge.exposeInMainWorld("api", {
   importChesscom: (username: string) =>
     ipcRenderer.invoke("import-chesscom", username)
 });
+

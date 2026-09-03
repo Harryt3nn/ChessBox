@@ -17,12 +17,15 @@ import {
   clearAuthToken
 } from "./Storage/MainStorage";
 
+
+
 // main electron process
 // creates application window, handles IPC requests from renderer, manages filesystem
 // 'backend' of the app
 
 declare const MAIN_WINDOW_WEBPACK_ENTRY: string;
 declare const MAIN_WINDOW_PRELOAD_WEBPACK_ENTRY: string;
+
 
 // all IPC functions — delegate to storage/MainStorage.ts rather than duplicating logic here
 
@@ -90,6 +93,7 @@ ipcMain.handle("storage:loadAuthToken", () => loadAuthToken());
 
 ipcMain.handle("storage:clearAuthToken", () => clearAuthToken());
 
+
 // creation of window
 
 const createWindow = (): void => {
@@ -108,6 +112,9 @@ const createWindow = (): void => {
 };
 
 app.on("ready", createWindow);
+
+// STOCKFISH: optional but good practice — free the engine's WASM memory when the
+// app is closing, rather than leaving it to the OS.
 
 app.on("window-all-closed", () => {
   if (process.platform !== "darwin") app.quit();

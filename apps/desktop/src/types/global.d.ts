@@ -26,5 +26,11 @@ declare global {
       importLichess(username: string): Promise<ImportResult>;
       importChesscom(username: string): Promise<ImportResult>;
     };
+    // STOCKFISH: mirrors the shape exposed in preload.ts via
+    // contextBridge.exposeInMainWorld("stockfish", ...). depth is optional
+    // to match the default handled on the main-process side.
+    stockfish: {
+      getBestMove(fen: string, depth?: number): Promise<string>;
+    };
   }
 }
