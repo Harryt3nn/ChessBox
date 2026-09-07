@@ -1,0 +1,3 @@
+[submodule "vendor/chessbox-server"]
+	path = vendor/chessbox-server
+	url = https://github.com/Harryt3nn/chessbox-server.git
