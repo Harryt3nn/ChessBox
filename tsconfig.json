@@ -1,0 +1,19 @@
+{
+  "compilerOptions": {
+    "target": "ES2020",
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "jsx": "react-jsx",
+    "outDir": "apps/desktop/.webpack",
+    "strict": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "resolveJsonModule": true,
+    "paths": {
+      "@chessbox/shared/router": ["./vendor/chessbox-server/packages/shared/src/router.ts"],
+      "@chessbox/shared": ["./vendor/chessbox-server/packages/shared/src"]
+    }
+  },
+  "include": ["apps/desktop/src", "apps/desktop/src/types", "apps/desktop/config"]
+}

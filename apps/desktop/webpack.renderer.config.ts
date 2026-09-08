@@ -1,5 +1,6 @@
 /*apps/desktop/webpack.renderer.config.ts*/
 
+import path from 'path';
 import type { Configuration } from 'webpack';
 import { rules } from './webpack.rules';
 import { plugins } from './webpack.plugins';
@@ -35,5 +36,9 @@ export const rendererConfig: Configuration = {
   plugins,
   resolve: {
     extensions: ['.js', '.ts', '.jsx', '.tsx', '.css'],
+    alias: {
+      '@chessbox/shared/router': path.resolve(__dirname, '..', '..', 'vendor', 'chessbox-server', 'packages', 'shared', 'src', 'router.ts'),
+      '@chessbox/shared': path.resolve(__dirname, '..', '..', 'vendor', 'chessbox-server', 'packages', 'shared', 'src'),
+    },
   },
 };

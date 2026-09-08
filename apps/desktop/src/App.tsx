@@ -8,8 +8,6 @@ import TrainingToolkit from './pages/TrainingToolkit';
 import BoardView from './pages/BoardView';
 import NoveltyFinder from './pages/NoveltyFinder';
 import Profile from './pages/Profile';
-import Community from './pages/Community';
-import styles from './pages/App.module.css';
 import Sidebar from "./components/SidebarModule";
 import { LogIn } from './components/logIn';
 import { restoreAuthToken } from './trpc';
@@ -42,15 +40,13 @@ const App = () => {
     if (page === 'board') return <BoardView page={page} setPage={setPage} />;
     if (page === 'novelty') return <NoveltyFinder page={page} setPage={setPage} currentUser={currentUser} />;
     if (page === 'profile') return <Profile page={page} setPage={setPage} onLogout={() => { setIsAuthed(false); setCurrentUser(null); }} isAuthed={isAuthed} />;
-    if (page === 'community') return <Community page={page} setPage={setPage} />;
+  
 
     return (
       <div className="app-layout">
         <Sidebar setPage={setPage} />
         <main className="main-content">
-          <div className={styles.center}>
             <h1>Home page coming soon...</h1>
-          </div>
         </main>
       </div>
     );
@@ -58,7 +54,7 @@ const App = () => {
 
   return (
     <>
-      <div className={authChecked && !isAuthed ? styles.locked : undefined}>
+      <div className={authChecked && !isAuthed ? 'locked' : undefined}>
         {renderPage()}
       </div>
 
