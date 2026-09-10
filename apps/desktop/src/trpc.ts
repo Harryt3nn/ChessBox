@@ -12,7 +12,7 @@ export function setAuthToken(token: string | null) {
 export const trpc = createTRPCClient<AppRouter>({
   links: [
     httpBatchLink({
-      url: 'http://localhost:3001/trpc',
+      url: 'http://100.79.222.16:3001/trpc',
       headers: () => (authToken ? { authorization: `Bearer ${authToken}` } : {}),
     }),
   ],

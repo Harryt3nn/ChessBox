@@ -1,0 +1,15 @@
+{
+    "sqltools.connections": [
+        {
+            "ssh": "Disabled",
+            "previewLimit": 50,
+            "server": "100.79.222.16",
+            "port": 5432,
+            "driver": "PostgreSQL",
+            "name": "ChessBox",
+            "username": "chessbox",
+            "database": "chessbox",
+            "password": "devpassword"
+        }
+    ]
+}

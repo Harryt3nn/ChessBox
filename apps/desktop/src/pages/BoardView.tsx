@@ -10,6 +10,15 @@ import type { MoveNode } from '../types/moveNode';
 import type { GameTree } from '../types/gameTree';
 import styles from './BoardView.module.css';
 import Sidebar from '../components/SidebarModule';
+import leftArrow from '../assets/icons/033-left arrow.png';
+import rightArrow from '../assets/icons/034-right arrow.png';
+import farRightArrow from '../assets/icons/029-forward.png';
+import farLeftArrow from '../assets/icons/030-backward.png';
+import downloadGame from '../assets/icons/015-download.png';
+import openFolder from '../assets/icons/014-archive.png';
+import reset from '../assets/icons/019-refresh.png';
+import copyIcon from '../assets/icons/011-copy.png';
+import iconStyles from "../components/buttons/iconRules.module.css";
 
 interface BoardViewProps {
     page: Page;
@@ -182,7 +191,7 @@ const BoardView = ({ page, setPage }: BoardViewProps) => {
 
 
   // -------------------------------------------------------------------------
-  // RIGHT-CLICK SQUARE HIGHLIGHTING
+  // SQUARE HIGHLIGHTING
   // -------------------------------------------------------------------------
 
   const onSquareRightClick = (square: Square) => {
@@ -551,32 +560,32 @@ return (
         {/* Navigation buttons — fixed, not part of the scroll */}
         <div className={styles.moveNav}>
           <button className={styles.navArrow} onClick={goToStart} disabled={!canGoBack} title="Start (↑)">
-            <i className="fa-solid fa-backward-fast"></i>
+            <img src={farLeftArrow} className={iconStyles.icon} />
           </button>
           <button className={styles.navArrow} onClick={goBack} disabled={!canGoBack} title="Back (←)">
-            <i className="fa-solid fa-backward-step"></i>
+            <img src={leftArrow} className={iconStyles.icon} />
           </button>
           <button className={styles.navArrow} onClick={goForward} disabled={!canGoForward} title="Forward (→)">
-            <i className="fa-solid fa-forward-step"></i>
+            <img src={rightArrow} className={iconStyles.icon} />
           </button>
           <button className={styles.navArrow} onClick={goToEnd} disabled={!canGoForward} title="End (↓)">
-            <i className="fa-solid fa-forward-fast"></i>
+            <img src={farRightArrow} className={iconStyles.icon} />
           </button>
         </div>
 
         {/* Save / Load / Reset — fixed, not part of the scroll */}
         <div className={styles.boardPanelActions}>
           <button className={styles.btnSecondary} onClick={saveGame}>
-            <i className="fa-solid fa-floppy-disk"></i> Save
+            <img src={downloadGame} className={iconStyles.icon} /> Save
           </button>
 
           <label className={styles.btnSecondary} style={{ cursor: 'pointer' }}>
-            <i className="fa-solid fa-folder-open"></i> Load
+            <img src={openFolder} className={iconStyles.icon} /> Load
             <input type="file" accept=".json" style={{ display: 'none' }} onChange={loadGame} />
           </label>
 
           <button className={styles.btnReset} onClick={resetBoard}>
-            <i className="fa-solid fa-rotate-left"></i> Reset
+            <img src={reset} className={iconStyles.icon} /> Reset
           </button>
         </div>
 
@@ -607,7 +616,7 @@ return (
               <button
                 className={`${styles.btnSecondary} ${styles.panelCopyBtn}`}
                 onClick={() => navigator.clipboard.writeText(getCurrentFen(tree))}>
-                <i className="fa-regular fa-copy"></i> Copy FEN
+                <img src={copyIcon} className={iconStyles.icon} /> Copy FEN
               </button>
             </>
           )}
@@ -625,7 +634,7 @@ return (
               <button
                 className={`${styles.btnSecondary} ${styles.panelCopyBtn}`}
                 onClick={() => navigator.clipboard.writeText(pgnText)}>
-                <i className="fa-regular fa-copy"></i> Copy PGN
+                <img src={copyIcon} className={iconStyles.icon} /> Copy PGN
               </button>
             </>
           )}

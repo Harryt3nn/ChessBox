@@ -46,7 +46,8 @@ const App = () => {
       <div className="app-layout">
         <Sidebar setPage={setPage} />
         <main className="main-content">
-            <h1>Home page coming soon...</h1>
+          
+            
         </main>
       </div>
     );
