@@ -10,8 +10,6 @@ import { BoardButton } from "./buttons/boardButton";
 import { NoveltyFinderButton } from "./buttons/noveltyFinderButton";
 import { SettingsButton } from "./buttons/settingsButton";
 import { HomeButton } from "./buttons/homeButton";
-import { CommunityButton } from "./buttons/communityButton";
-import { ProfileButton } from "./buttons/profileButton";
 import type { Page } from '../types/Page';
 
 interface SidebarProps {
@@ -31,12 +29,10 @@ export default function Sidebar({ setPage }: SidebarProps) {
         <ToolsButton onClick={() => setPage("tools")} />
         <BoardButton onClick={() => setPage("board")} />
         <NoveltyFinderButton onClick={() => setPage("novelty")} />
-        <CommunityButton onClick={() => setPage("community")}/>
       </nav>
 
       <div className={styles["sidebar-bottom"]}>
         <HomeButton onClick={() => setPage("home")}/>
-        <ProfileButton onClick={() => setPage("profile")}/>
         <SettingsButton onClick={() => setPage("settings")} />
       </div>
     </aside>

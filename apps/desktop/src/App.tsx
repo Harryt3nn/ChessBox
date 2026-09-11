@@ -7,7 +7,6 @@ import Settings from './pages/Settings';
 import TrainingToolkit from './pages/TrainingToolkit';
 import BoardView from './pages/BoardView';
 import NoveltyFinder from './pages/NoveltyFinder';
-import Profile from './pages/Profile';
 import Sidebar from "./components/SidebarModule";
 import { LogIn } from './components/logIn';
 import { restoreAuthToken } from './trpc';
@@ -36,11 +35,10 @@ const App = () => {
     if (page === 'analytics') return <Analytics page={page} setPage={setPage} />;
     if (page === 'repertoires') return <EditRepertoires page={page} setPage={setPage} />;
     if (page === 'tools') return <TrainingToolkit page={page} setPage={setPage} />;
-    if (page === 'settings') return <Settings page={page} setPage={setPage} />;
+    if (page === 'settings') return <Settings page={page} setPage={setPage} onLogout={() => { setIsAuthed(false); setCurrentUser(null); }} isAuthed={isAuthed} />;
     if (page === 'board') return <BoardView page={page} setPage={setPage} />;
     if (page === 'novelty') return <NoveltyFinder page={page} setPage={setPage} currentUser={currentUser} />;
-    if (page === 'profile') return <Profile page={page} setPage={setPage} onLogout={() => { setIsAuthed(false); setCurrentUser(null); }} isAuthed={isAuthed} />;
-  
+    
 
     return (
       <div className="app-layout">

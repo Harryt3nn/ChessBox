@@ -1,17 +1,9 @@
-/* apps/desktop/src/pages/Profile.tsx */
+/*apps/desktop/src/components/profileCard.tsx */
 
-import { useState, useEffect } from 'react';
-import Sidebar from '../components/SidebarModule';
+import { useEffect, useState } from "react";
+import styles from "./profileCard.module.css";
+import { Page } from "../types/Page";
 import { trpc, setAuthToken } from '../trpc';
-import styles from './Profile.module.css';
-import type { Page } from '../types/Page';
-
-interface ProfileProps {
-    page: Page;
-    setPage: (page: Page) => void;
-    onLogout: () => void;
-    isAuthed: boolean;
-}
 
 interface ProfileData {
     id: string;
@@ -21,18 +13,23 @@ interface ProfileData {
     chesscomName: string | null;
 }
 
-const Profile = ({ page, setPage, onLogout, isAuthed }: ProfileProps) => {
+interface ProfileCardProps {
+  page: Page;
+  setPage: (page: Page) => void;
+  onLogout: () => void;
+  isAuthed: boolean;
+}
+
+export const ProfileCard = ({ page, setPage, onLogout, isAuthed }: ProfileCardProps) => {
     const [profile, setProfile] = useState<ProfileData | null>(null);
     const [loading, setLoading] = useState(true);
+
 
     useEffect(() => {
         if (!isAuthed) return;
 
         setLoading(true);
-        trpc.auth.me.query()
-            .then(setProfile)
-            .catch(() => setProfile(null))
-            .finally(() => setLoading(false));
+        trpc.auth.me.query().then(setProfile).catch(() => setProfile(null)).finally(() => setLoading(false));
     }, [isAuthed]);
 
     async function handleLogout() {
@@ -42,15 +39,9 @@ const Profile = ({ page, setPage, onLogout, isAuthed }: ProfileProps) => {
         onLogout();
     }
 
+
     return (
-        <div className="app-layout">
-            <Sidebar setPage={setPage} />
-
-            <main className="main-content">
-
-
-
-                <div className={styles.profileCard}>
+        <div className={styles.profileCard}>
                     {loading ? (
                         <p className={styles.loadingText}>Loading profile...</p>
                     ) : profile ? (
@@ -90,11 +81,5 @@ const Profile = ({ page, setPage, onLogout, isAuthed }: ProfileProps) => {
                         <p className={styles.loadingText}>Failed to load profile.</p>
                     )}
                 </div>
-
-
-            </main>
-        </div>
     );
-};
-
-export default Profile
+}

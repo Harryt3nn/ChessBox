@@ -5,28 +5,31 @@ import Sidebar from '../components/SidebarModule';
 import { trpc } from '../trpc';
 import styles from './Settings.module.css';
 import type { Page } from '../types/Page';
+import { ProfileCard } from '../components/profileCard';
 
 interface SettingsProps {
   page: Page;
   setPage: (page: Page) => void;
+  onLogout: () => void;
+  isAuthed: boolean;
 }
 
-const Settings = ({ page, setPage }: SettingsProps) => {
+const Settings = ({ page, setPage, onLogout, isAuthed }: SettingsProps) => {
   const [showChessConnect, setShowChessConnect] = useState(false);
   const [service, setService] = useState<"chesscom" | "lichess" | null>(null);
   const [username, setUsername] = useState("");
   const [status, setStatus] = useState<"idle" | "success" | "error">("idle");
 
+
+
   const handleSave = async () => {
     if (!service) return;
-
     try {
       if (service === "chesscom") {
         await trpc.connections.connectChesscom.mutate({ username });
       } else {
         await trpc.connections.connectLichess.mutate({ username });
       }
-
       setStatus("success");
       setTimeout(() => {
         setShowChessConnect(false);
@@ -34,16 +37,25 @@ const Settings = ({ page, setPage }: SettingsProps) => {
         setUsername("");
         setService(null);
       }, 1200);
-    } catch {
+    } 
+    catch 
+    {
       setStatus("error");
     }
   };
+
+   
+
 
   return (
     <div className="app-layout">
       <Sidebar setPage={setPage} />
 
       <main className={`main-content ${styles.settingsPage}`}>
+
+        <ProfileCard page={page} setPage={setPage} onLogout={onLogout} isAuthed={isAuthed} />
+      
+
         <div className={styles.settingsSection}>
           <button
             className={`${styles.connectBtn} ${styles.chesscomBtn}`}
@@ -124,4 +136,4 @@ const Settings = ({ page, setPage }: SettingsProps) => {
   );
 };
 
-export default Settings
+export default Settings   
