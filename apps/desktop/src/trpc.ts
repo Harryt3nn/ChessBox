@@ -33,3 +33,9 @@ export async function restoreAuthToken() {
     return { success: false, user: null };
   }
 }
+
+// forgets the session on this device (the server-side token is revoked separately where needed)
+export async function signOut() {
+  setAuthToken(null);
+  await window.storage.clearAuthToken();
+}

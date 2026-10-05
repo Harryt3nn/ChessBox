@@ -1,6 +1,6 @@
 # ChessBox — Master Project Document
 
-*Living reference document: interview talking points, architecture, current state, and roadmap. Last updated 10 September 2026.*
+*Living reference document: interview talking points, architecture, current state, and roadmap. Last updated 5 October 2026.*
 
 ---
 
@@ -32,8 +32,14 @@ All genuinely happened, in order of how good a story they make:
 ### If asked about security
 - Passwords hashed with **Argon2id** (via `hash-wasm`), not a weaker legacy hash.
 - **Timing-safe login**: a fixed dummy hash is compared against even when the username doesn't exist, so response time doesn't leak whether an account exists (defends against username enumeration).
-- JWT-based auth, currently a flat expiry (see Roadmap — refresh-token flow is a known future improvement, not yet built).
-- Known gap, openly acknowledged: **rate limiting is not yet implemented** on `auth.login`/`auth.register` — flagged as the single highest-priority pre-v1 security item (see §7). Good, honest answer if asked "what would you do next" — shows awareness of what's actually missing rather than claiming completeness.
+- The same thinking applies to "forgot password", which always reports success whether or not the email has an account.
+- **Layered rate limiting**: a blanket per-IP limit on every request, plus tighter limits per action. Login is limited per IP *and* per account, so rotating IPs against one account doesn't help; anything that sends email is limited per address, so the API can't be used to spam someone's inbox. Batched tRPC requests are capped too, since one HTTP request can carry many calls.
+- **Revocable stateless sessions**: JWTs carry a `tokenVersion` that's checked against the database on each request. Changing or resetting a password (or "sign out everywhere") bumps it, which revokes every other session without needing a token blacklist — and the device that changed the password gets a fresh token so it stays signed in.
+- **Email verification and password reset by 6-digit code** (the client is a desktop app, not a website, so there's no link to click). Codes are stored only as hashes, expire in 15 minutes, are single-use, and die after 5 wrong guesses.
+- **Untrusted-input boundaries on the desktop too**: imported repertoire ids become file names, so they're restricted to `[A-Za-z0-9_-]` (a `../` id was a real path-traversal bug before this); the sandboxed renderer can only read files the user picked in a native dialog; the main process re-sanitises every IPC payload rather than trusting the renderer.
+- **Found and fixed a real data leak in review**: `user.me` returned the whole user row, password hash included. Now every user query selects only safe fields, and the auth test script fails if the hash ever appears again.
+- JWTs are still a flat 3-day expiry (a refresh-token flow is a possible future improvement).
+- Openly acknowledged gaps (good "what would you do next" answers): rate limits live in memory, so they reset on restart and wouldn't work across multiple instances (Redis would fix that); sign-up still reveals whether an email is registered; HTTPS is only unnecessary because Tailscale encrypts the tunnel.
 
 ### If asked about AI use in the project
 Straightforward, non-defensive answer: AI was used as an accelerant for scaffolding in areas involving frameworks used for the first time (much of the initial stack was genuinely new to me), specifically to move faster past boilerplate rather than to avoid learning it. The proof this didn't become a crutch is demonstrable, not just claimed — the entire deployment, debugging, and infrastructure work (everything in the section above) was done independently, reasoning through unfamiliar systems (Docker internals, npm workspaces, kernel-level USB behaviour, Prisma's config resolution) without being able to lean on AI-generated scaffolding, because none of it existed yet for these specific, novel problems.
@@ -48,7 +54,7 @@ Straightforward, non-defensive answer: AI was used as an accelerant for scaffold
 ┌─────────────────────────┐         ┌──────────────────────────────────────┐
 │   Electron Desktop App  │         │         Raspberry Pi (home server)   │
 │   (Windows, packaged)   │         │                                      │
-│                         │  HTTPS  │  ┌──────────────┐   ┌──────────────┐ │
+│                         │  HTTP   │  ┌──────────────┐   ┌──────────────┐ │
 │  Renderer (React) ◄──── ┼Tailscale┤  │  api         │   │  postgres    │ │
 │    ↓ IPC bridge         │  :3001  │  │  Fastify+tRPC│──►│  (Docker)    │ │
 │  Main (Node, filesystem)│         │  │  (Docker)    │   │              │ │
@@ -57,7 +63,7 @@ Straightforward, non-defensive answer: AI was used as an accelerant for scaffold
 ```
 
 - **Desktop app**: Electron + React + TypeScript, Electron Forge (webpack-typescript template). Fully offline-capable for repertoire/game data (stored locally); connects to the remote API only for auth and (future) derived analysis data.
-- **Backend**: Fastify + tRPC + Prisma/PostgreSQL, containerised via Docker Compose, self-hosted on a Raspberry Pi 5, reachable remotely via **Tailscale** (no public port-forwarding — the API is only reachable to devices on the user's own tailnet).
+- **Backend**: Fastify + tRPC + Prisma/PostgreSQL, containerised via Docker Compose, self-hosted on a Raspberry Pi 5, reachable remotely via **Tailscale** (no public port-forwarding — the API is only reachable to devices on the user's own tailnet). Traffic is plain HTTP inside Tailscale's WireGuard tunnel, so it is encrypted in transit; HTTPS would be needed before exposing the API any other way. Postgres is not published outside the compose network.
 - **Two separate git repositories** (`ChessBox` — desktop client; `ChessBox-Server` — API + shared types), linked via a git submodule so the client retains full tRPC type inference against the server's router without needing them in one repo.
 
 ### 3.2 Desktop app: process model
@@ -65,7 +71,7 @@ Straightforward, non-defensive answer: AI was used as an accelerant for scaffold
 Electron's two-process split, both real:
 
 - **Main process** (`src/index.ts`, `src/preload.ts`) — Node.js context, full filesystem/OS access. Registers all `ipcMain.handle` handlers, does the actual file I/O via `MainStorage.ts`, native file dialogs.
-- **Renderer process** (everything under `src/pages`, `src/components`) — sandboxed, no direct Node access. Talks to main exclusively via `window.storage.*`, bridged through `preload.ts`'s `contextBridge`.
+- **Renderer process** (everything under `src/pages`, `src/components`) — Chromium sandbox on (`sandbox: true`, context isolation, no Node integration). Talks to main exclusively via `window.storage.*` / `window.api.*`, bridged through `preload.ts`'s `contextBridge`. The main process treats every IPC payload as untrusted and re-validates it.
 
 ```
 Renderer (React component)
@@ -89,20 +95,21 @@ Two genuinely different storage systems for two genuinely different kinds of dat
 | | Where | What | Why there |
 |---|---|---|---|
 | **Filesystem** (local, per-device, via `MainStorage.ts`) | `%APPDATA%/<app>/ChessBox-data/` | Repertoires, nodes, imported games (Lichess/Chess.com), auth token (OS-encrypted via `safeStorage`) | Large, per-user, edit-heavy, source-of-truth data with no need for relational querying |
-| **PostgreSQL** (remote, via the Pi's API) | `chessbox` DB | User accounts; *(planned)* deviation/match records from novelty analysis | Statistical/aggregate-shaped derived data — "how many times has this deviation occurred," "list all unresolved deviations" are relational queries, not filesystem scans |
+| **PostgreSQL** (remote, via the Pi's API) | `chessbox` DB | User accounts (Argon2id hash, verified-email flag, `tokenVersion`, linked chess usernames), one-time email codes (hashed); *(planned)* deviation/match records from novelty analysis | Statistical/aggregate-shaped derived data — "how many times has this deviation occurred," "list all unresolved deviations" are relational queries, not filesystem scans |
 
 Local filesystem layout (`documentation/ARCHITECTURE.md`, current):
 ```
-ChessBox-data/
-├── folders.json           # Array of all Folder objects
+%APPDATA%/ChessBox/ChessBox-data/
+├── folders.json           # { folders: Folder[] }
 ├── nodes.json              # Map of nodeId → Node (all nodes, all repertoires)
-├── repositories/           # One .json file per repertoire
+├── repertoires/            # One .json file per repertoire
 │   └── {repertoire-id}.json
 ├── auth.token               # OS-encrypted JWT
 └── games/
-    ├── lichess/
-    └── chesscom/
+    ├── lichess/{username}/{game-id}.pgn
+    └── chesscom/{username}/{game-uuid}.pgn
 ```
+A file that fails to parse is renamed to `*.corrupt-<timestamp>` rather than crashing the app or being overwritten.
 
 ### 3.4 Repertoire graph data model
 
@@ -119,7 +126,7 @@ ChessBox-data/
 }
 ```
 
-- `childIds` — moves originated at this node (normal tree structure).
+- `childIds` — moves originated at this node (normal tree structure). chessgraph's `childIds` (and older `children`) are normalised to `childIDs` by the import sanitiser.
 - `transpositionEdges` — named edges to an **existing** node elsewhere in the graph, reached via a different move order. This is what actually solves the transposition problem — not "two nodes pointing to the same target," but an explicit, separate edge type layered on top of the tree.
 - **Single-response constraint** (in progress, see Roadmap): whose move is next at any node is derivable from the node's FEN side-to-move vs. `repertoire.side`. If it's the user's move next, `childIds` must contain at most one entry — enforced at creation time (hard block in the editor) and at import time (resolution gate for graphs like chessgraph.net exports, which don't have this constraint natively).
 - Format is **chessgraph.net (v3) compatible** by design — ChessBox can currently be thought of as a chessgraph extension for import purposes, until a native graph builder replaces manual/imported-only creation (see Roadmap #7).
@@ -154,8 +161,11 @@ Built and present in the codebase:
 - Board view with `react-chessboard` (`BoardView.tsx`) — basic analysis board, no Stockfish integration yet
 - Import pipeline from chessgraph.net JSON exports (`validateChessGraphExport.ts` → `prepareForImport.ts` → `ImportModal.tsx` → merge into storage)
 - Lichess and Chess.com game importers (`LichessImporter.ts`, `ChesscomImporter.ts`, `PGNtoJSON.ts`)
-- Auth: sign-up/login/session restore, JWT stored via Electron's `safeStorage` (OS-level encryption)
-- Stub/placeholder pages: `Analytics`, `TrainingToolkit`, `NoveltyFinder`, `Profile`, `Settings` — present in navigation, not yet functionally complete
+- Auth: sign-up/login (username or email)/session restore, JWT stored via Electron's `safeStorage` (OS-level encryption); email verification, forgotten-password reset and change password by emailed 6-digit code; sign out everywhere
+- Rate limiting, CORS allow-list, production error masking, startup config checks on the API
+- Import sanitisation for repertoire files and downloaded games (`sanitiseImport.ts`), shared by renderer and main process
+- Settings page: profile card, Chess.com / Lichess linking, security card
+- Designed pages with the shared art deco components (`PageHeader`, `PageShared.module.css`, Flaticon icons): `Home` (shortcuts), `Analytics`, `TrainingToolkit`, `NoveltyFinder` — layouts and empty states are in place; the analysis behind them isn't built yet
 - Full backend: Fastify + tRPC + Prisma, containerised, deployed, migrations applied, remotely reachable — genuinely live, not just locally runnable
 
 ---
@@ -163,22 +173,25 @@ Built and present in the codebase:
 ## 5. Roadmap
 
 ### Before a "real" v1 launch (security/correctness, not optional)
-- [ ] **Rate limit `auth.login`** — highest priority open item. No brute-force protection currently exists.
-- [ ] **Rate limit `auth.register`** — prevent scripted account spam.
-- [ ] **Rate limit `connections.connectLichess`/`connectChesscom`** — unbounded calls risk the server's IP getting blocked by those APIs.
+- [x] **Rate limit `auth.login`** — per IP and per account (10 per 15 min).
+- [x] **Rate limit `auth.register`** — 5 per hour per IP.
+- [x] **Rate limit `connections.connectLichess`/`connectChesscom`** — 10 per 15 min per user, plus an 8 s upstream timeout.
 - [ ] **Tighten CSP** before packaging — drop `unsafe-eval` and the dev-only `ws://localhost:3000` entry (both already flagged with TODOs in the code itself).
-- [ ] **Lock down CORS** — currently reflects any origin (fine for dev, not for shipping).
-- [ ] **Password reset flow** — no recovery path currently exists for a forgotten password.
+- [x] **Lock down CORS** — explicit allow-list via `CORS_ORIGINS` (dev server + packaged app's `null` origin).
+- [x] **Password reset flow** — emailed code, revokes all sessions. Also added: email verification, change password, sign out everywhere.
 - [ ] Finish or remove `importANB.tsx` — currently an incomplete partial copy of `ImportModal.tsx`.
-- [ ] Real homepage content (currently a placeholder).
-- [ ] Minimum-viable Profile page content (currently just a logout button).
+- [ ] **Deploy the auth/security server update to the Pi** — set `JWT_SECRET` (≥32 chars) and SMTP settings in `apps/api/.env`; the migration runs automatically on container start. The current desktop build needs this server version (login now sends `identifier`).
+- [ ] Decide whether sign-up should stop revealing that an email is already registered (needs a "someone tried to register with your email" mail instead).
+- [ ] Make usernames case-insensitive (`Harry` and `harry` can currently both exist).
+- [x] Real homepage content — shortcut cards to every section.
+- [x] Minimum-viable Profile content — profile card (username, email, linked accounts) and security card on the Settings page.
 - [ ] Fix `.moveActive` auto-scroll selector bug in `BoardView.tsx` (CSS Modules class won't match a plain `querySelector`).
 
 ### Core feature work
 - [ ] **Novelty finder** — build out the designed architecture in §3.5. Highest-priority *feature* item.
 - [ ] **Single-response enforcement** — creation-time hard block + import-time resolution gate (designed, see §3.4).
 - [ ] Analytics page — Lichess/Chess.com connected-account stats, opening success rates compared against saved repertoires; per-platform and combined views; time-period filtering (today/weekly/all-time).
-- [ ] Persistent Lichess/Chess.com account connections in Settings (avoid re-entering username every time).
+- [x] Persistent Lichess/Chess.com account connections in Settings (avoid re-entering username every time).
 - [ ] Stockfish integration — engine analysis on the board view, and evaluation feedback on novelties once the finder's built.
 - [ ] Native graph creation/editing (currently import-only or manual piece-by-piece) — deliberately deferred pending a "more unique way of doing this" than a chessgraph.net clone.
 - [ ] Export feature matching chessgraph.net's format (repertoire portability out, not just in).
@@ -193,20 +206,22 @@ Built and present in the codebase:
 - [ ] **SSD reliability** — currently disconnected/unused after repeated corruption (see §2 debugging notes). Likely root cause is the USB enclosure's JMicron bridge chip, not the drive itself; worth trying a different enclosure or a proper NVMe HAT before writing off the drive.
 - [ ] Two-node setup with a load balancer (Pi 5 + Pi 2) — genuine learning project for later; Pi 2's 32-bit architecture means current arm64 Docker images would need a separate build target, not a direct redeploy.
 - [ ] Multi-stage Docker build to shrink the current ~2.4GB image (works fine as-is, just larger than necessary).
-- [ ] `.env.example` file — quick win, first thing a reviewer cloning the repo will look for.
-- [ ] Basic integration tests on `auth.ts` (register succeeds / duplicate rejected / wrong password rejected / valid token returned) — small effort, real signal on a CS application.
+- [x] `.env.example` file — `vendor/chessbox-server/apps/api/.env.example`.
+- [ ] Basic integration tests on `auth.ts` (register succeeds / duplicate rejected / wrong password rejected / valid token returned) — small effort, real signal on a CS application. Test scripts covering the auth flows (19 cases) and import sanitiser (13 cases) were written and run during the security work, but aren't in the repo or wired to `npm test` yet.
+- [ ] Shared rate-limit store (e.g. Redis) — only needed if the API ever runs as more than one instance.
+- [ ] Check `docker-compose.yml`'s `dockerfile: apps/api/Dockerfile` against the tracked file name `apps/api/dockerfile` — Linux paths are case-sensitive.
 
 ### Codebase hygiene
-- [ ] Rename `repositories/` storage folder back to something less confusingly similar to `repertoires/` (low priority, no functional impact).
+- [x] Rename `repositories/` storage folder — the code now uses `repertoires/`.
 - [ ] Confirm `.gitignore` properly covers `apps/api/src/generated/` and compiled output — has been accidentally wiped by `git clean -fd` more than once.
-- [ ] Document the Electron/node_modules hoisting workaround somewhere discoverable, so a future broken `npm install` is a known fast fix, not a repeat multi-hour debug.
+- [x] Document the Electron/node_modules hoisting workaround somewhere discoverable — see "Troubleshooting" in `documentation/README.md`.
 
 ---
 
 ## 6. Legal / Licensing Notes
 
-- Icons via **Flaticon Premium** subscription — Premium tier removes the attribution requirement entirely (confirmed against Flaticon's current terms). License PDFs for each *pack* used are kept in-repo (`assets/licenses/`), which correctly covers every icon in that pack; any individually-downloaded icons (not currently shipped in the app) have their own separate per-icon licenses.
-- `documentation/legal.md` currently states an attribution requirement — this predates confirming the Premium tier's actual terms and should be updated to reflect that attribution is not required, while still noting: don't use a Flaticon icon as the app's primary trademarked logo (prohibited regardless of tier), and don't redistribute icons as a raw standalone pack.
+- Icons via **Flaticon Premium** subscription — Premium tier removes the attribution requirement entirely (confirmed against Flaticon's current terms). License PDFs for each *pack* used are kept in-repo (`apps/desktop/src/assets/licenses/`), which correctly covers every icon in that pack; any individually-downloaded icons (not currently shipped in the app) have their own separate per-icon licenses.
+- `documentation/legal.md` has been updated to match: attribution isn't required under Premium, but a Flaticon icon still can't be the app's primary trademarked logo, and the icons mustn't be redistributed as a raw standalone pack.
 
 ---
 

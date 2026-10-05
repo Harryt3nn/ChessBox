@@ -2,7 +2,7 @@
 
 import React, { useState } from "react";
 import type { PreparedImportData } from "../importsAndExports/prepareForImport";
-import { toast } from "react-toastify";
+import toast from "react-hot-toast";
 
 // UI component for importing chess graph JSON via 'prepareForImport' pipeline
 // reads imported file, allows for import selection by the user
@@ -27,16 +27,20 @@ export function ImportModal({data, onClose, reloadData}:
   const handleImport = async () => {
   setLoading(true);
 
-  await window.storage.importRepertoires({
-    folders: data.folders,
-    repertoires: data.repertoires.filter(r => selected.includes(r.id)),
-    nodes: data.nodes
-  })
-
-  await reloadData();
-  toast.success("Imported repertoires successfully");
-  setLoading(false);
-  onClose();
+  try {
+    await window.storage.importRepertoires({
+      folders: data.folders,
+      repertoires: data.repertoires.filter(r => selected.includes(r.id)),
+      nodes: data.nodes
+    });
+    await reloadData();
+    toast.success("Imported repertoires successfully");
+    onClose();
+  } catch (err) {
+    toast.error(err instanceof Error ? err.message : "Import failed");
+  } finally {
+    setLoading(false);
+  }
 };
 
 // render: overlay for import
@@ -48,6 +52,13 @@ export function ImportModal({data, onClose, reloadData}:
         <p>Select repertoires to import. Folders + nodes will be saved automatically.
 
         </p>
+
+        {/* anything the sanitiser dropped or repaired while reading the file */}
+        {data.warnings.length > 0 && (
+          <ul className="import-warnings">
+            {data.warnings.map(w => <li key={w}>{w}</li>)}
+          </ul>
+        )}
 
         <div className="folder-view">
           {data.folders.map(folder => {

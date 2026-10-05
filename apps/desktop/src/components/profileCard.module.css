@@ -3,6 +3,7 @@
 /*apps/desktop/src/components/profileCard.module.css*/
 
 .profileCard {
+  width: 100%;
   max-width: 420px;
   margin: 48px auto;
   background: var(--color-surface-1);

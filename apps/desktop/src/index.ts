@@ -3,7 +3,7 @@
 import { app, BrowserWindow, ipcMain, dialog } from "electron";
 import fs from "fs";
 import path from "path";
-import type { ImportRepertoiresPayload } from "./types/ImportPayload";
+import { IMPORT_LIMITS, sanitiseFolders, sanitiseRepertoire } from "./importsAndExports/sanitiseImport";
 import { importRepertoires } from "./Storage/ImportService";
 import { importChesscom } from "./Storage/ChesscomImporter";
 import { importLichess } from "./Storage/LichessImporter";
@@ -31,30 +31,48 @@ declare const MAIN_WINDOW_PRELOAD_WEBPACK_ENTRY: string;
 
 ipcMain.handle("storage:loadFolders", () => loadFolders());
 
-ipcMain.handle("storage:saveFolders", (_event, folders) => saveFolders(folders));
+// renderer input is never written to disk as-is
+ipcMain.handle("storage:saveFolders", (_event, folders: unknown) => saveFolders(sanitiseFolders(folders)));
 
 ipcMain.handle("storage:loadRepertoires", () => loadRepertoires());
 
-ipcMain.handle("storage:saveRepertoire", (_event, rep) => saveRepertoires([rep]));
+ipcMain.handle("storage:saveRepertoire", (_event, rep: unknown) => {
+  const clean = sanitiseRepertoire(rep);
+  if (!clean) throw new Error("Invalid repertoire");
+  return saveRepertoires([clean]);
+});
+
+// the renderer may only read files the user picked in an open dialog this session
+const userPickedFiles = new Set<string>();
 
 ipcMain.handle(
   "storage:openFileDialog",
   async (_event: Electron.IpcMainInvokeEvent, options: Electron.OpenDialogOptions) => {
     const result = await dialog.showOpenDialog(options);
+    result.filePaths.forEach(p => userPickedFiles.add(path.resolve(p)));
     return result.filePaths;
   }
 );
 
 ipcMain.handle(
   "storage:readFile",
-  (_event: Electron.IpcMainInvokeEvent, filePath: string) => {
+  async (_event: Electron.IpcMainInvokeEvent, filePath: string) => {
+    if (typeof filePath !== "string" || !userPickedFiles.has(path.resolve(filePath))) {
+      throw new Error("That file wasn't chosen through the file picker.");
+    }
+
+    const { size } = await fs.promises.stat(filePath);
+    if (size > IMPORT_LIMITS.maxFileBytes) {
+      throw new Error(`That file is too large to import (limit ${IMPORT_LIMITS.maxFileBytes / 1024 / 1024} MB).`);
+    }
+
     return fs.promises.readFile(filePath, "utf8");
   }
 );
 
 ipcMain.handle(
   "storage:importRepertoires",
-  (_event, payload: ImportRepertoiresPayload) => importRepertoires(payload)
+  (_event, payload: unknown) => importRepertoires(payload)
 );
 
 ipcMain.handle("import-lichess", async (_event, username: string) => {
@@ -104,17 +122,27 @@ const createWindow = (): void => {
     icon: path.join(__dirname, 'public', 'icon.png'),
     webPreferences: {
       preload: MAIN_WINDOW_PRELOAD_WEBPACK_ENTRY,
-      sandbox: false,
+      // renderer has no Node access; it can only use the APIs preload.ts exposes
+      sandbox: true,
+      contextIsolation: true,
+      nodeIntegration: false,
     },
   });
 
   mainWindow.loadURL(MAIN_WINDOW_WEBPACK_ENTRY);
 };
 
-app.on("ready", createWindow);
+// the app only ever shows its own page: block new windows and navigation away from it,
+// so a malicious link in imported data (or anywhere else) can't load remote content with app privileges
+app.on("web-contents-created", (_event, contents) => {
+  contents.setWindowOpenHandler(() => ({ action: "deny" }));
+  contents.on("will-navigate", (event, url) => {
+    if (url !== contents.getURL()) event.preventDefault();
+  });
+  contents.on("will-attach-webview", event => event.preventDefault());
+});
 
-// STOCKFISH: optional but good practice — free the engine's WASM memory when the
-// app is closing, rather than leaving it to the OS.
+app.on("ready", createWindow);
 
 app.on("window-all-closed", () => {
   if (process.platform !== "darwin") app.quit();

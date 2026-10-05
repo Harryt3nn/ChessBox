@@ -5,6 +5,10 @@ import type { Folder } from "../../types/Folder";
 import type { Repertoire } from "../../types/Repertoire";
 import RepertoireRow from "../RepertoireRow";
 import styles from "./FolderSection.module.css";
+import { Icon } from "../Icon";
+import folderClosedIcon from "../../assets/icons/096-folder-29.png";
+import folderOpenIcon from "../../assets/icons/196-folder-8.png";
+import removeGlyph from "../../assets/icons/031-remove.png";
 
 // UI component to display available 'folders' (JSON objects)
 // ensures folders can collapse
@@ -57,12 +61,13 @@ const FolderSelection: React.FC<FolderSelectionProps> = ({folder, repertoires, o
 
   // render:
   return (
-    <div className={styles.folderBlock}>
+    <div className={styles.folderSection}>
       {/* Folder Header */}
       <div className={styles.folderHeader}>
         {/* Expand/Collapse */}
-        <i
-          className={`fa-solid ${folder.collapsed ? "fa-folder" : "fa-folder-open"} ${styles.folderIcon}`}
+        <img
+          src={folder.collapsed ? folderClosedIcon : folderOpenIcon}
+          className={styles.folderIcon}
           onClick={() => onToggle(folder.id)}
         />
 
@@ -90,10 +95,10 @@ const FolderSelection: React.FC<FolderSelectionProps> = ({folder, repertoires, o
         {!editingFolder && (
           <button
             onClick={startFolderRename}
-            className={`${styles.folderBtn} ${styles.folderButtonRename}`}
+            className={`${styles.folderBtn} ${styles.folderBtnRename}`}
             title="Rename folder"
           >
-            <i className="fa-solid fa-pen" />
+            Rename
           </button>
         )}
 
@@ -103,13 +108,13 @@ const FolderSelection: React.FC<FolderSelectionProps> = ({folder, repertoires, o
           className={`${styles.folderBtn} ${styles.folderBtnDelete}`}
           title="Delete folder"
         >
-          <i className="fa-solid fa-trash" />
+          <Icon src={removeGlyph} size={14} />
         </button>
       </div>
 
       {/* Repertoires */}
       {!folder.collapsed && (
-        <div className={styles.retertoireList}>
+        <div className={styles.repertoireList}>
           {repertoires.length === 0 ? (
             <div className={styles.repertoireEmpty}>No repertoires</div>
           ) : (

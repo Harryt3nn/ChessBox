@@ -4,23 +4,17 @@ import { Chess } from "chess.js";
 import { randomUUID } from "crypto";
 import type { Node } from "../types/Node";
 import type { MoveNode } from "../types/moveNode";
+import type { GameJson } from "../types/JSONGame";
 
-export interface GameJson {
-  id: string;
-  source: "lichess" | "chesscom";
-  username: string;
-  nodes: Node[];
-  moveTree: MoveNode;
-  tags: Record<string, string>;
-}
 
-export function pgnToJson(
-  pgn: string,
-  source: "lichess" | "chesscom",
-  username: string
-): GameJson {
+// returns null for a PGN that can't be parsed, so one bad game file can't crash a batch
+export function pgnToJson(pgn: string, source: "lichess" | "chesscom", username: string): GameJson | null {
   const chess = new Chess();
-  chess.loadPgn(pgn);
+  try {
+    chess.loadPgn(pgn);
+  } catch {
+    return null;
+  }
 
   const rawTags = chess.header();
 
@@ -46,20 +40,11 @@ export function pgnToJson(
       id,
       parentId,
       move,
-      children: [],
-      annotations: {
-        comment: "",
-        eval: undefined,
-        tags: []
-      }
+      childIDs: []
     };
 
+    if (nodes.length > 0) nodes[nodes.length - 1].childIDs.push(id);
     nodes.push(node);
-
-    if (parentId) {
-      const parent = nodes.find(n => n.id === parentId);
-      if (parent) parent.children.push(id);
-    }
 
     parentId = id;
 

@@ -3,8 +3,6 @@
 import React, { useState, useCallback, useEffect, useRef, useMemo } from 'react';
 import { Chessboard } from 'react-chessboard';
 import { Chess, Square } from 'chess.js';
-import { HomeButton } from '../components/buttons/homeButton';
-import { SettingsButton } from '../components/buttons/settingsButton';
 import type { Page } from '../types/Page';
 import type { MoveNode } from '../types/moveNode';
 import type { GameTree } from '../types/gameTree';
@@ -170,7 +168,7 @@ const buildPgn = (tree: GameTree): string => {
 // COMPONENT
 // ---------------------------------------------------------------------------
 
-const BoardView = ({ page, setPage }: BoardViewProps) => {
+const BoardView = ({ setPage }: BoardViewProps) => {
 
   // The full game tree. All state lives here.
   const [tree, setTree] = useState<GameTree>(createInitialTree);

@@ -12,7 +12,7 @@ import {
 import type { Folder } from "../types/Folder";
 import type { Repertoire } from "../types/Repertoire";
 import type { Node } from "../types/Node";
-import type { ImportRepertoiresPayload } from "../types/ImportPayload";
+import { sanitiseImport } from "../importsAndExports/sanitiseImport";
 
 function mergeFolders(existing: Folder[], incoming: Folder[]): Folder[] {
   const map = new Map(existing.map(f => [f.id, f]));
@@ -30,8 +30,9 @@ function mergeRepertoires(existing: Repertoire[], incoming: Repertoire[]): Reper
   return [...map.values()];
 }
 
-export async function importRepertoires(payload: ImportRepertoiresPayload): Promise<{ success: true }> {
-  const { folders, repertoires, nodes } = payload;
+// payload arrives over IPC from the renderer, so it is sanitised again here rather than trusted
+export async function importRepertoires(payload: unknown): Promise<{ success: true }> {
+  const { folders, repertoires, nodes } = sanitiseImport(payload);
 
   const existingFolders = await loadFolders();
   const existingRepertoires = await loadRepertoires();
@@ -39,7 +40,8 @@ export async function importRepertoires(payload: ImportRepertoiresPayload): Prom
 
   const mergedFolders = mergeFolders(existingFolders, folders);
   const mergedRepertoires = mergeRepertoires(existingRepertoires, repertoires);
-  const mergedNodes: Record<string, Node> = { ...existingNodes, ...nodes };
+  // like folders and repertoires, existing nodes win -- an import can't overwrite positions already saved
+  const mergedNodes: Record<string, Node> = { ...nodes, ...existingNodes };
 
   await saveFolders(mergedFolders);
   await saveRepertoires(mergedRepertoires);

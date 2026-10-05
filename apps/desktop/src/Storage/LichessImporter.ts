@@ -5,7 +5,10 @@ import path from "path";
 import readline from "readline";
 import { Readable } from "stream";
 import { ensureDirs, LICHESS_DIR } from "./MainStorage";
-import { pgnToJson } from "./PGNtoJSON";
+import { isSafeId } from "../importsAndExports/sanitiseImport";
+
+// a single game's PGN is a few KB; anything far larger isn't a real game
+const MAX_PGN_BYTES = 200_000;
 
 export interface LichessImportResult {
   ok: boolean;
@@ -14,6 +17,10 @@ export interface LichessImportResult {
 }
 
 export async function importLichess(username: string): Promise<LichessImportResult> {
+  if (!/^[A-Za-z0-9_-]{1,50}$/.test(username)) {
+    return { ok: false, error: "Invalid username" };
+  }
+
   ensureDirs();
 
   const userDir = path.join(LICHESS_DIR, username);
@@ -31,15 +38,23 @@ export async function importLichess(username: string): Promise<LichessImportResu
       const trimmed = (line as string).trim();
       if (!trimmed) continue;
 
-      let game: { id: string; pgn: string };
+      let game: unknown;
       try {
         game = JSON.parse(trimmed);
       } catch {
         continue; // skip malformed lines rather than crashing the whole import
       }
 
-      const filePath = path.join(userDir, `${game.id}.pgn`);
-      await fs.promises.writeFile(filePath, game.pgn, "utf8");
+      // the id becomes a file name, so it must be a plain id; the pgn must be a sensible-sized string
+      const { id, pgn } = (game ?? {}) as { id?: unknown; pgn?: unknown };
+      if (!isSafeId(id) || typeof pgn !== "string" || !pgn || pgn.length > MAX_PGN_BYTES) continue;
+
+      const filePath = path.join(userDir, `${id}.pgn`);
+
+      // skip if file already exists
+      if (fs.existsSync(filePath)) continue;
+
+      await fs.promises.writeFile(filePath, pgn, "utf8");
       gamesImported++;
     }
   }

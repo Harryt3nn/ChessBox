@@ -2,7 +2,7 @@
 
 import React, { useState } from "react";
 import type { PreparedImportData } from "../importsAndExports/prepareForImport";
-import { toast } from "react-toastify";
+import toast from "react-hot-toast";
 
 // different than import modal, this system is for importing JSON or PGN for the analysis board
 // code below is copied and now needs to be altered

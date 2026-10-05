@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from "react";
 import styles from "./profileCard.module.css";
-import { Page } from "../types/Page";
 import { trpc, setAuthToken } from '../trpc';
 
 interface ProfileData {
@@ -14,13 +13,11 @@ interface ProfileData {
 }
 
 interface ProfileCardProps {
-  page: Page;
-  setPage: (page: Page) => void;
   onLogout: () => void;
   isAuthed: boolean;
 }
 
-export const ProfileCard = ({ page, setPage, onLogout, isAuthed }: ProfileCardProps) => {
+export const ProfileCard = ({ onLogout, isAuthed }: ProfileCardProps) => {
     const [profile, setProfile] = useState<ProfileData | null>(null);
     const [loading, setLoading] = useState(true);
 

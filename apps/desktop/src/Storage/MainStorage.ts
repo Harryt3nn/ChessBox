@@ -6,6 +6,7 @@ import { app, safeStorage } from "electron";
 import type { Folder } from "../types/Folder";
 import type { Repertoire } from "../types/Repertoire";
 import type { Node } from "../types/Node";
+import { isSafeId } from "../importsAndExports/sanitiseImport";
 
 /* -------------------------------------------------------
    PATHS
@@ -51,6 +52,40 @@ export function ensureDirs() {
 }
 
 /* -------------------------------------------------------
+   CORRUPT FILE HANDLING
+------------------------------------------------------- */
+
+// a file that can't be parsed is renamed aside rather than overwritten,
+// so one bad file can't crash the app or silently lose the user's data
+async function quarantine(filePath: string, err: unknown) {
+  const aside = `${filePath}.corrupt-${Date.now()}`;
+  console.error(`Could not read ${filePath}, moved it to ${aside}:`, err);
+  try {
+    await fs.promises.rename(filePath, aside);
+  } catch {
+    // if it can't be moved, leaving it in place is still better than crashing
+  }
+}
+
+async function readJson(filePath: string): Promise<unknown> {
+  const raw = await fs.promises.readFile(filePath, "utf8");
+  try {
+    return JSON.parse(raw);
+  } catch (err) {
+    await quarantine(filePath, err);
+    return undefined;
+  }
+}
+
+/** repertoire ids become file names, so only [A-Za-z0-9_-] ids are ever written */
+function repertoirePath(id: unknown): string | null {
+  if (!isSafeId(id)) return null;
+  const filePath = path.join(REPS_DIR, `${id}.json`);
+  // belt and braces: the resolved path must still be inside the repertoires folder
+  return path.dirname(path.resolve(filePath)) === path.resolve(REPS_DIR) ? filePath : null;
+}
+
+/* -------------------------------------------------------
    AUTH TOKEN
 ------------------------------------------------------- */
 
@@ -89,8 +124,9 @@ export async function clearAuthToken(): Promise<void> {
 
 export async function loadFolders(): Promise<Folder[]> {
   ensureDirs();
-  const raw = await fs.promises.readFile(FOLDERS_PATH, "utf8");
-  return JSON.parse(raw).folders ?? [];
+  const data = await readJson(FOLDERS_PATH);
+  const folders = (data as { folders?: unknown } | undefined)?.folders;
+  return Array.isArray(folders) ? folders : [];
 }
 
 export async function saveFolders(folders: Folder[]): Promise<void> {
@@ -113,8 +149,8 @@ export async function loadRepertoires(): Promise<Repertoire[]> {
 
   for (const file of files) {
     if (!file.endsWith(".json")) continue;
-    const raw = await fs.promises.readFile(path.join(REPS_DIR, file), "utf8");
-    reps.push(JSON.parse(raw));
+    const rep = await readJson(path.join(REPS_DIR, file));
+    if (rep && typeof rep === "object" && !Array.isArray(rep)) reps.push(rep as Repertoire);
   }
 
   return reps;
@@ -123,11 +159,11 @@ export async function loadRepertoires(): Promise<Repertoire[]> {
 export async function saveRepertoires(repertoires: Repertoire[]): Promise<void> {
   ensureDirs();
   for (const rep of repertoires) {
-    if (!rep.id) {
-      console.warn("Skipping repertoire with missing id", rep);
+    const filePath = repertoirePath(rep.id);
+    if (!filePath) {
+      console.warn("Skipping repertoire with missing or unsafe id", rep.id);
       continue;
     }
-    const filePath = path.join(REPS_DIR, `${rep.id}.json`);
     await fs.promises.writeFile(filePath, JSON.stringify(rep, null, 2), "utf8");
   }
 }
@@ -139,8 +175,8 @@ export async function saveRepertoires(repertoires: Repertoire[]): Promise<void> 
 export async function loadNodes(): Promise<Record<string, Node>> {
   ensureDirs();
   try {
-    const raw = await fs.promises.readFile(NODES_PATH, "utf8");
-    return JSON.parse(raw);
+    const data = await readJson(NODES_PATH);
+    return data && typeof data === "object" && !Array.isArray(data) ? (data as Record<string, Node>) : {};
   } catch {
     return {};
   }

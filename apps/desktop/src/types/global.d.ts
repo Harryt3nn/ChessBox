@@ -3,7 +3,7 @@
 
 import type { Folder } from "./Folder";
 import type { Repertoire } from "./Repertoire";
-import type { ImportResult } from "./ImportResult";
+import type { ImportResult } from "./ImportResults";
 import type { ImportRepertoiresPayload } from "./ImportPayload";
 
 export {};
@@ -11,10 +11,10 @@ export {};
 declare global {
   interface Window {
     storage: {
-      loadFolders(): Promise<any[]>;
-      saveFolders(folders: any[]): Promise<void>;
-      loadRepertoires(): Promise<any[]>;
-      saveRepertoire(rep: any): Promise<void>;
+      loadFolders(): Promise<Folder[]>;
+      saveFolders(folders: Folder[]): Promise<void>;
+      loadRepertoires(): Promise<Repertoire[]>;
+      saveRepertoire(rep: Repertoire): Promise<void>;
       openFileDialog(options: Electron.OpenDialogOptions): Promise<string[]>;
       readFile(filePath: string): Promise<string>;
       importRepertoires(payload: ImportRepertoiresPayload): Promise<{ success: boolean }>;
@@ -25,12 +25,6 @@ declare global {
      api: {
       importLichess(username: string): Promise<ImportResult>;
       importChesscom(username: string): Promise<ImportResult>;
-    };
-    // STOCKFISH: mirrors the shape exposed in preload.ts via
-    // contextBridge.exposeInMainWorld("stockfish", ...). depth is optional
-    // to match the default handled on the main-process side.
-    stockfish: {
-      getBestMove(fen: string, depth?: number): Promise<string>;
     };
   }
 }

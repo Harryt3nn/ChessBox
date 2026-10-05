@@ -1,0 +1,321 @@
+/*apps/desktop/src/pages/PageShared.module.css*/
+
+/* building blocks shared by the Home, Analytics, Training and Novelty pages
+   same art deco language as the profile card / modals: clipped corners, brass accents */
+
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  padding: 32px 40px 40px;
+  user-select: none;
+}
+
+/* Panels */
+
+.panel {
+  background: var(--color-surface-1);
+  border: 1px solid var(--color-border-strong);
+  clip-path: polygon(12px 0, 100% 0, 100% calc(100% - 12px), calc(100% - 12px) 100%, 0 100%, 0 12px);
+  padding: 20px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  min-width: 0;
+}
+
+.panel-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.section-title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--color-text-secondary);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+/* brass diamond marker before section titles */
+.section-title::before {
+  content: "";
+  width: 7px;
+  height: 7px;
+  background: var(--color-amber);
+  transform: rotate(45deg);
+  flex-shrink: 0;
+}
+
+.panel-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 16px;
+}
+
+/* Stat tiles */
+
+.stat-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 12px;
+}
+
+.stat-tile {
+  background: var(--color-surface-2);
+  border: 1px solid var(--color-border);
+  clip-path: polygon(8px 0, 100% 0, 100% calc(100% - 8px), calc(100% - 8px) 100%, 0 100%, 0 8px);
+  padding: 14px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.stat-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--color-text-tertiary);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.stat-value {
+  color: var(--color-amber);
+  font-size: 26px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+
+.stat-value-empty {
+  color: var(--color-text-faint);
+}
+
+/* Segmented toggle (matches the BoardView SAN / FEN / PGN switcher) */
+
+.toggle {
+  display: inline-flex;
+  background: var(--color-surface-2);
+  border: 1px solid var(--color-border-strong);
+  clip-path: polygon(8px 0, 100% 0, 100% calc(100% - 8px), calc(100% - 8px) 100%, 0 100%, 0 8px);
+}
+
+.toggle-btn {
+  padding: 8px 16px;
+  background: transparent;
+  color: var(--color-text-secondary);
+  border: none;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  transition: background 0.15s, color 0.15s;
+}
+
+.toggle-btn + .toggle-btn {
+  border-left: 1px solid var(--color-border-strong);
+}
+
+.toggle-btn:hover {
+  color: var(--color-amber);
+}
+
+.toggle-active,
+.toggle-active:hover {
+  background: var(--color-amber);
+  color: var(--color-ink);
+}
+
+/* Buttons */
+
+.btn-primary,
+.btn-outline {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 9px 16px;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  cursor: pointer;
+  clip-path: polygon(6px 0, 100% 0, 100% calc(100% - 6px), calc(100% - 6px) 100%, 0 100%, 0 6px);
+  transition: background 0.15s, color 0.15s, border-color 0.15s;
+}
+
+.btn-primary {
+  background: var(--color-amber);
+  color: var(--color-ink);
+  border: 1px solid var(--color-amber);
+}
+
+.btn-primary:hover {
+  background: var(--color-amber-hover);
+}
+
+.btn-outline {
+  background: transparent;
+  color: var(--color-text-secondary);
+  border: 1px solid var(--color-border-strong);
+}
+
+.btn-outline:hover {
+  color: var(--color-amber);
+  border-color: var(--color-amber);
+}
+
+.btn-primary:disabled,
+.btn-outline:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.btn-outline:disabled:hover {
+  color: var(--color-text-secondary);
+  border-color: var(--color-border-strong);
+}
+
+/* Empty states — shown wherever a feature has its design but not its data yet */
+
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  gap: 10px;
+  padding: 28px 16px;
+  flex: 1;
+}
+
+.empty-icon {
+  width: 52px;
+  height: 52px;
+  opacity: 0.85;
+  margin-bottom: 4px;
+}
+
+.empty-title {
+  color: var(--color-text-secondary);
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.empty-hint {
+  color: var(--color-text-faint);
+  font-size: 12px;
+  max-width: 340px;
+  line-height: 1.5;
+}
+
+/* Small tag for features that are designed but not yet built */
+
+.soon-badge {
+  padding: 3px 8px;
+  border: 1px solid rgba(var(--color-amber-rgb), 0.5);
+  color: var(--color-amber);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+/* Feature cards (Home shortcuts, Training tools) */
+
+.card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 16px;
+}
+
+.feature-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 22px 20px;
+  background: var(--color-surface-1);
+  border: 1px solid var(--color-border-strong);
+  clip-path: polygon(12px 0, 100% 0, 100% calc(100% - 12px), calc(100% - 12px) 100%, 0 100%, 0 12px);
+  color: inherit;
+  font-family: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s, transform 0.1s;
+}
+
+.feature-card:hover {
+  background: var(--color-surface-2);
+  border-color: var(--color-amber);
+  transform: translateY(-2px);
+}
+
+.feature-card:disabled {
+  cursor: default;
+}
+
+.feature-card:disabled:hover {
+  background: var(--color-surface-1);
+  border-color: var(--color-border-strong);
+  transform: none;
+}
+
+.feature-card-icon {
+  width: 40px;
+  height: 40px;
+}
+
+.feature-card-title {
+  color: var(--color-text-primary);
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+
+.feature-card-text {
+  color: var(--color-text-tertiary);
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.feature-card .soon-badge {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+}
+
+/* Simple table for opening / deviation lists */
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+
+.table th {
+  padding: 8px 10px;
+  color: var(--color-text-tertiary);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  text-align: left;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.table td {
+  padding: 10px;
+  color: var(--color-text-secondary);
+  border-bottom: 1px solid rgba(var(--color-cream-rgb), 0.06);
+}

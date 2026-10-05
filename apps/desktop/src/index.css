@@ -66,3 +66,10 @@ body {
   height: 100vh;
   user-select: none;
 }
+
+.main-content {
+  flex: 1;
+  min-width: 0;
+  height: 100vh;
+  overflow-y: auto;
+}

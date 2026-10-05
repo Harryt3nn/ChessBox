@@ -1,7 +1,5 @@
 /*apps/desktop/src/importsAndExports/validateChessGraphExports.ts*/
 
-import type { Node } from "../types/Node";
-
 // validates selected files to ensure they are appropriate
 // appropriate files are in compliance with chess graph formatting
 // returns null if the file is valid
@@ -22,12 +20,12 @@ export function validateChessGraphExport(data: any): string | null {
 
   for (const rawNode of Object.values(data.nodes)) 
     {
-    const node = rawNode as Node;
+    const node = rawNode as any;
 
     if (!node || typeof node !== "object") {return "A node is malformed or not an object.";}
     if (!node.id) {return "A node is missing an 'id' field.";}
-    if (node.children == null) {node.children = [];}
-    if (!Array.isArray(node.children)) {return "A node has an invalid 'children' field.";}
+    const childIDs = node.childIDs ?? node.childIds ?? node.children ?? [];
+    if (!Array.isArray(childIDs)) {return "A node has an invalid 'childIDs' field.";}
   }
   return null;
 }

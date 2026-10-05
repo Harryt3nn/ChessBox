@@ -8,9 +8,10 @@
   user-select: none;
 }
 
-.rep-row-icon { 
-    color: var(--color-text-tertiary); width: 14px; 
-
+.rep-row-icon {
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
 }
 
 .rep-row-name { 

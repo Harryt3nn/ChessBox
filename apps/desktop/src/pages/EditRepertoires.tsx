@@ -4,16 +4,20 @@ import { useState, useEffect, useRef, useMemo } from 'react';
 import { FileSystemStorageProvider } from "../Storage/FileSystemStorageProvider";
 import { validateChessGraphExport } from "../importsAndExports/validateChessGraphExport";
 import { ImportModal } from "../components/ImportModal";
-import { prepareForImport } from "../importsAndExports/prepareForImport"
+import { prepareForImport, type PreparedImportData } from "../importsAndExports/prepareForImport"
+import { ImportError } from "../importsAndExports/sanitiseImport";
 import type { Page } from '../types/Page';
 import type { Repertoire } from '../types/Repertoire'
 import type { Folder } from '../types/Folder'
 import styles from './EditRepertoires.module.css';
 import Sidebar from '../components/SidebarModule';
-import { InlineEdit } from "../components/editRepertoireComponents/InlineEdit";
-import { ChessKnightIcon } from "../components/editRepertoireComponents/ChessKnightIcon";
-import { RepertoireCard } from "../components/editRepertoireComponents/RepertoireCard";
 import FolderSelection from "../components/editRepertoireComponents/FolderSelection";
+import { Icon } from "../components/Icon";
+import folderPlusIcon from "../assets/icons/213-folder-3.png";
+import folderIcon from "../assets/icons/096-folder-29.png";
+import plusGlyph from "../assets/icons/018-plus.png";
+import importGlyph from "../assets/icons/015-download.png";
+import searchGlyph from "../assets/icons/032-search.png";
 
 
 
@@ -26,7 +30,7 @@ function generateId(): string {
   return crypto.randomUUID();
 }
 
-const EditRepertoires = ({ page, setPage }: EditRepertoiresProps) => {
+const EditRepertoires = ({ setPage }: EditRepertoiresProps) => {
   const [folders, setFolders] = useState<Folder[]>([]);
   const [repertoires, setRepertoires] = useState<Repertoire[]>([]);
   const [search, setSearch] = useState("");
@@ -34,7 +38,7 @@ const EditRepertoires = ({ page, setPage }: EditRepertoiresProps) => {
   const [newFolderName, setNewFolderName] = useState("");
   const newFolderRef = useRef<HTMLInputElement>(null);
   const storage = useMemo(() => new FileSystemStorageProvider(), []);
-  const [pendingImportData, setPendingImportData] = useState<any | null>(null);
+  const [pendingImportData, setPendingImportData] = useState<PreparedImportData | null>(null);
   const [showImportModal, setShowImportModal] = useState(false);
   
 
@@ -47,26 +51,34 @@ const EditRepertoires = ({ page, setPage }: EditRepertoiresProps) => {
 
   
   const filePath = filePaths[0];
-  const fileContents = await window.storage.readFile(filePath);
-  let parsed: any;
-  const error = validateChessGraphExport(parsed);
-
+  let fileContents: string;
+  try {fileContents = await window.storage.readFile(filePath);}
+  catch (err) {alert(err instanceof Error ? err.message : "Could not read file.");
+    return;
+  }
 
   if (!fileContents) {
     alert("Could not read file.");
     return;
   }
 
+  let parsed: unknown;
   try {parsed = JSON.parse(fileContents);}
    catch {alert("File is not in a valid format.");
     return;
   }
- 
+
+  const error = validateChessGraphExport(parsed);
   if (error) {alert("Invalid ChessGraph export: " + error);
     return;
   }
 
-  const prepared = prepareForImport(parsed);
+  // sanitising can still reject the file (e.g. nothing usable, or too large) -- never let it crash the page
+  let prepared: PreparedImportData;
+  try {prepared = prepareForImport(parsed);}
+  catch (err) {alert(err instanceof ImportError ? err.message : "This file couldn't be imported.");
+    return;
+  }
 
   setPendingImportData(prepared);
   setShowImportModal(true);
@@ -178,15 +190,15 @@ return (
         <h1>Your Repertoires</h1>
         <div className={styles.topbarActions}>
           <button className={styles.btnOutline} onClick={() => setCreatingFolder(true)}>
-            <i className="fa-solid fa-folder-plus" />
+            <img src={folderPlusIcon} className={styles.btnImg} />
             New Folder
           </button>
           <button className={styles.btnPrimary} onClick={() => {/* TODO */}}>
-            <i className="fa-solid fa-plus" />
+            <Icon src={plusGlyph} size={14} />
             New Graph
           </button>
           <button className={styles.btnOutline} onClick={handleImportClick}>
-            <i className="fa-solid fa-file-import" />
+            <Icon src={importGlyph} size={14} />
             Import JSON
           </button>
         </div>
@@ -196,7 +208,7 @@ return (
       {/* Search */}
       <div className={styles.searchContainer}>
         <div className={styles.searchWrapper}>
-          <i className="fa-solid fa-magnifying-glass search-icon" />
+          <Icon src={searchGlyph} size={14} className={styles.searchIcon} />
           <input
             className={styles.searchInput}
             value={search}
@@ -210,7 +222,7 @@ return (
       {creatingFolder && (
         <div className={styles.newFolderContainer}>
           <div className={styles.newFolderInput}>
-            <i className="fa-solid fa-folder" />
+            <img src={folderIcon} className={styles.btnImg} />
             <input
               ref={newFolderRef}
               value={newFolderName}

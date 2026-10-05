@@ -1,15 +1,17 @@
 /* apps/desktop/src/App.tsx */
 
 import { useState, useEffect } from 'react';
+import { Toaster } from 'react-hot-toast';
 import EditRepertoires from './pages/EditRepertoires';
 import Analytics from './pages/Analytics';
 import Settings from './pages/Settings';
 import TrainingToolkit from './pages/TrainingToolkit';
 import BoardView from './pages/BoardView';
 import NoveltyFinder from './pages/NoveltyFinder';
-import Sidebar from "./components/SidebarModule";
+import Home from './pages/Home';
 import { LogIn } from './components/logIn';
-import { restoreAuthToken } from './trpc';
+import { VerifyEmail } from './components/VerifyEmail';
+import { restoreAuthToken, signOut, trpc } from './trpc';
 import type { Page } from './types/Page';
 import type { inferRouterOutputs } from '@trpc/server';
 import type { AppRouter } from '@chessbox/shared/router';
@@ -31,28 +33,40 @@ const App = () => {
     });
   }, []);
 
+  function handleLogout() {
+    setIsAuthed(false);
+    setCurrentUser(null);
+  }
+
+  // signed in, but the account's email hasn't been confirmed yet
+  // (explicit false only -- an older server that doesn't report the field shouldn't lock anyone out)
+  const needsVerification = isAuthed && currentUser !== null && currentUser.emailVerified === false;
+
   function renderPage() {
     if (page === 'analytics') return <Analytics page={page} setPage={setPage} />;
     if (page === 'repertoires') return <EditRepertoires page={page} setPage={setPage} />;
     if (page === 'tools') return <TrainingToolkit page={page} setPage={setPage} />;
-    if (page === 'settings') return <Settings page={page} setPage={setPage} onLogout={() => { setIsAuthed(false); setCurrentUser(null); }} isAuthed={isAuthed} />;
+    if (page === 'settings') return <Settings page={page} setPage={setPage} onLogout={handleLogout} isAuthed={isAuthed} />;
     if (page === 'board') return <BoardView page={page} setPage={setPage} />;
     if (page === 'novelty') return <NoveltyFinder page={page} setPage={setPage} currentUser={currentUser} />;
-    
 
-    return (
-      <div className="app-layout">
-        <Sidebar setPage={setPage} />
-        <main className="main-content">
-          
-            
-        </main>
-      </div>
-    );
+    return <Home setPage={setPage} />;
   }
 
   return (
     <>
+      <Toaster
+        position="bottom-right"
+        toastOptions={{
+          style: {
+            background: 'var(--color-surface-2)',
+            color: 'var(--color-text-primary)',
+            border: '1px solid var(--color-border-strong)',
+            borderRadius: 0,
+            fontSize: 13,
+          },
+        }}
+      />
       <div className={authChecked && !isAuthed ? 'locked' : undefined}>
         {renderPage()}
       </div>
@@ -62,6 +76,14 @@ const App = () => {
           setIsAuthed(true);
           setCurrentUser(user);
         }} />
+      )}
+
+      {needsVerification && (
+        <VerifyEmail
+          email={currentUser.email}
+          onVerified={() => trpc.auth.me.query().then(setCurrentUser)}
+          onLogout={() => signOut().then(handleLogout)}
+        />
       )}
     </>
   );

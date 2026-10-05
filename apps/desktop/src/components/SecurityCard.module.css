@@ -1,0 +1,129 @@
+/*apps/desktop/src/components/SecurityCard.module.css*/
+
+/* same framing as the profile card above it */
+.securityCard {
+  width: 100%;
+  max-width: 420px;
+  margin: 32px auto 48px;
+  background: var(--color-surface-1);
+  border: 1px solid var(--color-border-strong);
+  clip-path: polygon(16px 0, 100% 0, 100% calc(100% - 16px), calc(100% - 16px) 100%, 0 100%, 0 16px);
+  padding: 28px 32px;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.title {
+  color: var(--color-amber);
+  font-size: 16px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  text-align: center;
+}
+
+.section-label {
+  color: var(--color-text-secondary);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.form input {
+  width: 100%;
+  padding: 10px 14px;
+  background: var(--color-surface-2);
+  border: 1px solid var(--color-border);
+  color: var(--color-text-primary);
+  font-size: 14px;
+  font-family: 'Segoe UI', sans-serif;
+  outline: none;
+  transition: border-color 0.15s;
+  user-select: text;
+}
+
+.form input:focus {
+  border-color: var(--color-amber);
+}
+
+.form input::placeholder {
+  color: var(--color-text-faint);
+}
+
+.error {
+  color: var(--color-coral-hover);
+  font-size: 12px;
+}
+
+.success {
+  color: var(--color-amber);
+  font-size: 12px;
+}
+
+.primary-btn,
+.danger-btn {
+  padding: 10px 16px;
+  clip-path: polygon(6px 0, 100% 0, 100% calc(100% - 6px), calc(100% - 6px) 100%, 0 100%, 0 6px);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+}
+
+.primary-btn {
+  margin-top: 4px;
+  border: none;
+  background: var(--color-amber);
+  color: var(--color-ink);
+}
+
+.primary-btn:hover:not(:disabled) {
+  background: var(--color-amber-hover);
+}
+
+.danger-btn {
+  flex-shrink: 0;
+  border: 1px solid var(--color-coral-hover);
+  background: transparent;
+  color: var(--color-coral-hover);
+}
+
+.danger-btn:hover:not(:disabled) {
+  background: var(--color-coral);
+  color: var(--color-text-primary);
+}
+
+.primary-btn:disabled,
+.danger-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.divider {
+  height: 1px;
+  background: var(--color-border);
+}
+
+.sign-out-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.hint {
+  margin-top: 4px;
+  color: var(--color-text-faint);
+  font-size: 12px;
+  line-height: 1.4;
+}

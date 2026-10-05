@@ -21,6 +21,8 @@ const rendererRules = [
         options: {
           modules: {
             localIdentName: '[name]__[local]--[hash:base64:5]',
+            // lets kebab-case classes (.topbar-actions) be used as styles.topbarActions
+            exportLocalsConvention: 'camelCase',
           },
         },
       },

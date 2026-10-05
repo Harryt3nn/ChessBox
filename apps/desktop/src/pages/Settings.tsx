@@ -6,6 +6,9 @@ import { trpc } from '../trpc';
 import styles from './Settings.module.css';
 import type { Page } from '../types/Page';
 import { ProfileCard } from '../components/profileCard';
+import { SecurityCard } from '../components/SecurityCard';
+import { Icon } from '../components/Icon';
+import linkGlyph from '../assets/icons/020-link.png';
 
 interface SettingsProps {
   page: Page;
@@ -14,7 +17,7 @@ interface SettingsProps {
   isAuthed: boolean;
 }
 
-const Settings = ({ page, setPage, onLogout, isAuthed }: SettingsProps) => {
+const Settings = ({ setPage, onLogout, isAuthed }: SettingsProps) => {
   const [showChessConnect, setShowChessConnect] = useState(false);
   const [service, setService] = useState<"chesscom" | "lichess" | null>(null);
   const [username, setUsername] = useState("");
@@ -53,7 +56,7 @@ const Settings = ({ page, setPage, onLogout, isAuthed }: SettingsProps) => {
 
       <main className={`main-content ${styles.settingsPage}`}>
 
-        <ProfileCard page={page} setPage={setPage} onLogout={onLogout} isAuthed={isAuthed} />
+        <ProfileCard onLogout={onLogout} isAuthed={isAuthed} />
       
 
         <div className={styles.settingsSection}>
@@ -64,7 +67,7 @@ const Settings = ({ page, setPage, onLogout, isAuthed }: SettingsProps) => {
               setShowChessConnect(true);
             }}
           >
-            <i className="fa-solid fa-chess-board"></i>
+            <Icon src={linkGlyph} size={16} />
             Connect Chess.com
           </button>
 
@@ -75,10 +78,12 @@ const Settings = ({ page, setPage, onLogout, isAuthed }: SettingsProps) => {
               setShowChessConnect(true);
             }}
           >
-            <i className="fa-solid fa-chess-board"></i>
+            <Icon src={linkGlyph} size={16} />
             Connect Lichess
           </button>
         </div>
+
+        {isAuthed && <SecurityCard onLogout={onLogout} />}
 
         {showChessConnect && (
           <div className={styles.modalOverlay}>

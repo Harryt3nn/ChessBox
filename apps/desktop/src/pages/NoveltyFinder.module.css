@@ -52,3 +52,58 @@
   color: var(--color-text-secondary);
   font-size: 13px;
 }
+
+/* Import panel — brand colours follow the Settings connect buttons:
+   sage is reserved for Chess.com, cream for Lichess */
+
+.importHint {
+  color: var(--color-text-tertiary);
+  font-size: 13px;
+}
+
+.importActions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.importBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 11px 18px;
+  border: none;
+  clip-path: polygon(6px 0, 100% 0, 100% calc(100% - 6px), calc(100% - 6px) 100%, 0 100%, 0 6px);
+  color: var(--color-ink);
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: background 0.15s, transform 0.1s;
+}
+
+.importBtn:hover:not(:disabled) {
+  transform: translateY(-2px);
+}
+
+.importBtn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.chesscomBtn {
+  background: var(--color-sage);
+}
+
+.chesscomBtn:hover:not(:disabled) {
+  background: var(--color-sage-hover);
+}
+
+.lichessBtn {
+  background: var(--color-text-primary);
+}
+
+.lichessBtn:hover:not(:disabled) {
+  background: #fff8ef;
+}
