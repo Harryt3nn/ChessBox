@@ -15,6 +15,7 @@ import {
   saveRepertoires,
   loadNodes,
   saveNodePatch,
+  deleteRepertoire,
   saveAuthToken,
   loadAuthToken,
   clearAuthToken
@@ -42,7 +43,9 @@ ipcMain.handle("storage:loadRepertoires", () => loadRepertoires());
 ipcMain.handle("storage:loadNodes", () => loadNodes());
 
 // renderer input is sanitised node by node inside saveNodePatch
-ipcMain.handle("storage:saveNodes", (_event, patch: unknown) => saveNodePatch(patch));
+ipcMain.handle("storage:saveNodes", (_event, patch: unknown, remove: unknown) => saveNodePatch(patch, remove));
+
+ipcMain.handle("storage:deleteRepertoire", (_event, id: unknown) => deleteRepertoire(id));
 
 ipcMain.handle("storage:saveRepertoire", (_event, rep: unknown) => {
   const clean = sanitiseRepertoire(rep);

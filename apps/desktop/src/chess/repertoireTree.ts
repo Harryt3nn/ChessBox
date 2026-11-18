@@ -46,6 +46,8 @@ export function repertoireToTree(rootId: string, nodes: Record<string, Node>, he
   if (!root) throw new Error('This repertoire has no starting position.');
 
   const tree = createTree(root.fen ?? DEFAULT_POSITION, headers);
+  // the start position keeps its graph id, like every other node, so it can be found by id
+  tree.root.id = rootId;
   const lineTo = new Map<string, string[]>([[rootId, []]]);
   const leaves: { leaf: MoveNode; targetId: string }[] = [];
   let skipped = 0;

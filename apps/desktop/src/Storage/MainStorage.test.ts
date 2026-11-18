@@ -11,7 +11,7 @@ const dataDir = await vi.hoisted(async () => {
 
 vi.mock('electron', () => ({ app: { getPath: () => dataDir }, safeStorage: {} }));
 
-import { loadNodes, saveNodePatch, saveNodes } from './MainStorage';
+import { deleteRepertoire, loadNodes, loadRepertoires, saveNodePatch, saveNodes, saveRepertoires } from './MainStorage';
 
 const NODES = path.join(dataDir, 'ChessBox-data', 'nodes.json');
 
@@ -47,7 +47,39 @@ describe('saveNodePatch', () => {
     expect(fs.readFileSync(NODES, 'utf8')).not.toContain('evil');
   });
 
+  it('removes the ids it is asked to, alongside the patch', async () => {
+    await saveNodePatch({ root: { id: 'root', parentId: null, move: null, childIDs: [] } }, ['a', '../evil']);
+    expect(Object.keys(await loadNodes())).toEqual(['root']);
+  });
+
   it('rejects something that is not an object', async () => {
     await expect(saveNodePatch([])).rejects.toThrow();
+  });
+});
+
+describe('deleteRepertoire', () => {
+  it('removes the repertoire, its nodes and its novelty results, and nothing else', async () => {
+    await saveNodes({
+      r1: { id: 'r1', repertoireId: 'rep1', parentId: null, move: null, childIDs: ['x'] },
+      x: { id: 'x', repertoireId: 'rep1', parentId: 'r1', move: 'e4', childIDs: [] },
+      r2: { id: 'r2', repertoireId: 'rep2', parentId: null, move: null, childIDs: [] },
+    });
+    await saveRepertoires([
+      { id: 'rep1', name: 'a', side: 'white', rootNodeId: 'r1', folderId: null, createdAt: 0, updatedAt: 0 },
+      { id: 'rep2', name: 'b', side: 'black', rootNodeId: 'r2', folderId: null, createdAt: 0, updatedAt: 0 },
+    ]);
+    const novelty = path.join(dataDir, 'ChessBox-data', 'novelty');
+    fs.mkdirSync(novelty, { recursive: true });
+    fs.writeFileSync(path.join(novelty, 'rep1.json'), '{}');
+
+    await deleteRepertoire('rep1');
+
+    expect((await loadRepertoires()).map(r => r.id)).toEqual(['rep2']);
+    expect(Object.keys(await loadNodes())).toEqual(['r2']);
+    expect(fs.existsSync(path.join(novelty, 'rep1.json'))).toBe(false);
+  });
+
+  it('refuses an unsafe id', async () => {
+    await expect(deleteRepertoire('../x')).rejects.toThrow();
   });
 });

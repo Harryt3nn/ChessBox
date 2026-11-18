@@ -186,7 +186,7 @@ export async function loadNodes(): Promise<Record<string, Node>> {
  * writes changed and new nodes (from the board's "save to repertoire"), keeping all others.
  * The patch comes from the renderer, so each node is sanitised and must sit under its own id.
  */
-export async function saveNodePatch(patch: unknown): Promise<void> {
+export async function saveNodePatch(patch: unknown, remove: unknown = []): Promise<void> {
   if (!patch || typeof patch !== "object" || Array.isArray(patch)) throw new Error("Invalid node update");
 
   const clean: Record<string, Node> = {};
@@ -196,11 +196,28 @@ export async function saveNodePatch(patch: unknown): Promise<void> {
   }
 
   const nodes = await loadNodes();
+  for (const id of Array.isArray(remove) ? remove : []) {
+    if (isSafeId(id)) delete nodes[id];
+  }
   for (const [id, node] of Object.entries(clean)) {
     // defineProperty, so an id like "__proto__" is stored as data, never as the object's prototype
     Object.defineProperty(nodes, id, { value: node, enumerable: true, writable: true, configurable: true });
   }
   await saveNodes(nodes);
+}
+
+/** removes a repertoire with its nodes and its novelty-finder results */
+export async function deleteRepertoire(id: unknown): Promise<void> {
+  const file = repertoirePath(id);
+  if (!file) throw new Error("Invalid repertoire id");
+
+  const nodes = await loadNodes();
+  for (const [nodeId, node] of Object.entries(nodes)) {
+    if (node.repertoireId === id) delete nodes[nodeId];
+  }
+  await saveNodes(nodes);
+  await fs.promises.rm(file, { force: true });
+  await fs.promises.rm(path.join(DATA_DIR, "novelty", `${id}.json`), { force: true });
 }
 
 export async function saveNodes(nodes: Record<string, Node>): Promise<void> {

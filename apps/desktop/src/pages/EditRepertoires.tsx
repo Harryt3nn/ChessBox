@@ -11,6 +11,7 @@ import type { Folder } from '../types/Folder'
 import styles from './EditRepertoires.module.css';
 import FolderSelection from "../components/editRepertoireComponents/FolderSelection";
 import { UNCATEGORISED_ID, storedFolders, withUncategorised } from "../components/editRepertoireComponents/uncategorised";
+import { newRepertoire } from "../builder/graph";
 import { Icon } from "../components/Icon";
 import folderPlusIcon from "../assets/icons/213-folder-3.png";
 import folderIcon from "../assets/icons/096-folder-29.png";
@@ -26,9 +27,13 @@ function generateId(): string {
 
 interface EditRepertoiresProps {
   onOpenRepertoire: (rep: Repertoire) => void;
+  onBuildRepertoire: (rep: Repertoire) => void;
 }
 
-const EditRepertoires = ({ onOpenRepertoire }: EditRepertoiresProps) => {
+const EditRepertoires = ({ onOpenRepertoire, onBuildRepertoire }: EditRepertoiresProps) => {
+  const [creatingGraph, setCreatingGraph] = useState(false);
+  const [graphName, setGraphName] = useState('');
+  const [graphSide, setGraphSide] = useState<'white' | 'black'>('white');
   const [folders, setFolders] = useState<Folder[]>([]);
   const [repertoires, setRepertoires] = useState<Repertoire[]>([]);
   const [search, setSearch] = useState("");
@@ -139,6 +144,17 @@ const createFolder = async () => {
   setCreatingFolder(false);
 };
 
+// a new empty repertoire, opened straight in the builder
+const createGraph = async () => {
+  const name = graphName.trim() || 'New Repertoire';
+  const { repertoire, root } = newRepertoire(name, graphSide, null);
+  await storage.saveNodes({ [root.id]: root });
+  await storage.saveRepertoire(repertoire);
+  setCreatingGraph(false);
+  setGraphName('');
+  onBuildRepertoire(repertoire);
+};
+
 const deleteFolder = async (folderId: string) => {
   const updatedFolders = folders.filter(f => f.id !== folderId);
   const updatedRepertoires = repertoires.map(rep =>
@@ -174,7 +190,7 @@ return (
           <img src={folderPlusIcon} className={styles.btnImg} />
           New Folder
         </button>
-        <button className={styles.btnPrimary} onClick={() => {/* TODO */}}>
+        <button className={styles.btnPrimary} onClick={() => setCreatingGraph(true)}>
           <Icon src={plusGlyph} size={14} />
           New Graph
         </button>
@@ -198,6 +214,29 @@ return (
       </div>
     </div>
 
+
+    {/* New repertoire inline form */}
+      {creatingGraph && (
+        <div className={styles.newFolderContainer}>
+          <div className={styles.newFolderInput}>
+            <input
+              autoFocus
+              value={graphName}
+              onChange={e => setGraphName(e.target.value)}
+              placeholder="Repertoire name..."
+              onKeyDown={e => {
+                if (e.key === "Enter") void createGraph();
+                if (e.key === "Escape") setCreatingGraph(false);
+              }}/>
+            <select value={graphSide} onChange={e => setGraphSide(e.target.value as 'white' | 'black')}>
+              <option value="white">plays white</option>
+              <option value="black">plays black</option>
+            </select>
+            <button className={styles.btnPrimary} onClick={() => void createGraph()}>Create</button>
+            <button className={styles.btnOutline} onClick={() => setCreatingGraph(false)}>Cancel</button>
+          </div>
+        </div>
+      )}
 
     {/* New folder inline input */}
     {creatingFolder && (
@@ -233,6 +272,7 @@ return (
             onRenameFolder={renameFolder}
             onRenameRepertoire={renameRepertoire}
             onOpenRepertoire={onOpenRepertoire}
+            onBuildRepertoire={onBuildRepertoire}
             onDeleteFolder={deleteFolder}/>)))}
     </div>
   </main>

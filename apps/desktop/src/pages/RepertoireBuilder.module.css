@@ -1,0 +1,165 @@
+/*apps/desktop/src/pages/RepertoireBuilder.module.css*/
+
+.builder {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 14px 24px;
+  border-bottom: 1px solid var(--color-border);
+  flex-shrink: 0;
+}
+
+.title {
+  color: var(--color-amber);
+  font-size: 20px;
+  letter-spacing: 0.02em;
+}
+
+.meta {
+  color: var(--color-text-tertiary);
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.header-actions {
+  margin-left: auto;
+  display: flex;
+  gap: 8px;
+}
+
+.body {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+}
+
+.canvas {
+  flex: 1;
+  min-width: 0;
+  background: var(--color-void);
+}
+
+.empty {
+  padding: 40px;
+  color: var(--color-text-tertiary);
+}
+
+/* position boxes on the canvas */
+.node {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--color-surface-2);
+  border: 1px solid var(--color-border-strong);
+  color: var(--color-text-primary);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.node-selected {
+  border-color: var(--color-amber);
+  box-shadow: 0 0 0 2px rgba(var(--color-amber-rgb), 0.4);
+}
+
+.comment-dot {
+  position: absolute;
+  top: 5px;
+  right: 6px;
+  width: 6px;
+  height: 6px;
+  background: var(--color-amber);
+  transform: rotate(45deg);
+}
+
+.handle {
+  opacity: 0;
+}
+
+.edge :global(.react-flow__edge-path) {
+  stroke: var(--color-border-strong);
+}
+
+.transposition :global(.react-flow__edge-path) {
+  stroke: var(--color-amber);
+  stroke-dasharray: 5 4;
+}
+
+/* selected position: mini board, comment, actions */
+.panel {
+  width: 320px;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 20px 24px;
+  background: var(--color-surface-1);
+  border-left: 1px solid var(--color-border);
+  overflow-y: auto;
+}
+
+.panel-title {
+  color: var(--color-text-primary);
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.hint {
+  color: var(--color-text-faint);
+  font-size: 12px;
+}
+
+.comment {
+  min-height: 90px;
+  padding: 8px 10px;
+  background: var(--color-surface-2);
+  border: 1px solid var(--color-border);
+  color: var(--color-text-primary);
+  font-family: inherit;
+  font-size: 13px;
+  resize: vertical;
+  user-select: text;
+}
+
+.panel-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.message {
+  color: var(--color-text-secondary);
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.btn {
+  padding: 7px 12px;
+  background: none;
+  border: 1px solid var(--color-border-strong);
+  color: var(--color-text-secondary);
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+
+.btn:hover {
+  color: var(--color-amber);
+  border-color: var(--color-amber);
+}
+
+.danger:hover {
+  color: var(--color-coral-hover);
+  border-color: var(--color-coral-hover);
+}

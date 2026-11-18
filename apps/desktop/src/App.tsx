@@ -8,6 +8,7 @@ import Settings from './pages/Settings';
 import TrainingToolkit from './pages/TrainingToolkit';
 import BoardView from './pages/BoardView';
 import NoveltyFinder from './pages/NoveltyFinder';
+import RepertoireBuilder from './pages/RepertoireBuilder';
 import Home from './pages/Home';
 import { LogIn } from './components/logIn';
 import { TopBar } from './components/TopBar';
@@ -30,6 +31,14 @@ const App = () => {
   const [boardRepertoire, setBoardRepertoire] = useState<Repertoire | null>(null);
   // a position to jump to once the repertoire is on the board (a novelty-finder result)
   const [boardFocus, setBoardFocus] = useState<BoardFocus | null>(null);
+
+  // the repertoire open in the visual builder
+  const [builderRepertoire, setBuilderRepertoire] = useState<Repertoire | null>(null);
+
+  function openBuilder(rep: Repertoire) {
+    setBuilderRepertoire(rep);
+    setPage('builder');
+  }
 
   function openInBoard(rep: Repertoire, focus?: BoardFocus) {
     setBoardRepertoire(rep);
@@ -56,7 +65,10 @@ const App = () => {
 
   function renderPage() {
     if (page === 'analytics') return <Analytics />;
-    if (page === 'repertoires') return <EditRepertoires onOpenRepertoire={openInBoard} />;
+    if (page === 'repertoires') return <EditRepertoires onOpenRepertoire={openInBoard} onBuildRepertoire={openBuilder} />;
+    if (page === 'builder' && builderRepertoire) {
+      return <RepertoireBuilder key={builderRepertoire.id} repertoire={builderRepertoire} onOpenInBoard={openInBoard} onBack={() => setPage('repertoires')} />;
+    }
     if (page === 'tools') return <TrainingToolkit page={page} setPage={setPage} />;
     if (page === 'settings') return <Settings page={page} onLogout={handleLogout} isAuthed={isAuthed} />;
     if (page === 'board') return <BoardView repertoire={boardRepertoire} focus={boardFocus} onCloseRepertoire={() => { setBoardRepertoire(null); setBoardFocus(null); }} />;

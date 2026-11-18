@@ -39,6 +39,11 @@ describe('repertoireToTree', () => {
     expect(tree.root.children[0].id).toBe('e4');
   });
 
+  it('gives the tree root the repertoire root\'s id, so the start position can be found by id', () => {
+    const { tree } = repertoireToTree('root-123', graph(n('root-123', null, ['a']), n('a', 'e4')));
+    expect(tree.root.id).toBe('root-123');
+  });
+
   it('accepts chessgraph childIds', () => {
     const nodes = graph({ id: 'root', parentId: null, move: null, childIDs: [], childIds: ['a'] } as unknown as Node, n('a', 'Nf3'));
     expect(moves(repertoireToTree('root', nodes).tree.root)).toEqual(['Nf3']);

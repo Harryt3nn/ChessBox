@@ -32,7 +32,7 @@ const positionKey = (fen: string) => fen.split(' ').slice(0, 4).join(' ');
 const isTranspositionLeaf = (move: MoveNode) => move.id.includes('>');
 
 /** a node with its children under childIDs only (older files use chessgraph's childIds / children) */
-function normalised(node: Node): Node {
+export function normalised(node: Node): Node {
   const copy: Record<string, unknown> = { ...node, childIDs: childrenOf(node) };
   delete copy.childIds;
   delete copy.children;

@@ -12,9 +12,10 @@ interface Props {
   rep: Repertoire;
   onRename: (id: string, name: string) => void;
   onOpen: (rep: Repertoire) => void;
+  onBuild: (rep: Repertoire) => void;
 }
 
-const RepertoireRow: React.FC<Props> = ({ rep, onRename, onOpen }) => {
+const RepertoireRow: React.FC<Props> = ({ rep, onRename, onOpen, onBuild }) => {
   const [editing, setEditing] = useState(false);
   const [name, setName] = useState(rep.name);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -59,6 +60,9 @@ const RepertoireRow: React.FC<Props> = ({ rep, onRename, onOpen }) => {
         </span>
       )}
 
+      <button className={styles.openButton} onClick={() => onBuild(rep)} title="Edit this repertoire as a graph">
+        Builder
+      </button>
       <button className={styles.openButton} onClick={() => onOpen(rep)} title="Open this repertoire in the analysis board">
         Open in board
       </button>
