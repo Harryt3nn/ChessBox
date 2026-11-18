@@ -1,7 +1,7 @@
 /* apps/desktop/src/App.tsx */
 
 import { useState, useEffect } from 'react';
-import { Toaster } from 'react-hot-toast';
+import toast, { Toaster } from 'react-hot-toast';
 import EditRepertoires from './pages/EditRepertoires';
 import Analytics from './pages/Analytics';
 import Settings from './pages/Settings';
@@ -25,9 +25,13 @@ const App = () => {
   const [currentUser, setCurrentUser] = useState<User | null>(null);
 
   useEffect(() => {
-    restoreAuthToken().then(({ success, user }) => {
-      setIsAuthed(success);
-      setCurrentUser(user);
+    restoreAuthToken().then(session => {
+      // can't check the saved session: stay signed in so local work carries on
+      if (session.status === 'unverified') {
+        toast.error("Can't reach the ChessBox server. Your repertoires and board still work; account features will be back once it's reachable.", { duration: 8000 });
+      }
+      setIsAuthed(session.status !== 'signedOut');
+      setCurrentUser(session.status === 'signedIn' ? session.user : null);
       setAuthChecked(true);
     });
   }, []);

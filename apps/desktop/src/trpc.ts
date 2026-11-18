@@ -1,7 +1,10 @@
 /* apps/desktop/src/trpc.ts */
 
 import type { AppRouter } from '@chessbox/shared/router';
-import { createTRPCClient, httpBatchLink } from '@trpc/client';
+import type { inferRouterOutputs } from '@trpc/server';
+import { createTRPCClient, httpBatchLink, TRPCClientError } from '@trpc/client';
+
+type User = inferRouterOutputs<AppRouter>['auth']['me'];
 
 let authToken: string | null = null;
 
@@ -18,18 +21,27 @@ export const trpc = createTRPCClient<AppRouter>({
   ],
 });
 
-export async function restoreAuthToken() {
+export type RestoredSession =
+  | { status: 'signedIn'; user: User }
+  | { status: 'signedOut' }
+  // a saved token we couldn't check (server unreachable or erroring); kept for next time
+  | { status: 'unverified' };
+
+export async function restoreAuthToken(): Promise<RestoredSession> {
   const token = await window.storage.loadAuthToken();
-  if (!token) return { success: false, user: null };
+  if (!token) return { status: 'signedOut' };
 
   setAuthToken(token);
 
   try {
-    const user = await trpc.auth.me.query();
-    return { success: true, user };
-  } catch {
-    setAuthToken(null);
-    await window.storage.clearAuthToken();
-    return { success: false, user: null };
+    return { status: 'signedIn', user: await trpc.auth.me.query() };
+  } catch (err) {
+    // only the server rejecting the token ends the session; the Pi being off says nothing about it
+    if (err instanceof TRPCClientError && err.data?.code === 'UNAUTHORIZED') {
+      setAuthToken(null);
+      await window.storage.clearAuthToken();
+      return { status: 'signedOut' };
+    }
+    return { status: 'unverified' };
   }
 }
