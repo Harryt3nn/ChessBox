@@ -5,8 +5,8 @@
 ChessBox is a desktop app built with **Electron + React + TypeScript** using Electron Forge
 with the webpack-typescript template. Repertoires, positions and imported games are stored
 locally on disk. Accounts live on a small self-hosted API (Fastify + tRPC + PostgreSQL in
-Docker on a Raspberry Pi, reached over Tailscale), which handles sign-in, email
-verification, password management and linked Chess.com / Lichess usernames.
+Docker on a Raspberry Pi, reached over Tailscale), which handles sign-up, sign-in and
+linked Chess.com / Lichess usernames.
 
 The project is two git repositories:
 
@@ -31,7 +31,6 @@ Tech Stack
   "zod"
   "hash-wasm (Argon2id)"
   "JWT"
-  "Nodemailer (SMTP)"
   "Docker"
   "Tailscale"
 }
@@ -274,7 +273,7 @@ Desktop (tRPC client, src/trpc.ts)
     ↓ HTTP over Tailscale :3001, Authorization: Bearer <JWT>
 Fastify  — CORS allow-list, 64 KB body limit, global 300 req/min/IP limit, security headers
     ↓
-tRPC     — createContext() resolves the session (JWT signature + tokenVersion check)
+tRPC     — createContext() resolves the session from the JWT
     ↓
 routers  — auth, connections, user  (inputs validated with @chessbox/shared zod schemas)
     ↓
@@ -285,31 +284,18 @@ Prisma   → PostgreSQL (Docker, not exposed outside the compose network)
 
 | Procedure | Access | Description |
 |---|---|---|
-| `auth.register` | public | Create account, email a verification code, return a session token |
-| `auth.login` | public | Sign in with username **or** email |
+| `auth.register` | public | Create account, return a session token |
+| `auth.login` | public | Sign in with username and password |
 | `auth.me` | signed in | Current user (never includes the password hash) |
-| `auth.verifyEmail` | signed in | Confirm the email with the 6-digit code |
-| `auth.resendVerification` | signed in | Send a fresh verification code |
-| `auth.requestPasswordReset` | public | Email a reset code (always reports success — no account enumeration) |
-| `auth.resetPassword` | public | Set a new password with the emailed code; signs out every session |
-| `auth.changePassword` | signed in | Change password (needs current one); signs out other sessions, returns a new token |
-| `auth.logoutEverywhere` | signed in | Revoke every session for the account |
-| `connections.connectLichess` | verified email | Check the Lichess account exists, save the username |
-| `connections.connectChesscom` | verified email | Check the Chess.com account exists, save the username |
+| `connections.connectLichess` | signed in | Check the Lichess account exists, save the username |
+| `connections.connectChesscom` | signed in | Check the Chess.com account exists, save the username |
 | `user.me` | signed in | Same safe field selection as `auth.me` |
 
 ### Sessions
 
-JWTs (HS256, 3-day expiry) carry the user id and a `tokenVersion`. Every request re-reads
-the user's current `tokenVersion`; a token with an older version is rejected. Changing or
-resetting the password, or "Sign Out All", increments it — which is how sessions on other
-devices are revoked without a token blacklist.
-
-### Email codes
-
-Verification and reset codes are 6 random digits, stored only as a SHA-256 hash in the
-`EmailCode` table, valid for 15 minutes, single-use, and destroyed after 5 wrong guesses.
-The desktop app is not a website, so the user types the code in rather than clicking a link.
+JWTs (3-day expiry) carry the user id. A request is signed in if its token has a valid
+signature and hasn't expired. Logging out deletes the token on that device; there is no
+server-side revocation.
 
 ---
 
@@ -317,11 +303,11 @@ The desktop app is not a website, so the user types the code in rather than clic
 
 | Area | Measure |
 |---|---|
-| Passwords | Argon2id (64 MB, 3 iterations); 8–64 characters; constant-time login via a dummy hash when the account doesn't exist |
-| Rate limiting | Global 300/min/IP; login 10 per 15 min per IP **and** per account; register 5/hour/IP; emails 10/hour/IP and 3 per 15 min per address; code attempts 20 per 15 min/IP; password change 5 per 15 min/user; chess account linking 10 per 15 min/user |
-| Sessions | Pinned HS256, `tokenVersion` revocation, token encrypted at rest with `safeStorage` |
+| Passwords | Argon2id (64 MB, 3 iterations); constant-time login via a dummy hash when the account doesn't exist |
+| Rate limiting | Global 300 requests/min per IP; chess account linking 10 per 15 min per user; max 10 calls per batched request |
+| Sessions | JWT, token encrypted at rest with `safeStorage` |
 | Server errors | No stack traces and generic messages for internal errors in production; readable validation messages |
-| Server config | Refuses to start without `JWT_SECRET` (≥32 chars) and `DATABASE_URL`; runs as non-root in Docker |
+| Server config | Refuses to start without `JWT_SECRET` and `DATABASE_URL`; runs as non-root in Docker |
 | Network | API only reachable on the tailnet; Postgres not published; CORS allow-list (`CORS_ORIGINS`) |
 | Upstream calls | Chess usernames limited to `[A-Za-z0-9_-]`, URL-encoded, 8 s timeout |
 | Electron | Sandboxed renderer, no Node integration, new windows / navigation / webviews blocked |
@@ -339,15 +325,14 @@ renders the persistent `Sidebar`, which calls `setPage`.
 ### Page tree
 ```
 App.tsx
-├── LogIn overlay           — sign in / sign up / forgot password (shown when signed out)
-├── VerifyEmail overlay     — shown when signed in with an unverified email
+├── LogIn overlay           — sign in / sign up (shown when signed out)
 ├── Home.tsx                — shortcut cards to every section
 ├── EditRepertoires.tsx     — repertoire file browser, JSON import
 ├── BoardView.tsx           — analysis board
 ├── NoveltyFinder.tsx       — game import; deviations / novelties panels (designed, not built)
 ├── Analytics.tsx           — filters, stat tiles, openings / coverage panels (designed, not built)
 ├── TrainingToolkit.tsx     — planned training tools, marked "Coming soon"
-└── Settings.tsx            — ProfileCard, connect Chess.com / Lichess, SecurityCard
+└── Settings.tsx            — ProfileCard, connect Chess.com / Lichess
 ```
 
 ### Shared UI
@@ -368,10 +353,8 @@ App.tsx
 | Component | Description |
 |---|---|
 | `SidebarModule.tsx` | Persistent left navigation (buttons in `components/buttons/`) |
-| `logIn.tsx` | Sign in / sign up / forgot password / reset password modal |
-| `VerifyEmail.tsx` | Enter or resend the email verification code |
+| `logIn.tsx` | Sign in / sign up modal |
 | `profileCard.tsx` | Username, email, linked accounts, log out |
-| `SecurityCard.tsx` | Change password, sign out everywhere |
 | `FolderSelection.tsx` | Renders a single folder row with its repertoires |
 | `RepertoireRow.tsx` | Renders a single repertoire inside a folder (double-click to rename) |
 | `ImportModal.tsx` | Checkbox UI for selecting which repertoires to import, shows sanitiser warnings |
@@ -381,9 +364,6 @@ App.tsx
 
 ## Known Quirks
 
-- `BoardView.tsx` auto-scroll looks for `.move-active` with `querySelector`, which never
-  matches the CSS Modules class `styles.moveActive` — the move list doesn't scroll to the
-  active move yet.
 - `importANB.tsx` is an unfinished copy of `ImportModal.tsx` (no selection UI yet) and
   isn't used anywhere.
 - `ImportModal.tsx` uses plain global class names that have no styles yet.
@@ -398,13 +378,29 @@ App.tsx
 ## ANALYSIS BOARD ------------------------------------------------------
 
 `BoardView.tsx` — a `react-chessboard` (v4) board backed by `chess.js`, with no engine yet.
+The tree logic and PGN / FEN import and export live in `src/chess/analysisTree.ts` (pure, no React).
 
-- Moves are stored as a `MoveNode` tree (`GameTree` in `types/gameTree.ts`), so playing a
-  different move from an earlier position creates a variation rather than overwriting
-- Click a piece to see legal-move dots; drag or click to move
-- Right-click squares to highlight them (kept separate from legal-move highlights)
-- Arrow keys step backwards / forwards through the current line
-- Variations at the current position are listed and clickable
-- SAN move list, plus FEN and PGN views with copy-to-clipboard
+- Moves are stored as a `MoveNode` tree (`GameTree` in `types/gameTree.ts`); `children[0]` is the
+  main line, so playing a different move from an earlier position adds a variation. Nodes can
+  carry a PGN `comment` and `nags`; the tree keeps imported PGN `headers`
+- **Move list** (`components/board/MoveList.tsx`) is laid out like Lichess: the main line in
+  number / white / black rows, broken by full-width blocks for comments and variations (nested
+  variations in brackets). Black moves are numbered `N...` wherever a line starts or resumes
+- **One source for display and export**: the move list and the PGN are both built from the same
+  token walk (`gameTokens` / `variationTokens`), so numbering, variation order and comments match
+- Drag or click to move; click a piece for legal-move dots; promotion opens a piece picker
+  (drag or click); the last move and a king in check are highlighted
+- Right-click squares to mark them; any left click clears the marks
+- Arrow keys: ← / → step through the line, ↑ start, ↓ end of the current line; `F` flips the board
+- Status line: side to move, check, checkmate / stalemate / insufficient material; players of an imported game
+- **Import**: paste a PGN (Load PGN) or FEN (Enter / Load FEN), or open a `.pgn` / `.fen` / `.txt`
+  file (or a `.json` saved by the old Save button). PGN keeps variations, comments, NAGs and tags;
+  every move is replayed through chess.js, so an illegal move is reported by its move number.
+  With several games in one PGN the first is imported. Imports over 1 MB / 20,000 moves are refused
+- **Export**: download a `.pgn` (named `White-vs-Black-Date.pgn`), or copy the PGN / FEN. The seven
+  standard tags are always written, plus `FEN` / `SetUp` for a custom start; the result comes from
+  the main line (checkmate / stalemate / insufficient material) or the imported `Result` tag
+- Typing in the FEN / PGN boxes makes a draft — nothing changes until you load it, and Esc
+  discards it. Replacing an analysis that has moves asks first
 
 ---

@@ -22,7 +22,7 @@
 
 12. -------------------------------------
 
-13. CURRENT: basic analysis board (without stockfish, adding that later. For now, is a way to test out features with the react chessboard (v4)). Features to add: move history, stockfish move analysis, highlight legal captures, toggle on or off highlighting legal moves, flip board, board cosmetics
+13. (partly done 5 Oct: move history with variations, flip board, PGN/FEN import and export, promotion picker, last-move and check highlights — Stockfish and board cosmetics still to do) CURRENT: basic analysis board (without stockfish, adding that later. For now, is a way to test out features with the react chessboard (v4)). Features to add: move history, stockfish move analysis, highlight legal captures, toggle on or off highlighting legal moves, flip board, board cosmetics
 
 14. ✅ DONE — fix spelling mistake in 'EditRepertiores' (file and component are spelled EditRepertoires)
 
@@ -34,20 +34,20 @@
 
 18. -----------------------------------------
 
-19. left click on the board removes all highlighted sections
+19. ✅ DONE — left click on the board removes all highlighted sections
 
 20. ✅ DONE — Switch from font awesome to flaticon SVG images (Flaticon PNGs in src/assets/icons, glyphs drawn with the Icon component)
 
-21. ✅ DONE — Add email verification + reset password + forgot password (6-digit email codes; also change password and sign out everywhere)
+21. Add email verification + reset password + forgot password
 
-22. ✅ DONE — RATE LIMITING ON EVERYTHING!!!! (global per-IP limit plus per-action limits on every auth and connection endpoint)
+22. RATE LIMITING ON EVERYTHING!!!! (partly done: global 300/min per IP and a per-user limit on chess account linking; login/register still need their own limits)
 
 
 Worth doing before September
-.env.example✅ DONE —  — five minutes, and it's the first thing anyone cloning your repo (including an interviewer) will look for. Nothing kills a portfolio project faster than a reviewer cloning it and immediately hitting the exact debugging spiral we just went through. (vendor/chessbox-server/apps/api/.env.example)
+✅ DONE — .env.example — five minutes, and it's the first thing anyone cloning your repo (including an interviewer) will look for. Nothing kills a portfolio project faster than a reviewer cloning it and immediately hitting the exact debugging spiral we just went through. (vendor/chessbox-server/apps/api/.env.example)
 A README that actually explains the architecture — you've already got ARCHITECTURE.md files scattered through the repo, which is great instinct. Make sure the root README.md has: what the app does, why (the real problem it solves for you), tech stack, and setup instructions that work start-to-finish. This is genuinely one of the highest-leverage things for a portfolio piece — reviewers spend seconds deciding whether to dig deeper.
 Basic integration tests on auth.ts, specifically — not because a hobby project needs full coverage, but because "shows understanding of testing" is a real signal on a CS application, and auth is the one part of your app where an interviewer might actually ask "how did you make sure this was secure/correct?" Even 4-5 tests (register succeeds, duplicate email rejected, wrong password rejected, login returns a valid token) is enough to point to.
-Rate limiting on login/register✅ DONE —  — cheap to add (@fastify/rate-limit is a one-line plugin), and it's the kind of detail that separates "I copied a tutorial" from "I thought about how this gets attacked." Worth it given you're already timing-safe-comparing passwords — you clearly care about this stuff, so finish the thought.
+Rate limiting on login/register — cheap to add (@fastify/rate-limit is a one-line plugin), and it's the kind of detail that separates "I copied a tutorial" from "I thought about how this gets attacked." Worth it given you're already timing-safe-comparing passwords — you clearly care about this stuff, so finish the thought.
 Error boundaries / graceful failure in the desktop app — if Postgres or the API is down, does the UI just hang or crash? A polished 1.0 handles "server unreachable" with a real message, not a blank screen.
 Skip for now, revisit post-September
 Everything in my last message beyond those — Vault, Turborepo, Redis-backed sessions, Sentry, CI/CD migration pipelines. These solve problems at a scale and team-size you don't have. Adding them now costs you real September-deadline time for approximately zero portfolio benefit — a reviewer isn't going to check if you're using HashiCorp Vault for a hobby project's dev secrets. If anything, over-engineering a solo hobby project can read as not understanding when complexity is warranted, which cuts against you.
@@ -58,28 +58,28 @@ Beyond the code itself: a short case-study writeup (even just a section in the R
 
 Before v1 Launch (required)
 Security — the load-bearing items
- Rate limit auth.login✅ DONE —  — highest priority security item. No limit currently exists; someone could brute-force a known username's password. Add @fastify/rate-limit, apply a strict limit here specifically (e.g. 5 attempts / 15 min / IP). (10 per 15 min per IP and per account)
- Rate limit auth.register✅ DONE —  — prevent scripted account-creation spam. (5 per hour per IP)
- Rate limit connections.connectLichess✅ DONE —  / connectChesscom — these proxy to third-party APIs; unbounded calls could get your server (or its IP) rate-limited or blocked by Lichess/Chess.com. (10 per 15 min per user, 8 s timeout)
+ Rate limit auth.login — highest priority security item. No limit currently exists; someone could brute-force a known username's password. Add @fastify/rate-limit, apply a strict limit here specifically (e.g. 5 attempts / 15 min / IP).
+ Rate limit auth.register — prevent scripted account-creation spam.
+ ✅ DONE — Rate limit connections.connectLichess / connectChesscom — these proxy to third-party APIs; unbounded calls could get your server (or its IP) rate-limited or blocked by Lichess/Chess.com. (10 per 15 min per user, 8 s timeout)
  Tighten CSP before packaging — both TODO comments already in the code (index.html and forge.config.ts's devContentSecurityPolicy) need addressing: drop 'unsafe-eval' and the ws://localhost:3000 dev-server entry, since neither should exist outside of local development.
- Lock down CORS✅ DONE —  origin: true — currently reflects any origin, fine for local dev, not for anything real. Replace with an explicit check once you know your packaged app's actual origin behavior. (allow-list via CORS_ORIGINS)
+ ✅ DONE — Lock down CORS origin: true — currently reflects any origin, fine for local dev, not for anything real. Replace with an explicit check once you know your packaged app's actual origin behavior. (allow-list via CORS_ORIGINS)
 Auth / accounts
- Password reset flow✅ DONE —  — no way for a user to recover a forgotten password currently. Table stakes for a real signup system.
- Email confirmation✅ DONE —  — verify the email address at signup is real and owned by the registrant. Lower urgency than password reset, but expected of "real" auth. (unverified accounts can't link chess accounts)
+ Password reset flow — no way for a user to recover a forgotten password currently. Table stakes for a real signup system.
+ Email confirmation — verify the email address at signup is real and owned by the registrant. Lower urgency than password reset, but expected of "real" auth.
 Core functionality gaps
  importANB.tsx is incomplete — comment in the file itself says it's a partially-finished copy of ImportModal.tsx; the selection UI is missing entirely and the import button can never be enabled as currently written. Needs finishing or removing from the UI if not ready.
- Icon set✅ DONE —  — Flaticon Premium SVGs still needed (folder-plus, plus, import, magnifying glass, chevron, pencil, trash, knight). Blocking a fully polished UI. Grab licenses + PDFs while subscribed. (PNG set rather than SVG; rename uses a text button as there is no pencil icon)
- Homepage✅ DONE —  — currently a placeholder ("Home page coming soon..."). Needs real content before this looks like a finished v1. (shortcut cards to every section)
- Profile page✅ DONE —  — currently a stub with just a plain logout button. Decide minimum viable content for v1 (even just displaying username/email/connected accounts would round it out). (profile + security cards on the Settings page)
+ ✅ DONE — Icon set — Flaticon Premium SVGs still needed (folder-plus, plus, import, magnifying glass, chevron, pencil, trash, knight). Blocking a fully polished UI. Grab licenses + PDFs while subscribed. (PNG set rather than SVG; rename uses a text button as there is no pencil icon)
+ ✅ DONE — Homepage — currently a placeholder ("Home page coming soon..."). Needs real content before this looks like a finished v1. (shortcut cards to every section)
+ ✅ DONE — Profile page — currently a stub with just a plain logout button. Decide minimum viable content for v1 (even just displaying username/email/connected accounts would round it out). (profile + security cards on the Settings page)
 Polish / correctness
- Fix .moveActive auto-scroll selector bug in BoardView.tsx — querySelector('.move-active') will never match a CSS Modules class; the "scroll to active move" behavior likely silently does nothing. Swap to a data-active attribute.
+ ✅ DONE — Fix .moveActive auto-scroll selector bug in BoardView.tsx — querySelector('.move-active') will never match a CSS Modules class; the "scroll to active move" behavior likely silently does nothing. Swap to a data-active attribute.
  Style importANB.tsx / ImportModal.tsx — both currently use unstyled literal classNames with no CSS module wired up at all.
  Rename importANB → ImportANB — lowercase component name works but risks confusing JSX/DOM-element resolution and trips some lint configs.
 After v1 Launch (ongoing hobbyist work)
 Security hardening (deeper, not launch-blocking)
  Consider helmet or equivalent security-headers middleware on Fastify for defense-in-depth beyond CSP alone.
  Revisit JWT expiry/refresh strategy — currently a flat 7-day token with no refresh mechanism; fine for v1, but a refresh-token flow would be a nicer long-term UX (avoids full re-login every week).
- Audit npm audit findings periodically✅ DONE —  — 56+ vulnerabilities showing in current dependency tree; triage rather than ignore over time. (5 Oct: desktop 0 vulnerabilities after removing unused apify-client; server fastify updated, 2 left inside the Prisma CLI)
+ ✅ DONE — Audit npm audit findings periodically — 56+ vulnerabilities showing in current dependency tree; triage rather than ignore over time. (5 Oct: desktop 0 vulnerabilities after removing unused apify-client; server fastify updated, 2 left inside the Prisma CLI)
 Features
  Signup-flow polish — currently minimal viable toggle-based form; consider clearer inline validation feedback, password strength indicator, etc.
  Theme switching (cream/noir data-theme structure already scaffolded in index.css but not wired to a settings UI toggle yet).
@@ -87,14 +87,14 @@ Features
  Revisit ImportRepertoiresPayload/ImportService.ts for any further drift now that the type de-duplication is done — keep an eye out for new fields added to one without the other.
 Codebase hygiene
  Confirm .gitignore covers apps/api/src/generated/, compiled .js/.d.ts output, and packages/shared/dist/ — these have been accidentally wiped by git clean -fd more than once this project; ignoring them properly prevents future confusion, and regenerating (prisma generate, build script) is cheap.
- Document the electron hoisting workaround✅ DONE —  (manual Copy-Item into apps/desktop/node_modules/electron) somewhere so future npm install runs that break it are a known, fast fix rather than a repeat multi-hour debug session. (README → Troubleshooting)
+ ✅ DONE — Document the electron hoisting workaround (manual Copy-Item into apps/desktop/node_modules/electron) somewhere so future npm install runs that break it are a known, fast fix rather than a repeat multi-hour debug session. (README → Troubleshooting)
  Consider consolidating apps/api/src/index.ts's IPC-adjacent duplication patterns (already partly cleaned up) as the API surface grows.
 
 
 Added 5 October 2026 (after the security work)
- Deploy the server update to the Pi — set JWT_SECRET (32+ characters) and SMTP settings in apps/api/.env, then rebuild. Migrations now run on container start. The current desktop build needs this server version.
+ Deploy the server update to the Pi (global rate limit, CORS, user.me fix). Login is unchanged, so the desktop works with either server version.
  Check docker-compose.yml's dockerfile path (apps/api/Dockerfile) against the tracked file name (apps/api/dockerfile) — Linux is case-sensitive.
- Add the auth-flow and import-sanitiser test scripts to the repo and wire them to npm test (they were written and run, but live outside the repo).
- Decide whether sign-up should stop revealing that an email is already registered.
+ Add the import-sanitiser test script to the repo and wire it to npm test (it was written and run, but lives outside the repo).
  Make usernames case-insensitive (Harry and harry can both exist).
  Rate limits are in memory — fine for one Pi, would need Redis if the API ever runs as several instances.
+ Email verification, password reset, change password and sign out everywhere were built and then reverted (5 Oct) because the desktop and server versions didn't match. Next time, deploy the server before switching the desktop over.

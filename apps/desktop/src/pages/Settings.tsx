@@ -6,7 +6,6 @@ import { trpc } from '../trpc';
 import styles from './Settings.module.css';
 import type { Page } from '../types/Page';
 import { ProfileCard } from '../components/profileCard';
-import { SecurityCard } from '../components/SecurityCard';
 import { Icon } from '../components/Icon';
 import linkGlyph from '../assets/icons/020-link.png';
 
@@ -82,8 +81,6 @@ const Settings = ({ setPage, onLogout, isAuthed }: SettingsProps) => {
             Connect Lichess
           </button>
         </div>
-
-        {isAuthed && <SecurityCard onLogout={onLogout} />}
 
         {showChessConnect && (
           <div className={styles.modalOverlay}>

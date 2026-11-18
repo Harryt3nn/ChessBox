@@ -32,14 +32,12 @@ All genuinely happened, in order of how good a story they make:
 ### If asked about security
 - Passwords hashed with **Argon2id** (via `hash-wasm`), not a weaker legacy hash.
 - **Timing-safe login**: a fixed dummy hash is compared against even when the username doesn't exist, so response time doesn't leak whether an account exists (defends against username enumeration).
-- The same thinking applies to "forgot password", which always reports success whether or not the email has an account.
-- **Layered rate limiting**: a blanket per-IP limit on every request, plus tighter limits per action. Login is limited per IP *and* per account, so rotating IPs against one account doesn't help; anything that sends email is limited per address, so the API can't be used to spam someone's inbox. Batched tRPC requests are capped too, since one HTTP request can carry many calls.
-- **Revocable stateless sessions**: JWTs carry a `tokenVersion` that's checked against the database on each request. Changing or resetting a password (or "sign out everywhere") bumps it, which revokes every other session without needing a token blacklist — and the device that changed the password gets a fresh token so it stays signed in.
-- **Email verification and password reset by 6-digit code** (the client is a desktop app, not a website, so there's no link to click). Codes are stored only as hashes, expire in 15 minutes, are single-use, and die after 5 wrong guesses.
+- **API-wide rate limiting**: a blanket per-IP limit on every request, a per-user limit on the endpoints that call Lichess / Chess.com, and a cap on batched tRPC requests, since one HTTP request can carry many calls.
 - **Untrusted-input boundaries on the desktop too**: imported repertoire ids become file names, so they're restricted to `[A-Za-z0-9_-]` (a `../` id was a real path-traversal bug before this); the sandboxed renderer can only read files the user picked in a native dialog; the main process re-sanitises every IPC payload rather than trusting the renderer.
-- **Found and fixed a real data leak in review**: `user.me` returned the whole user row, password hash included. Now every user query selects only safe fields, and the auth test script fails if the hash ever appears again.
-- JWTs are still a flat 3-day expiry (a refresh-token flow is a possible future improvement).
-- Openly acknowledged gaps (good "what would you do next" answers): rate limits live in memory, so they reset on restart and wouldn't work across multiple instances (Redis would fix that); sign-up still reveals whether an email is registered; HTTPS is only unnecessary because Tailscale encrypts the tunnel.
+- **Found and fixed a real data leak in review**: `user.me` returned the whole user row, password hash included. Now every user query selects only safe fields.
+- JWTs are a flat 3-day expiry with no server-side revocation (a refresh-token flow is a possible future improvement).
+- Openly acknowledged gaps (good "what would you do next" answers): login and register have no dedicated brute-force limit beyond the global per-IP one; there's no password reset or email verification yet; rate limits live in memory, so they reset on restart (Redis would fix that); HTTPS is only unnecessary because Tailscale encrypts the tunnel.
+- An attempt at email verification, password reset, change password and "sign out everywhere" (token-version revocation) was built and then reverted on 5 October 2026 — the desktop build and the deployed server got out of step, so sign-in broke. Worth revisiting with the server deployed first.
 
 ### If asked about AI use in the project
 Straightforward, non-defensive answer: AI was used as an accelerant for scaffolding in areas involving frameworks used for the first time (much of the initial stack was genuinely new to me), specifically to move faster past boilerplate rather than to avoid learning it. The proof this didn't become a crutch is demonstrable, not just claimed — the entire deployment, debugging, and infrastructure work (everything in the section above) was done independently, reasoning through unfamiliar systems (Docker internals, npm workspaces, kernel-level USB behaviour, Prisma's config resolution) without being able to lean on AI-generated scaffolding, because none of it existed yet for these specific, novel problems.
@@ -95,7 +93,7 @@ Two genuinely different storage systems for two genuinely different kinds of dat
 | | Where | What | Why there |
 |---|---|---|---|
 | **Filesystem** (local, per-device, via `MainStorage.ts`) | `%APPDATA%/<app>/ChessBox-data/` | Repertoires, nodes, imported games (Lichess/Chess.com), auth token (OS-encrypted via `safeStorage`) | Large, per-user, edit-heavy, source-of-truth data with no need for relational querying |
-| **PostgreSQL** (remote, via the Pi's API) | `chessbox` DB | User accounts (Argon2id hash, verified-email flag, `tokenVersion`, linked chess usernames), one-time email codes (hashed); *(planned)* deviation/match records from novelty analysis | Statistical/aggregate-shaped derived data — "how many times has this deviation occurred," "list all unresolved deviations" are relational queries, not filesystem scans |
+| **PostgreSQL** (remote, via the Pi's API) | `chessbox` DB | User accounts (Argon2id hash, linked chess usernames); *(planned)* deviation/match records from novelty analysis | Statistical/aggregate-shaped derived data — "how many times has this deviation occurred," "list all unresolved deviations" are relational queries, not filesystem scans |
 
 Local filesystem layout (`documentation/ARCHITECTURE.md`, current):
 ```
@@ -161,10 +159,10 @@ Built and present in the codebase:
 - Board view with `react-chessboard` (`BoardView.tsx`) — basic analysis board, no Stockfish integration yet
 - Import pipeline from chessgraph.net JSON exports (`validateChessGraphExport.ts` → `prepareForImport.ts` → `ImportModal.tsx` → merge into storage)
 - Lichess and Chess.com game importers (`LichessImporter.ts`, `ChesscomImporter.ts`, `PGNtoJSON.ts`)
-- Auth: sign-up/login (username or email)/session restore, JWT stored via Electron's `safeStorage` (OS-level encryption); email verification, forgotten-password reset and change password by emailed 6-digit code; sign out everywhere
-- Rate limiting, CORS allow-list, production error masking, startup config checks on the API
+- Auth: sign-up/login/session restore, JWT stored via Electron's `safeStorage` (OS-level encryption)
+- Global API rate limiting, CORS allow-list, production error masking, startup config checks on the API
 - Import sanitisation for repertoire files and downloaded games (`sanitiseImport.ts`), shared by renderer and main process
-- Settings page: profile card, Chess.com / Lichess linking, security card
+- Settings page: profile card, Chess.com / Lichess linking
 - Designed pages with the shared art deco components (`PageHeader`, `PageShared.module.css`, Flaticon icons): `Home` (shortcuts), `Analytics`, `TrainingToolkit`, `NoveltyFinder` — layouts and empty states are in place; the analysis behind them isn't built yet
 - Full backend: Fastify + tRPC + Prisma, containerised, deployed, migrations applied, remotely reachable — genuinely live, not just locally runnable
 
@@ -173,19 +171,18 @@ Built and present in the codebase:
 ## 5. Roadmap
 
 ### Before a "real" v1 launch (security/correctness, not optional)
-- [x] **Rate limit `auth.login`** — per IP and per account (10 per 15 min).
-- [x] **Rate limit `auth.register`** — 5 per hour per IP.
+- [ ] **Rate limit `auth.login`** — only the global 300/min per-IP limit applies so far; needs its own strict limit.
+- [ ] **Rate limit `auth.register`** — prevent scripted account spam.
 - [x] **Rate limit `connections.connectLichess`/`connectChesscom`** — 10 per 15 min per user, plus an 8 s upstream timeout.
 - [ ] **Tighten CSP** before packaging — drop `unsafe-eval` and the dev-only `ws://localhost:3000` entry (both already flagged with TODOs in the code itself).
 - [x] **Lock down CORS** — explicit allow-list via `CORS_ORIGINS` (dev server + packaged app's `null` origin).
-- [x] **Password reset flow** — emailed code, revokes all sessions. Also added: email verification, change password, sign out everywhere.
+- [ ] **Password reset flow** — no recovery path currently exists for a forgotten password. (Built and reverted once — deploy the server before the desktop next time.)
 - [ ] Finish or remove `importANB.tsx` — currently an incomplete partial copy of `ImportModal.tsx`.
-- [ ] **Deploy the auth/security server update to the Pi** — set `JWT_SECRET` (≥32 chars) and SMTP settings in `apps/api/.env`; the migration runs automatically on container start. The current desktop build needs this server version (login now sends `identifier`).
-- [ ] Decide whether sign-up should stop revealing that an email is already registered (needs a "someone tried to register with your email" mail instead).
+- [ ] **Deploy the server update to the Pi** — global rate limit, CORS allow-list, `user.me` fix, connection checks, non-root container. Login is unchanged, so the desktop works with either server version.
 - [ ] Make usernames case-insensitive (`Harry` and `harry` can currently both exist).
 - [x] Real homepage content — shortcut cards to every section.
-- [x] Minimum-viable Profile content — profile card (username, email, linked accounts) and security card on the Settings page.
-- [ ] Fix `.moveActive` auto-scroll selector bug in `BoardView.tsx` (CSS Modules class won't match a plain `querySelector`).
+- [x] Minimum-viable Profile content — profile card (username, email, linked accounts) on the Settings page.
+- [x] Fix `.moveActive` auto-scroll selector bug in `BoardView.tsx` — now uses a `data-active` attribute.
 
 ### Core feature work
 - [ ] **Novelty finder** — build out the designed architecture in §3.5. Highest-priority *feature* item.
@@ -207,7 +204,7 @@ Built and present in the codebase:
 - [ ] Two-node setup with a load balancer (Pi 5 + Pi 2) — genuine learning project for later; Pi 2's 32-bit architecture means current arm64 Docker images would need a separate build target, not a direct redeploy.
 - [ ] Multi-stage Docker build to shrink the current ~2.4GB image (works fine as-is, just larger than necessary).
 - [x] `.env.example` file — `vendor/chessbox-server/apps/api/.env.example`.
-- [ ] Basic integration tests on `auth.ts` (register succeeds / duplicate rejected / wrong password rejected / valid token returned) — small effort, real signal on a CS application. Test scripts covering the auth flows (19 cases) and import sanitiser (13 cases) were written and run during the security work, but aren't in the repo or wired to `npm test` yet.
+- [ ] Basic integration tests on `auth.ts` (register succeeds / duplicate rejected / wrong password rejected / valid token returned) — small effort, real signal on a CS application. A test script for the import sanitiser (13 cases) was written and run during the security work, but isn't in the repo or wired to `npm test` yet.
 - [ ] Shared rate-limit store (e.g. Redis) — only needed if the API ever runs as more than one instance.
 - [ ] Check `docker-compose.yml`'s `dockerfile: apps/api/Dockerfile` against the tracked file name `apps/api/dockerfile` — Linux paths are case-sensitive.
 

@@ -10,8 +10,7 @@ import BoardView from './pages/BoardView';
 import NoveltyFinder from './pages/NoveltyFinder';
 import Home from './pages/Home';
 import { LogIn } from './components/logIn';
-import { VerifyEmail } from './components/VerifyEmail';
-import { restoreAuthToken, signOut, trpc } from './trpc';
+import { restoreAuthToken } from './trpc';
 import type { Page } from './types/Page';
 import type { inferRouterOutputs } from '@trpc/server';
 import type { AppRouter } from '@chessbox/shared/router';
@@ -37,10 +36,6 @@ const App = () => {
     setIsAuthed(false);
     setCurrentUser(null);
   }
-
-  // signed in, but the account's email hasn't been confirmed yet
-  // (explicit false only -- an older server that doesn't report the field shouldn't lock anyone out)
-  const needsVerification = isAuthed && currentUser !== null && currentUser.emailVerified === false;
 
   function renderPage() {
     if (page === 'analytics') return <Analytics page={page} setPage={setPage} />;
@@ -76,14 +71,6 @@ const App = () => {
           setIsAuthed(true);
           setCurrentUser(user);
         }} />
-      )}
-
-      {needsVerification && (
-        <VerifyEmail
-          email={currentUser.email}
-          onVerified={() => trpc.auth.me.query().then(setCurrentUser)}
-          onLogout={() => signOut().then(handleLogout)}
-        />
       )}
     </>
   );

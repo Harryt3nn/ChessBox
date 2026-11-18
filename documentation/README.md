@@ -14,7 +14,7 @@ The first peice of inspiration comes from a website called chess graph. This sit
 - **Repertoires as graphs** — import opening repertoires from [chessgraph.net](https://chessgraph.net) JSON exports, organised into folders. Transpositions are explicit edges rather than duplicated lines.
 - **Analysis board** — play through lines with variations, legal-move hints, square highlights, and FEN / PGN copy.
 - **Game import** — pull your blitz and rapid games from Lichess and Chess.com using the accounts linked in Settings.
-- **Accounts** — sign up, sign in with username or email, email verification, forgotten-password reset, change password, sign out of every device.
+- **Accounts** — sign up and sign in; link your Chess.com and Lichess usernames.
 - **Designed, being built** — the Novelty Finder (walk your games through your repertoires to find where you leave your prep), Analytics, and Training Tools pages.
 
 ## Tech stack
@@ -22,7 +22,7 @@ The first peice of inspiration comes from a website called chess graph. This sit
 | Part | Built with |
 |---|---|
 | Desktop app | Electron, React, TypeScript, Electron Forge (webpack), react-chessboard, chess.js |
-| API | Fastify, tRPC, zod, Prisma, PostgreSQL, Argon2id (hash-wasm), JWT, Nodemailer |
+| API | Fastify, tRPC, zod, Prisma, PostgreSQL, Argon2id (hash-wasm), JWT |
 | Hosting | Docker Compose on a Raspberry Pi 5, reachable over Tailscale |
 
 The API lives in a separate repository, [chessbox-server](https://github.com/Harryt3nn/chessbox-server), included here as a git submodule at `vendor/chessbox-server` so the desktop app gets full tRPC type inference from the server's router.
@@ -77,11 +77,11 @@ Full instructions are in [`vendor/chessbox-server/README.md`](../vendor/chessbox
 
 ```bash
 cd vendor/chessbox-server
-cp apps/api/.env.example apps/api/.env      # then fill in JWT_SECRET, POSTGRES_PASSWORD, SMTP_*
+cp apps/api/.env.example apps/api/.env      # then fill in JWT_SECRET and POSTGRES_PASSWORD
 docker compose --env-file ./apps/api/.env up --build
 ```
 
-Database migrations run automatically when the API container starts.
+Any pending database migrations run automatically when the API container starts.
 
 ## Troubleshooting
 
@@ -93,13 +93,11 @@ Copy-Item -Recurse ..\..\node_modules\electron .\node_modules\electron
 
 **Every page looks unstyled.** CSS Modules are exported in camelCase (`webpack.renderer.config.ts`). If that option is removed, kebab-case class names such as `.topbar-actions` stop matching `styles.topbarActions`.
 
-**Sign-in fails with a validation error right after updating.** The desktop app and the API have to be on matching versions. Deploy the API first.
-
-**Verification or reset codes never arrive.** The API needs SMTP settings in `apps/api/.env`. Without them, codes are printed to the API log in development and can't be sent at all in production.
+**Sign-in fails with a validation error right after updating.** The desktop app and the API have to agree on the shape of each call. If a change touches both, deploy the API first.
 
 ## Security
 
-Passwords are hashed with Argon2id. Sessions are revocable JWTs, stored on disk encrypted by the OS. Every endpoint is rate-limited, and every imported file is sanitised before it touches the disk. The renderer runs sandboxed. The full list is in the Security section of [ARCHITECTURE.md](ARCHITECTURE.md#security).
+Passwords are hashed with Argon2id. Sessions are JWTs, stored on disk encrypted by the OS. The API is rate-limited per IP, and every imported file is sanitised before it touches the disk. The renderer runs sandboxed. The full list is in the Security section of [ARCHITECTURE.md](ARCHITECTURE.md#security).
 
 ## License
 

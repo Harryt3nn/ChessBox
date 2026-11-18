@@ -122,31 +122,3 @@
 .modeToggle:hover {
   color: var(--color-amber);
 }
-.modeToggle + .modeToggle {
-  margin-top: 8px;
-}
-
-/* neutral information (code sent, password reset) -- errors use .error */
-.notice {
-  margin: -8px 0 20px;
-  padding: 10px 14px;
-  border: 1px solid rgba(var(--color-amber-rgb), 0.4);
-  background: rgba(var(--color-amber-rgb), 0.08);
-  color: var(--color-text-secondary);
-  font-size: 13px;
-  line-height: 1.5;
-  text-align: center;
-  user-select: none;
-}
-
-.lead {
-  margin: -8px 0 20px;
-  color: var(--color-text-tertiary);
-  font-size: 13px;
-  line-height: 1.5;
-  text-align: center;
-}
-
-.lead strong {
-  color: var(--color-text-primary);
-}

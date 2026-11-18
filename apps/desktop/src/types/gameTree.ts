@@ -16,5 +16,7 @@ import type { MoveNode } from '../types/moveNode';
 export type GameTree = {
   root: MoveNode;
   currentPath: string[];
+  // PGN tag pairs (White, Black, Event, ...) kept from an imported game and written back on export
+  headers?: Record<string, string>;
 };
 

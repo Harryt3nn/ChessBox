@@ -1,0 +1,100 @@
+/*apps/desktop/src/components/board/MoveList.module.css*/
+
+.move-list {
+  display: flex;
+  flex-direction: column;
+}
+
+.row {
+  display: grid;
+  grid-template-columns: 2.5rem 1fr 1fr;
+  gap: 2px;
+  padding: 1px 0;
+}
+
+.number {
+  color: var(--color-text-faint);
+  font-variant-numeric: tabular-nums;
+}
+
+.move,
+.inline-move {
+  cursor: pointer;
+  transition: background 0.1s, color 0.1s;
+}
+
+.move {
+  padding: 2px 6px;
+  border-left: 2px solid transparent;
+}
+
+.move:hover,
+.inline-move:hover {
+  background: rgba(var(--color-cream-rgb), 0.08);
+}
+
+.placeholder {
+  padding: 2px 6px;
+  color: var(--color-text-faint);
+}
+
+.active,
+.active:hover {
+  background: rgba(var(--color-amber-rgb), 0.16);
+  border-left-color: var(--color-amber);
+  color: var(--color-amber);
+  font-weight: 600;
+}
+
+/* full-width break in the main line for comments and variations */
+.block {
+  margin: 4px 0 6px 2.5rem;
+  padding: 4px 10px;
+  border-left: 2px solid var(--color-border);
+  font-size: 13px;
+  line-height: 1.7;
+}
+
+.variation {
+  color: var(--color-text-tertiary);
+}
+
+.variation + .variation {
+  margin-top: 2px;
+}
+
+.inline-move {
+  padding: 0 3px;
+  margin-right: 1px;
+}
+
+.paren {
+  color: var(--color-text-faint);
+}
+
+/* hug the brackets to the moves inside them, as in the PGN: (3... Nf6) */
+.paren-open + .inline-move {
+  padding-left: 0;
+}
+
+.inline-move:has(+ .paren-close) {
+  padding-right: 0;
+}
+
+.paren-open {
+  margin-left: 3px;
+}
+
+.paren-close {
+  margin-right: 3px;
+}
+
+.comment {
+  color: var(--color-text-faint);
+  font-style: italic;
+  padding: 0 4px;
+}
+
+.empty {
+  color: var(--color-text-faint);
+}

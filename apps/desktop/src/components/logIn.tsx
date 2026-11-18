@@ -2,7 +2,7 @@
 
 
 import { useState } from "react";
-import { usernameSchema, passwordSchema, emailSchema, emailCodeSchema } from "@chessbox/shared";
+import { usernameSchema, passwordSchema, emailSchema } from "@chessbox/shared";
 import { trpc, setAuthToken } from '../trpc'
 import styles from "./logIn.module.css";
 import type { inferRouterOutputs } from '@trpc/server';
@@ -11,72 +11,42 @@ import type { AppRouter } from '@chessbox/shared/router';
 type RouterOutput = inferRouterOutputs<AppRouter>;
 type User = RouterOutput["auth"]["me"];
 
-// login / register, plus the two-step forgotten password flow:
-// "forgot" asks for the email, "reset" takes the emailed code and the new password
-type Mode = "login" | "register" | "forgot" | "reset";
-
-const TITLES: Record<Mode, string> = {
-  login: "Sign into ChessBox",
-  register: "Create your ChessBox account",
-  forgot: "Reset your password",
-  reset: "Choose a new password",
-};
-
-const SUBMIT_LABELS: Record<Mode, [idle: string, busy: string]> = {
-  login: ["Log In", "Signing in..."],
-  register: ["Sign Up", "Creating account..."],
-  forgot: ["Send Code", "Sending..."],
-  reset: ["Reset Password", "Resetting..."],
-};
+type Mode = "login" | "register";
 
 export function LogIn({ onSuccess }: { onSuccess: (user: User) => void }) {
   const [mode, setMode] = useState<Mode>("login");
 
-  const [identifier, setIdentifier] = useState("");
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
-  const [code, setCode] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
 
   const [errors, setErrors] = useState<{
-    identifier?: string;
     username?: string;
     email?: string;
-    code?: string;
     password?: string;
     confirmPassword?: string;
   }>({});
   const [submitError, setSubmitError] = useState<string | null>(null);
-  const [notice, setNotice] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
 
   function validate() {
+    const usernameResult = usernameSchema.safeParse(username);
+    const passwordResult = passwordSchema.safeParse(password);
     const newErrors: typeof errors = {};
-    const check = (key: keyof typeof errors, result: { success: boolean; error?: { issues: { message: string }[] } }) => {
-      if (!result.success) newErrors[key] = result.error!.issues[0].message;
-    };
 
-    if (mode === "login") {
-      if (!identifier.trim()) newErrors.identifier = "Enter your username or email";
-      if (!password) newErrors.password = "Enter your password";
+    if (!usernameResult.success) {
+      newErrors.username = usernameResult.error.issues[0].message;
+    }
+    if (!passwordResult.success) {
+      newErrors.password = passwordResult.error.issues[0].message;
     }
 
     if (mode === "register") {
-      check("username", usernameSchema.safeParse(username));
-      check("email", emailSchema.safeParse(email));
-    }
-
-    if (mode === "forgot" || mode === "reset") {
-      check("email", emailSchema.safeParse(email));
-    }
-
-    if (mode === "reset") {
-      check("code", emailCodeSchema.safeParse(code));
-    }
-
-    if (mode === "register" || mode === "reset") {
-      check("password", passwordSchema.safeParse(password));
+      const emailResult = emailSchema.safeParse(email);
+      if (!emailResult.success) {
+        newErrors.email = emailResult.error.issues[0].message;
+      }
       if (password !== confirmPassword) {
         newErrors.confirmPassword = "Passwords do not match";
       }
@@ -86,162 +56,87 @@ export function LogIn({ onSuccess }: { onSuccess: (user: User) => void }) {
     return Object.keys(newErrors).length === 0;
   }
 
-  function switchMode(next: Mode, message: string | null = null) {
-    setMode(next);
+  function toggleMode() {
+    setMode(mode === "login" ? "register" : "login");
     setErrors({});
     setSubmitError(null);
-    setNotice(message);
-    setPassword("");
-    setConfirmPassword("");
-    if (next !== "reset") setCode("");
   }
 
-  async function signIn(token: string) {
-    setAuthToken(token);
-    await window.storage.saveAuthToken(token);
-    const user = await trpc.auth.me.query();
-    onSuccess(user);
-  }
-
-  async function handleSubmit(e: React.FormEvent) {
+   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     if (!validate()) return;
 
     setSubmitError(null);
-    setNotice(null);
     setSubmitting(true);
 
     try {
-      if (mode === "login") {
-        const result = await trpc.auth.login.mutate({ identifier, password });
-        await signIn(result.token);
-      }
+      const result =
+        mode === "login"
+          ? await trpc.auth.login.mutate({ username, password })
+          : await trpc.auth.register.mutate({ username, email, password });
 
-      if (mode === "register") {
-        const result = await trpc.auth.register.mutate({ username, email, password });
-        await signIn(result.token);
-      }
+      setAuthToken(result.token);
+      await window.storage.saveAuthToken(result.token);
 
-      if (mode === "forgot") {
-        await trpc.auth.requestPasswordReset.mutate({ email });
-        switchMode("reset", "If an account uses that email, a 6-digit code is on its way. It expires in 15 minutes.");
-      }
-
-      if (mode === "reset") {
-        await trpc.auth.resetPassword.mutate({ email, code, newPassword: password });
-        setIdentifier(email);
-        switchMode("login", "Password reset. Sign in with your new password.");
-      }
+      const user = await trpc.auth.me.query();
+      onSuccess(user);
     } catch (err) {
-      setSubmitError(err instanceof Error ? err.message : "Something went wrong. Please try again.");
+      setSubmitError(err instanceof Error ? err.message : `${mode === "login" ? "Login" : "Sign up"} failed`);
     } finally {
       setSubmitting(false);
     }
   }
 
-  const showEmail = mode === "register" || mode === "forgot" || mode === "reset";
-  const showPassword = mode !== "forgot";
-  const showConfirm = mode === "register" || mode === "reset";
-
   return (
     <div className={styles.modalBackdrop}>
       <div className={styles.modalWindow}>
-        <h2>{TITLES[mode]}</h2>
-
-        {notice && <p className={styles.notice}>{notice}</p>}
+        <h2>{mode === "login" ? "Sign into ChessBox" : "Create your ChessBox account"}</h2>
 
         <form onSubmit={handleSubmit}>
-          {mode === "login" && (
-            <>
-              <label htmlFor="identifier">Username or Email</label>
-              <input
-                id="identifier"
-                type="text"
-                name="identifier"
-                autoComplete="username"
-                value={identifier}
-                onChange={(e) => setIdentifier(e.target.value)}
-                required
-              />
-              {errors.identifier && <p className={styles.error}>{errors.identifier}</p>}
-            </>
-          )}
+          <label htmlFor="username">Username</label>
+          <input
+            id="username"
+            type="text"
+            name="username"
+            value={username}
+            onChange={(e) => setUsername(e.target.value)}
+            required
+          />
+          {errors.username && <p className={styles.error}>{errors.username}</p>}
 
           {mode === "register" && (
-            <>
-              <label htmlFor="username">Username</label>
-              <input
-                id="username"
-                type="text"
-                name="username"
-                autoComplete="username"
-                value={username}
-                onChange={(e) => setUsername(e.target.value)}
-                required
-              />
-              {errors.username && <p className={styles.error}>{errors.username}</p>}
-            </>
-          )}
-
-          {showEmail && (
             <>
               <label htmlFor="email">Email</label>
               <input
                 id="email"
                 type="email"
                 name="email"
-                autoComplete="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                readOnly={mode === "reset"}
                 required
               />
               {errors.email && <p className={styles.error}>{errors.email}</p>}
             </>
           )}
 
-          {mode === "reset" && (
-            <>
-              <label htmlFor="code">Code from your email</label>
-              <input
-                id="code"
-                type="text"
-                name="code"
-                inputMode="numeric"
-                autoComplete="one-time-code"
-                maxLength={6}
-                value={code}
-                onChange={(e) => setCode(e.target.value.replace(/\D/g, ""))}
-                required
-              />
-              {errors.code && <p className={styles.error}>{errors.code}</p>}
-            </>
-          )}
+          <label htmlFor="password">Password</label>
+          <input
+            id="password"
+            type="password"
+            name="password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            required
+          />
+          {errors.password && <p className={styles.error}>{errors.password}</p>}
 
-          {showPassword && (
-            <>
-              <label htmlFor="password">{mode === "reset" ? "New Password" : "Password"}</label>
-              <input
-                id="password"
-                type="password"
-                name="password"
-                autoComplete={mode === "login" ? "current-password" : "new-password"}
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-              />
-              {errors.password && <p className={styles.error}>{errors.password}</p>}
-            </>
-          )}
-
-          {showConfirm && (
+          {mode === "register" && (
             <>
               <label htmlFor="confirmPassword">Confirm Password</label>
               <input
                 id="confirmPassword"
                 type="password"
                 name="confirmPassword"
-                autoComplete="new-password"
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
                 required
@@ -253,38 +148,17 @@ export function LogIn({ onSuccess }: { onSuccess: (user: User) => void }) {
           {submitError && <p className={styles.error}>{submitError}</p>}
 
           <button type="submit" disabled={submitting}>
-            {SUBMIT_LABELS[mode][submitting ? 1 : 0]}
+            {submitting
+              ? mode === "login" ? "Signing in..." : "Creating account..."
+              : mode === "login" ? "Log In" : "Sign Up"}
           </button>
         </form>
 
-        {mode === "login" && (
-          <>
-            <button type="button" className={styles.modeToggle} onClick={() => switchMode("forgot")}>
-              Forgot password?
-            </button>
-            <button type="button" className={styles.modeToggle} onClick={() => switchMode("register")}>
-              Don't have an account? Sign up
-            </button>
-          </>
-        )}
-
-        {mode === "register" && (
-          <button type="button" className={styles.modeToggle} onClick={() => switchMode("login")}>
-            Already have an account? Log in
-          </button>
-        )}
-
-        {mode === "reset" && (
-          <button type="button" className={styles.modeToggle} onClick={() => switchMode("forgot")}>
-            Didn't get a code? Send another
-          </button>
-        )}
-
-        {(mode === "forgot" || mode === "reset") && (
-          <button type="button" className={styles.modeToggle} onClick={() => switchMode("login")}>
-            Back to sign in
-          </button>
-        )}
+        <button type="button" className={styles.modeToggle} onClick={toggleMode}>
+          {mode === "login"
+            ? "Don't have an account? Sign up"
+            : "Already have an account? Log in"}
+        </button>
       </div>
     </div>
   );
