@@ -186,25 +186,26 @@ function sanitiseNode(n: Record<string, unknown>): Node | null {
 }
 
 /** removes edges that point at missing nodes or would form a cycle (iterative, so deep lines can't overflow the stack) */
-function repairGraph(nodes: Record<string, Node>, warnings: string[]) {
+// a Map, not a plain object: ids like "constructor" or "__proto__" would otherwise hit Object.prototype
+function repairGraph(nodes: Map<string, Node>, warnings: string[]) {
   let danglingEdges = 0;
   let cycleEdges = 0;
 
-  for (const node of Object.values(nodes)) {
+  for (const node of nodes.values()) {
     const before = node.childIDs.length;
-    node.childIDs = node.childIDs.filter(id => id in nodes && id !== node.id);
+    node.childIDs = node.childIDs.filter(id => nodes.has(id) && id !== node.id);
     danglingEdges += before - node.childIDs.length;
 
-    if (node.parentId !== null && !(node.parentId in nodes)) node.parentId = null;
+    if (node.parentId !== null && !nodes.has(node.parentId)) node.parentId = null;
     if (node.transpositionEdges) {
-      node.transpositionEdges = node.transpositionEdges.filter(e => e.targetId in nodes);
+      node.transpositionEdges = node.transpositionEdges.filter(e => nodes.has(e.targetId));
       if (!node.transpositionEdges.length) delete node.transpositionEdges;
     }
   }
 
   // depth-first search; an edge to a node still on the current path is a back edge (a cycle)
   const state = new Map<string, 1 | 2>(); // 1 = on current path, 2 = finished
-  for (const start of Object.keys(nodes)) {
+  for (const start of nodes.keys()) {
     if (state.has(start)) continue;
 
     const stack: [id: string, nextChild: number][] = [[start, 0]];
@@ -212,7 +213,7 @@ function repairGraph(nodes: Record<string, Node>, warnings: string[]) {
 
     while (stack.length) {
       const top = stack[stack.length - 1];
-      const node = nodes[top[0]];
+      const node = nodes.get(top[0]) as Node;
 
       if (top[1] >= node.childIDs.length) {
         state.set(top[0], 2);
@@ -259,15 +260,15 @@ export function sanitiseImport(raw: unknown): SanitisedImport {
     throw new ImportError(`Too many positions (${rawNodes.length}, limit ${IMPORT_LIMITS.maxNodes}).`);
   }
 
-  const nodes: Record<string, Node> = {};
+  const nodes = new Map<string, Node>();
   let badNodes = 0;
   for (const n of rawNodes) {
     const node = isObject(n) ? sanitiseNode(n) : null;
-    if (!node || node.id in nodes) {
+    if (!node || nodes.has(node.id)) {
       badNodes++;
       continue;
     }
-    nodes[node.id] = node;
+    nodes.set(node.id, node);
   }
   if (badNodes) warnings.push(`Skipped ${badNodes} invalid position${badNodes === 1 ? "" : "s"}.`);
 
@@ -289,7 +290,7 @@ export function sanitiseImport(raw: unknown): SanitisedImport {
   for (const r of rawReps) {
     const rep = sanitiseRepertoire(r, now);
     // a repertoire whose root position is missing can't be opened, so it's skipped
-    if (!rep || repIds.has(rep.id) || !(rep.rootNodeId in nodes)) {
+    if (!rep || repIds.has(rep.id) || !nodes.has(rep.rootNodeId)) {
       badReps++;
       continue;
     }
@@ -303,5 +304,5 @@ export function sanitiseImport(raw: unknown): SanitisedImport {
     throw new ImportError("No valid repertoires were found in this file.");
   }
 
-  return { folders, repertoires, nodes, warnings };
+  return { folders, repertoires, nodes: Object.fromEntries(nodes), warnings };
 }

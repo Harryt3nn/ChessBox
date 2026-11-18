@@ -83,6 +83,36 @@ describe('sanitiseImport', () => {
     expect(() => sanitiseImport({ repertoires: [rep()], nodes: tooMany })).toThrow(ImportError);
   });
 
+  // ids that are also Object.prototype keys must be treated as plain ids, not inherited properties
+  describe('ids that clash with Object.prototype', () => {
+    it('removes a link to a missing "constructor" position instead of crashing', () => {
+      const result = sanitiseImport({ repertoires: [rep()], nodes: [node('root', ['constructor'])] });
+      expect(result.nodes.root.childIDs).toEqual([]);
+    });
+
+    it('removes a transposition edge to a missing "toString" position', () => {
+      const edge = { targetId: 'toString', move: 'Nf3' };
+      const result = sanitiseImport({ repertoires: [rep()], nodes: [node('root', [], { transpositionEdges: [edge] })] });
+      expect(result.nodes.root.transpositionEdges).toBeUndefined();
+    });
+
+    it('skips a repertoire whose root "toString" does not exist', () => {
+      const result = sanitiseImport({ repertoires: [rep(), rep({ id: 'rep2', rootNodeId: 'toString' })], nodes: [node('root')] });
+      expect(result.repertoires.map(r => r.id)).toEqual(['rep1']);
+    });
+
+    it('keeps a real position whose id is "toString"', () => {
+      const result = sanitiseImport({ repertoires: [rep({ rootNodeId: 'toString' })], nodes: [node('toString')] });
+      expect(Object.keys(result.nodes)).toEqual(['toString']);
+    });
+
+    it('stores a "__proto__" position as data without touching the prototype', () => {
+      const result = sanitiseImport({ repertoires: [rep({ rootNodeId: '__proto__' })], nodes: [node('__proto__')] });
+      expect(Object.keys(result.nodes)).toEqual(['__proto__']);
+      expect(Object.getPrototypeOf(result.nodes)).toBe(Object.prototype);
+    });
+  });
+
   it('rejects something that is not an object', () => {
     expect(() => sanitiseImport([])).toThrow(new ImportError('File is not a valid repertoire export.'));
   });
