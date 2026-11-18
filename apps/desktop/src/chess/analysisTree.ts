@@ -437,10 +437,21 @@ export function importLegacyJson(text: string): GameTree {
   return tree;
 }
 
+// a PGN may also start with "{" (a leading comment), so only real JSON counts
+function isJsonObject(text: string): boolean {
+  if (!text.startsWith('{')) return false;
+  try {
+    JSON.parse(text);
+    return true;
+  } catch {
+    return false;
+  }
+}
+
 /** works out what was pasted or opened: a saved JSON board, a FEN, or a PGN */
 export function importAny(text: string, fileName = ''): { tree: GameTree; note?: string } {
   const trimmed = text.trim();
-  if (fileName.toLowerCase().endsWith('.json') || trimmed.startsWith('{')) {
+  if (fileName.toLowerCase().endsWith('.json') || isJsonObject(trimmed)) {
     return { tree: importLegacyJson(trimmed) };
   }
   if (!trimmed.includes('\n') && validateFen(trimmed.replace(/\s+/g, ' ')).ok) {
