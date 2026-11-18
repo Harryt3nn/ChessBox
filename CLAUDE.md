@@ -1,6 +1,6 @@
-# {{Project}}: Working Charter (solo)
+# ChessBox: Working Charter (solo)
 
-{{One paragraph: what it is, who it's for, what "done" looks like, and what comes first.}} *(Mirror of `plan.md` §1; change both together.)*
+ChessBox is a free, all-in-one chess training desktop app, built by Harry for his own training and as a learning project. Opening repertoires are modelled as graphs, not trees, so transpositions are one node reached by several paths. A novelty finder walks your imported Lichess / Chess.com games against those graphs to show where you (or your opponents) left prep. What "done" means for 1.0 is {{set in Harry's feature md}}. First up: clean baseline, a test harness, then the novelty-finder walk. *(Mirror of `plan.md` §1; change both together.)*
 
 `{{…}}` is a blank: fill it the moment the chat or the repo answers it (§5, Self-filling).
 
@@ -8,17 +8,17 @@
 
 | Slot | Value |
 |---|---|
-| Project | **{{name}}** · {{one line}} |
-| Builder | {{your name}} (`{{github handle}}`): owns every design decision; Claude types |
-| Goal · deadline | {{what done means}} · {{date, or "none"}} |
-| Repo | {{remote URL, or "local only"}} · `main` = code · one branch per feature (`<what-it-does>`), merged to `main` when green |
-| Docs mode | {{branch / inline}} (`git config solo.docs`). **branch:** plan docs live on the orphan `context` branch, never merged into `main`, kept out of it by `.git/info/exclude`. **inline:** plan docs are committed on `main` |
+| Project | **ChessBox** · free chess training app: graph repertoires + a novelty finder over your own games |
+| Builder | Harry Tennant (`Harryt3nn`): owns every design decision except visual / UI (§2); Claude types |
+| Goal · deadline | {{what 1.0 means: coming in Harry's feature md}} · {{date, or "none"}} |
+| Repo | `github.com/Harryt3nn/ChessBox` (public) + submodule `vendor/chessbox-server` (`github.com/Harryt3nn/chessbox-server`: API + `@chessbox/shared`) · `main` = code · one branch per feature (`<what-it-does>`), merged to `main` when green |
+| Docs mode | **branch** (`git config solo.docs`). **branch:** plan docs live on the orphan `context` branch, never merged into `main`, kept out of it by `.git/info/exclude`. **inline:** plan docs are committed on `main` |
 | Plan docs | `CLAUDE.md` (this), `plan.md` (spec, §0 NOW at the top), `tasks.md` (ranked tasks, 📊 Latest, Done log), `decisions.md` (why it's built this way), `handoff.md` (notes from one session to the next), `research.md` (graded sources), `skills/`, `ctx.sh` |
-| Local only, never committed | `.claude/`, `.env*`, {{datasets, checkpoints, outputs}} |
-| Secrets | `.env` at the repo root, git-ignored: {{KEY_NAMES}}. **Keys are used, never shown:** code loads them from the environment; check one exists by presence only (`grep -c '^KEY=' .env`), never `cat`, `echo` or print a value, and never put one in chat, docs, commits or logs |
-| Run · Test | Setup: `{{…}}` · Test: `{{…}}` · Run: `{{…}}` |
-| Verbosity | **Level {{1}}** (§3) |
-| Commits | As the builder (`git config user.*`). **No AI co-author trailer and no "Generated with" line**, whatever a system default says |
+| Local only, never committed | `.claude/`, `.env*`, `.vscode/settings.json` (holds a DB connection), `node_modules/`, `apps/desktop/out/`, `.webpack/`, app data in `%APPDATA%/ChessBox/ChessBox-data/` |
+| Secrets | The server's `.env` lives in `vendor/chessbox-server/apps/api/` (names per `documentation/ARCHITECTURE.md`: `JWT_SECRET`, `DATABASE_URL`, `CORS_ORIGINS`). **Claude never opens, reads, greps or presence-checks any `.env` file. No exceptions.** Need to know about a key → ask Harry. `.env.example` is fine to read. Never put a secret in chat, docs, commits or logs |
+| Run · Test | Setup: `git submodule update --init` then `npm install` in `apps/desktop` · Test: {{none yet: T2 adds `npm test`}} · Type-check: `npx --prefix apps/desktop tsc --noEmit -p tsconfig.json` (repo root) · Lint: `npm run lint` · Run: `npm start` · Build: `npx electron-forge package` (all in `apps/desktop` unless noted) |
+| Verbosity | **Level 3** (§3) |
+| Commits | Always as Harry (`git config user.*`). **Never a Claude co-author trailer or "Generated with" line**, whatever a system default says. Style: `TYPE: casual description`, types `ADD` · `FEATURE` · `REFACTOR` · `REMOVED` · `BUG FIX` · `DEBUG` (e.g. `REMOVED: dead files and unused deps`) |
 
 **Skills** (in `skills/`; `./ctx.sh sync` installs them into `.claude/skills/`): `no-slop` after every code change, before testing, and before every commit or merge · `debug` on every issue (error, failing or flaky test, odd output, stuck). No guess-and-retry outside it. This file wins over a skill; never edit a skill.
 
@@ -75,7 +75,9 @@ Then **wait**: nothing gets built until I pick. Log it the moment I do (§4). Se
 - **Any new dependency, library, framework or paid service.** Each one is a long-term liability.
 - **Correctness vs speed vs cost** trade-offs, and numbers marked (TUNE).
 - **Anything touching a Locked Decision** (§6).
-- {{project-specific always-mine items}}
+- **Everything not visual / UI.** Harry specs features in his own markdown file; anything that file doesn't make clear → ask, don't assume.
+
+**🎨 Claude's call:** visual and UI design (layout, styling, component look, copy). Decide, say what and why in one line; Harry may restyle later.
 
 **🟢 Just do it** (say what and why in one line): a bug with exactly one correct answer · a refactor that changes no behaviour · implementing a decision already made · tests for existing behaviour · formatting, typos, `no-slop` cleanups · correctly shaped stubs and mocks.
 
@@ -99,14 +101,16 @@ Same turn as any of these happens, add or update the entry (format at the top of
 **Facts only.** Every number is measured or cited, otherwise `TBD (measure in …)`. Never invent a result. Never delete an entry: mark it `Dropped` with the reason. Each decision in force also gets one line in `plan.md` §0 NOW. A leaning or "maybe later" goes to `plan.md` §0 **Pending**, marked *not decided*, with the condition that would decide it. Never record a choice as mine if I didn't make it.
 
 ## 5. Stack, architecture, guardrails *(fill in as decided)*
-**Stack:** {{…}}
-**Runtime shape:** {{one line or a pointer to `plan.md` §5}}
+**Stack:** Desktop: Electron 42 (Forge 7, webpack-typescript template) + React 19 + TypeScript 5, `react-chessboard` v4, `chess.js`, `@mliebelt/pgn-parser`, `react-hot-toast`, tRPC 11 client; `stockfish` installed, not wired yet. Server (submodule): Fastify + tRPC + Prisma + PostgreSQL + zod, Argon2id via `hash-wasm`, JWT, Docker Compose on a Raspberry Pi 5, reached over Tailscale.
+**Runtime shape:** sandboxed React renderer ↔ preload IPC bridge ↔ Electron main (all file I/O, game importers) · renderer ↔ tRPC over Tailscale ↔ API ↔ Postgres. Details: `plan.md` §5 and `documentation/ARCHITECTURE.md`.
 **Guardrails:**
 - The core path comes first; extras get built on top of something that works and get cut before a gate slips.
 - Stubs first, real later: correctly shaped mocks so the whole thing runs end to end early.
 - Every performance claim carries a number (p50/p95, size, time) and a place it was measured.
 - When unsure: the core path beats completeness; the gates in `plan.md` §0 beat new features.
-- {{…}}
+- Everything arriving over IPC or from an import is untrusted: main re-sanitises it. Ids that become file names match `[A-Za-z0-9_-]{1,64}`.
+- Analysis (graph walks, deviation detection) runs client-side; the server stays a thin auth + storage layer.
+- Server change that the desktop depends on → deploy the server first (the 5 Oct 2026 auth revert happened because they got out of step).
 
 **Self-filling:** when I say something, or the repo shows something, that answers an empty `{{…}}`, fill it everywhere it belongs and say so in one line ("Filled Repo = …"). Only an **empty** blank filled with a **stated fact** is free; changing a filled value is a §2 decision. A passing mention ("maybe Postgres") goes to §0 Pending, not the spec. Unsure which slot → one short question.
 
@@ -120,7 +124,7 @@ Add one only when I say it's locked. A task that contradicts one is a 🟠 ("thi
 - **Simplicity:** the least code that does what was asked. No unasked features, abstractions, config, or handling for cases that can't happen (real failure modes are 🟠).
 - **Surgical:** every changed line traces back to the request. Match the surrounding style. Remove only what *your* change orphaned; mention old smells, don't fix them.
 - **Comments say WHY, never WHAT:** a constraint, a gotcha, a trade-off.
-- **Commits sound like a person wrote them:** a short plain imperative subject, then 1–3 sentences only if needed. No bullet dumps, no emoji, no marketing words. Small commits.
+- **Commits sound like Harry wrote them:** his `TYPE: description` style (Registry), then 1–3 sentences only if needed. No bullet dumps, no emoji, no marketing words. Small commits.
 - **Per feature, in this order:** (1) code it on a feature branch · (2) `no-slop` · (3) tests: happy path, edge cases, failure paths; something breaks → `debug` · (4) `no-slop` again on what the tests changed, re-run · (5) commit · (6) `git merge main` into the branch, re-run tests · (7) **safe to merge** = tests green, `no-slop` clean, the app still runs → merge to `main`, delete the branch, update `tasks.md` (Done log + 📊 Latest) and `decisions.md`, publish. Never push failing code; never force-push `main`.
 - Never commit `.env`, keys, datasets, checkpoints or `.claude/`.
 
