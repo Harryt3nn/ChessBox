@@ -4,6 +4,8 @@ import { contextBridge, ipcRenderer, } from "electron";
 import type { Folder } from "./types/Folder";
 import type { Repertoire } from "./types/Repertoire";
 import type { Node } from "./types/Node";
+import type { NoveltyFile } from "./novelty/results";
+import type { RunSummary } from "./Storage/NoveltyRunner";
 import { ImportRepertoiresPayload } from "./types/ImportPayload";
 
 // the only place where the renderer can communicate with main processes
@@ -53,6 +55,19 @@ contextBridge.exposeInMainWorld("api", {
   importLichess: (username: string) =>
     ipcRenderer.invoke("import-lichess", username),
   importChesscom: (username: string) =>
-    ipcRenderer.invoke("import-chesscom", username)
+    ipcRenderer.invoke("import-chesscom", username),
+
+  runNovelty: (repertoireId: string, mode: "latest" | "all"): Promise<RunSummary> =>
+    ipcRenderer.invoke("novelty:run", repertoireId, mode),
+
+  loadNovelty: (repertoireId: string): Promise<NoveltyFile | null> =>
+    ipcRenderer.invoke("novelty:load", repertoireId),
+
+  // returns a function that stops listening
+  onNoveltyProgress: (listener: (done: number, total: number) => void): (() => void) => {
+    const handler = (_event: Electron.IpcRendererEvent, done: number, total: number) => listener(done, total);
+    ipcRenderer.on("novelty:progress", handler);
+    return () => ipcRenderer.removeListener("novelty:progress", handler);
+  }
 });
 

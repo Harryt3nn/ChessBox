@@ -67,7 +67,7 @@ async function quarantine(filePath: string, err: unknown) {
   }
 }
 
-async function readJson(filePath: string): Promise<unknown> {
+export async function readJson(filePath: string): Promise<unknown> {
   const raw = await fs.promises.readFile(filePath, "utf8");
   try {
     return JSON.parse(raw);

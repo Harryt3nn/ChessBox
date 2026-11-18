@@ -1,24 +1,78 @@
 /* apps/desktop/src/pages/NoveltyFinder.tsx */
 
-import { useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
+import { DEFAULT_POSITION } from 'chess.js';
 import { PageHeader } from '../components/PageHeader';
 import { Icon } from '../components/Icon';
 import styles from './NoveltyFinder.module.css';
 import shared from './PageShared.module.css';
 import type { Page } from '../types/Page';
+import type { Repertoire } from '../types/Repertoire';
+import type { Finding, NoveltyFile } from '../novelty/results';
+import { FileSystemStorageProvider } from '../Storage/FileSystemStorageProvider';
+import { numberedLine } from '../chess/analysisTree';
 
 import noveltyIcon from '../assets/icons/020-chess.png';
 import deviationsIcon from '../assets/icons/204-folder-6.png';
 import ideaIcon from '../assets/icons/009-idea.png';
 import downloadGlyph from '../assets/icons/007-download.png';
-import searchGlyph from '../assets/icons/032-search.png';
 
 interface NoveltyFinderProps {
   page: Page;
   currentUser: any; // or your inferred User type
 }
 
+// rows shown per table; the rest are counted in the header
+const SHOWN = 50;
+
+const describeLine = (line: string[]) => (line.length ? numberedLine(DEFAULT_POSITION, line) : 'Start position');
+const formatDate = (ms: number) => (ms ? new Date(ms).toLocaleDateString() : '—');
+const byCount = (a: Finding, b: Finding) => b.count - a.count || b.lastSeen - a.lastSeen;
+
 const NoveltyFinder = ({ currentUser }: NoveltyFinderProps) => {
+  const storage = useMemo(() => new FileSystemStorageProvider(), []);
+  const [repertoires, setRepertoires] = useState<Repertoire[]>([]);
+  const [repertoireId, setRepertoireId] = useState('');
+  const [results, setResults] = useState<NoveltyFile | null>(null);
+  const [running, setRunning] = useState<{ done: number; total: number } | null>(null);
+  const [summary, setSummary] = useState<string | null>(null);
+
+  useEffect(() => {
+    storage.loadRepertoires().then(reps => {
+      setRepertoires(reps);
+      setRepertoireId(id => id || reps[0]?.id || '');
+    });
+  }, [storage]);
+
+  useEffect(() => {
+    setResults(null);
+    setSummary(null);
+    if (repertoireId) window.api.loadNovelty(repertoireId).then(setResults);
+  }, [repertoireId]);
+
+  async function check(mode: 'latest' | 'all') {
+    setRunning({ done: 0, total: 0 });
+    setSummary(null);
+    const stop = window.api.onNoveltyProgress((done, total) => setRunning({ done, total }));
+    try {
+      const s = await window.api.runNovelty(repertoireId, mode);
+      setSummary(s.walked === 0
+        ? 'No imported games where you played this repertoire\'s colour.'
+        : `Checked ${s.walked} game${s.walked === 1 ? '' : 's'}: ${s.deviations} deviation${s.deviations === 1 ? '' : 's'}, ${s.novelties} novelt${s.novelties === 1 ? 'y' : 'ies'}, ${s.inPrep} stayed in prep.`);
+      setResults(await window.api.loadNovelty(repertoireId));
+    } catch (err) {
+      setSummary(err instanceof Error ? err.message : 'The check failed.');
+    } finally {
+      stop();
+      setRunning(null);
+    }
+  }
+
+  const findings = Object.values(results?.findings ?? {});
+  const deviations = findings.filter(f => f.kind === 'deviation').sort(byCount);
+  const novelties = findings.filter(f => f.kind === 'novelty').sort(byCount);
+  const gameCount = Object.keys(results?.games ?? {}).length;
+
   const [importing, setImporting] = useState(false);
   const [importingFrom, setImportingFrom] = useState<"lichess" | "chesscom" | null>(null);
 
@@ -84,12 +138,6 @@ const NoveltyFinder = ({ currentUser }: NoveltyFinderProps) => {
           icon={noveltyIcon}
           title="Novelty Finder"
           subtitle="Walk your games through your repertoires and catch where they leave your prep."
-          actions={
-            <button className={shared.btnPrimary} disabled title="Coming soon">
-              <Icon src={searchGlyph} size={14} />
-              Find Novelties
-            </button>
-          }
         />
 
         {/* Game import */}
@@ -123,39 +171,88 @@ const NoveltyFinder = ({ currentUser }: NoveltyFinderProps) => {
           </div>
         </section>
 
+        {/* Check games against a repertoire (D15: the user picks it) */}
+        <section className={shared.panel}>
+          <div className={shared.panelHeader}>
+            <h2 className={shared.sectionTitle}>Check Games</h2>
+            {gameCount > 0 && <span className={styles.importHint}>{gameCount} games checked so far</span>}
+          </div>
+          <div className={styles.checkRow}>
+            <select className={styles.select} value={repertoireId} onChange={e => setRepertoireId(e.target.value)} disabled={!!running}>
+              {repertoires.map(r => <option key={r.id} value={r.id}>{r.name} ({r.side})</option>)}
+            </select>
+            <button className={shared.btnPrimary} onClick={() => check('latest')} disabled={!repertoireId || !!running}>Check latest game</button>
+            <button className={shared.btnOutline} onClick={() => check('all')} disabled={!repertoireId || !!running}>Check all games</button>
+          </div>
+          {running && (
+            <p className={styles.importHint}>
+              Checking{running.total ? ` ${running.done} / ${running.total}` : '…'}
+            </p>
+          )}
+          {summary && <p className={styles.importHint}>{summary}</p>}
+        </section>
+
         <div className={shared.panelGrid}>
-          {/* Deviations — game left the repertoire before reaching a leaf */}
+          {/* Deviations: your move left the prepared line */}
           <section className={shared.panel}>
             <div className={shared.panelHeader}>
               <h2 className={shared.sectionTitle}>Deviations</h2>
-              <span className={shared.soonBadge}>Coming soon</span>
+              {deviations.length > SHOWN && <span className={styles.importHint}>top {SHOWN} of {deviations.length}</span>}
             </div>
 
+            {deviations.length > 0 ? (
+              <table className={shared.table}>
+                <thead><tr><th>After</th><th>You played</th><th>Prepared</th><th>Times</th><th>Last</th></tr></thead>
+                <tbody>
+                  {deviations.slice(0, SHOWN).map(f => (
+                    <tr key={`${f.nodeId}|${f.move}`}>
+                      <td>{describeLine(f.line)}</td><td>{f.move}</td><td>{f.expected}</td><td>{f.count}</td><td>{formatDate(f.lastSeen)}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            ) : (
             <div className={shared.emptyState}>
               <img src={deviationsIcon} className={shared.emptyIcon} />
               <span className={shared.emptyTitle}>No deviations found yet</span>
               <span className={shared.emptyHint}>
-                Moves where you or your opponent left a prepared line will be collected
+                Moves where you left a prepared line will be collected
                 here, so you can drill them later.
               </span>
             </div>
+            )}
           </section>
 
           {/* Novelties — game followed a line to its end, next move is new */}
           <section className={shared.panel}>
             <div className={shared.panelHeader}>
               <h2 className={shared.sectionTitle}>Novelties</h2>
-              <span className={shared.soonBadge}>Coming soon</span>
+              {novelties.length > SHOWN && <span className={styles.importHint}>top {SHOWN} of {novelties.length}</span>}
             </div>
 
+            {novelties.length > 0 ? (
+              <table className={shared.table}>
+                <thead><tr><th>After</th><th>Move</th><th>Why new</th><th>Times</th><th>Last</th></tr></thead>
+                <tbody>
+                  {novelties.slice(0, SHOWN).map(f => (
+                    <tr key={`${f.nodeId}|${f.move}`}>
+                      <td>{describeLine(f.line)}</td><td>{f.move}</td>
+                      <td>{f.reason === 'opponent-move' ? "opponent's move" : 'line ended'}</td>
+                      <td>{f.count}</td><td>{formatDate(f.lastSeen)}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            ) : (
             <div className={shared.emptyState}>
               <img src={ideaIcon} className={shared.emptyIcon} />
               <span className={shared.emptyTitle}>No novelties found yet</span>
               <span className={shared.emptyHint}>
-                When a game follows a repertoire to the end of a line, the next move played
-                is saved here as a candidate to add.
+                Opponent moves your repertoire doesn't cover, and the next move after a line
+                ends, are saved here as candidates to add.
               </span>
             </div>
+            )}
           </section>
         </div>
       </div>

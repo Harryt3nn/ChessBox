@@ -7,6 +7,7 @@ import { IMPORT_LIMITS, sanitiseFolders, sanitiseRepertoire } from "./importsAnd
 import { importRepertoires } from "./Storage/ImportService";
 import { importChesscom } from "./Storage/ChesscomImporter";
 import { importLichess } from "./Storage/LichessImporter";
+import { loadNovelty, runNovelty } from "./Storage/NoveltyRunner";
 import {
   loadFolders,
   saveFolders,
@@ -110,6 +111,17 @@ ipcMain.handle("import-chesscom", async (_event, username: string) => {
 
     return { ok: false, error: String(err) };
   }
+});
+
+// novelty finder: walks imported games against one repertoire; progress is pushed to the window as it goes
+ipcMain.handle("novelty:run", (event, repertoireId: unknown, mode: unknown) => {
+  if (typeof repertoireId !== "string" || (mode !== "latest" && mode !== "all")) throw new Error("Invalid novelty run");
+  return runNovelty(repertoireId, mode, (done, total) => event.sender.send("novelty:progress", done, total));
+});
+
+ipcMain.handle("novelty:load", (_event, repertoireId: unknown) => {
+  if (typeof repertoireId !== "string") throw new Error("Invalid repertoire id");
+  return loadNovelty(repertoireId);
 });
 
 ipcMain.handle("storage:saveAuthToken", (_event, token: string) => saveAuthToken(token));

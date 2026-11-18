@@ -4,6 +4,8 @@
 import type { Folder } from "./Folder";
 import type { Repertoire } from "./Repertoire";
 import type { Node } from "./Node";
+import type { NoveltyFile } from "../novelty/results";
+import type { RunSummary } from "../Storage/NoveltyRunner";
 import type { ImportResult } from "./ImportResults";
 import type { ImportRepertoiresPayload } from "./ImportPayload";
 
@@ -28,6 +30,9 @@ declare global {
      api: {
       importLichess(username: string): Promise<ImportResult>;
       importChesscom(username: string): Promise<ImportResult>;
+      runNovelty(repertoireId: string, mode: "latest" | "all"): Promise<RunSummary>;
+      loadNovelty(repertoireId: string): Promise<NoveltyFile | null>;
+      onNoveltyProgress(listener: (done: number, total: number) => void): () => void;
     };
   }
 }
