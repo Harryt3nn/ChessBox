@@ -183,7 +183,7 @@ The record of design choices, the features added and dropped, and the reasons. R
 - **Evidence:** walk on real data: 8,340 Chess.com games, ~3 ms per game (measured in a throwaway vitest run, 2026-11-18).
 - **One-liner:** Each repertoire keeps its own record of how your games went against it.
 
-### D19 · novelty finder · You pick which imported accounts count: Status: Planned · Updated: 2026-11-19 01:10
+### D19 · novelty finder · You pick which imported accounts count: Status: Built · Updated: 2026-11-19 01:10
 - **Decision:** Harry: the Novelty Finder lists every imported account folder (`<site>/<username>`) with checkboxes; the selection is remembered per repertoire in its novelty file (`accounts`). Default: all.
 - **Why:** imported folders can include other people's accounts (e.g. `lichess/theoneandonlylipika`, ~225 games); works offline, unlike using Settings' linked names.
 - **Alternatives rejected:** only accounts linked in Settings (needs the server); keep all folders.
