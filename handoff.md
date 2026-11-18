@@ -13,6 +13,13 @@ For the next session. One entry per handoff, at most ~15 lines.
 
 ---
 
+## 2026-11-19 02:40 · Stage-1 MVP: M1–M5 done
+- **Done:** M4 finished (T16 actions, T22 account picker) and M5 builder (T17). `main@bb66569`, pushed. 159 tests.
+- **In progress:** nothing uncommitted. Dev app processes stopped.
+- **Next step:** M6 needs Harry first: `vendor/chessbox-server` has his own uncommitted edits (README, dockerfile, index.ts, routers, trpc.ts, shared schemas), and server changes must be deployed to the Pi before the desktop uses them. Then T18 settings page. M7: T20 research pass (SM-2 / FSRS, Aimchess) can start any time. T23 builder polish is UI-only.
+- **Gotchas:** as before; plus the Write tool strips trailing spaces from edit patterns; React Flow controls are default-styled.
+- **Commands to run:** `./ctx.sh sync` · `cd apps/desktop && npm test`
+
 ## 2026-11-19 00:30 · Stage-1 MVP: M1–M3 done, M4 half done
 - **Done:** M1 layout, M2 board (graveyard, edge cases, Stockfish lite + eval bar), M3 repertoire in board + save back, M4 T3 walk / T4 import gate / T15 runs. All merged + pushed, `main@fd04a4a`.
 - **In progress:** nothing uncommitted.
