@@ -192,11 +192,11 @@ The record of design choices, the features added and dropped, and the reasons. R
 - **Evidence:** first bulk run counted 4,396 games, ~225 of them from a second Lichess account.
 - **One-liner:** Only your games count, and you decide which those are.
 
-### D20 · dependency · React Flow + dagre for the repertoire builder: Status: Planned · Updated: 2026-11-19 01:10
+### D20 · dependency · React Flow + dagre for the repertoire builder: Status: Built · Updated: 2026-11-19 01:10
 - **Decision:** Harry picked `@xyflow/react` (React Flow) to draw the repertoire graph and `dagre` for a top-down layered layout (M5 / T17).
 - **Why:** nodes are React components (mini boards, comments, edit controls), pan / zoom / drag built in; dagre lays out ~900-node trees.
 - **Alternatives rejected:** Cytoscape.js (fast canvas, but custom node content is harder); a research pass first.
 - **Trade-off / risk:** two new dependencies; very large graphs may need collapsing branches for speed.
 - **Revisit if:** 900+ node repertoires feel slow.
-- **Evidence:** TBD (render time for the 888-node Italian, measure in T17).
+- **Evidence:** the 888-node White Aggressive Italian renders in ~1.2 s in the dev app (observed 1,184 / 1,281 ms). Versions pinned to stable releases: `@xyflow/react` 12.12.0 (not the 2-day-old 13.0 major), `@dagrejs/dagre` 3.1.3 (the maintained, typed `dagre`).
 - **One-liner:** A React canvas for graphs plus an automatic layout.
