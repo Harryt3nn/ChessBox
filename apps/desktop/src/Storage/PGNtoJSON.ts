@@ -23,18 +23,15 @@ export function pgnToJson(pgn: string, source: "lichess" | "chesscom", username:
     Object.entries(rawTags).map(([k, v]) => [k, v ?? ""])
   );
 
-  const moves = chess.history();
+  // verbose history carries each position, so a game starting from a FEN tag replays correctly
+  const moves = chess.history({ verbose: true });
   const nodes: Node[] = [];
   const moveNodes: MoveNode[] = [];
 
-  const temp = new Chess();
   let parentId: string | null = null;
 
-  for (const move of moves) {
-    temp.move(move);
-
+  for (const { san: move, after: fen } of moves) {
     const id = randomUUID();
-    const fen = temp.fen();
 
     const node: Node = {
       id,
