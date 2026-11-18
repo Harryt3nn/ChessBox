@@ -1,0 +1,35 @@
+/*apps/desktop/src/components/board/Graveyard.module.css*/
+
+.graveyard {
+  display: flex;
+  align-items: center;
+  height: 28px;
+  padding: 0 4px;
+}
+
+.piece {
+  font-size: 22px;
+  line-height: 1;
+}
+
+/* same pieces overlap, so a row of pawns stays short */
+.stacked {
+  margin-left: -9px;
+}
+
+.white {
+  color: var(--color-piece-light);
+  text-shadow: 0 0 1px var(--color-ink), 0 0 1px var(--color-ink);
+}
+
+.black {
+  color: var(--color-ink);
+  text-shadow: 0 0 1px var(--color-text-secondary), 0 0 1px var(--color-text-secondary);
+}
+
+.lead {
+  margin-left: 8px;
+  color: var(--color-text-tertiary);
+  font-size: 13px;
+  font-weight: 700;
+}

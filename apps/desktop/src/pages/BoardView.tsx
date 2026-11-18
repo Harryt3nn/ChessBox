@@ -8,6 +8,7 @@ import {
   createTree,
   getNodeAtPath,
   mainLineFrom,
+  movesAlongPath,
   playMove,
   isPromotionMove,
   positionStatus,
@@ -20,6 +21,8 @@ import {
   BoardImportError,
 } from '../chess/analysisTree';
 import { MoveList } from '../components/board/MoveList';
+import { Graveyard } from '../components/board/Graveyard';
+import { capturedPieces, materialBalance } from '../chess/material';
 import styles from './BoardView.module.css';
 import leftArrow from '../assets/icons/033-left arrow.png';
 import rightArrow from '../assets/icons/034-right arrow.png';
@@ -90,6 +93,8 @@ const BoardView = () => {
   // Full PGN (headers + every variation). Memoised: only rebuilds when the tree changes.
   const pgnText = useMemo(() => exportPgn(tree), [tree]);
   const status = useMemo(() => positionStatus(currentFen), [currentFen]);
+  const captured = useMemo(() => capturedPieces(tree.root.fen, movesAlongPath(tree.root, tree.currentPath)), [tree]);
+  const balance = useMemo(() => materialBalance(currentFen), [currentFen]);
 
   const clearSelection = () => {
     setSelectedSquare(null);
@@ -344,6 +349,10 @@ const BoardView = () => {
 return (
   <main className={styles.boardViewMain}>
     <div className={styles.boardContainer}>
+      {/* the side at the top of the board shows what it has taken above the board */}
+      {orientation === 'white'
+        ? <Graveyard pieces={captured.byBlack} pieceColor="w" lead={-balance} />
+        : <Graveyard pieces={captured.byWhite} pieceColor="b" lead={balance} />}
       <Chessboard
         position={currentFen}
         boardOrientation={orientation}
@@ -356,6 +365,9 @@ return (
         promotionToSquare={pendingPromotion?.to ?? null}
         customSquareStyles={customSquareStyles}
         boardWidth={560}/>
+      {orientation === 'white'
+        ? <Graveyard pieces={captured.byWhite} pieceColor="b" lead={balance} />
+        : <Graveyard pieces={captured.byBlack} pieceColor="w" lead={-balance} />}
     </div>
 
   {/* ----------------------------- PANEL ----------------------------- */}

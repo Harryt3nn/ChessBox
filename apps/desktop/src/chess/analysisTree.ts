@@ -42,6 +42,19 @@ export function getNodeAtPath(root: MoveNode, path: string[]): MoveNode {
   return node;
 }
 
+/** the SAN moves from the root to the node at `path`; stops early if an id isn't found */
+export function movesAlongPath(root: MoveNode, path: string[]): string[] {
+  const moves: string[] = [];
+  let node = root;
+  for (const id of path) {
+    const next = node.children.find(c => c.id === id);
+    if (!next) break;
+    moves.push(next.move);
+    node = next;
+  }
+  return moves;
+}
+
 /** `path` extended along the main line (children[0]) to its end */
 export function mainLineFrom(root: MoveNode, path: string[]): string[] {
   const out = [...path];

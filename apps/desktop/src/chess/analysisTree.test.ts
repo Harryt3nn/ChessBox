@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { BoardImportError, createTree, exportPgn, importAny, importPgn, mainLineFrom, playMove, plyInfo } from './analysisTree';
+import { BoardImportError, createTree, exportPgn, importAny, importPgn, mainLineFrom, movesAlongPath, playMove, plyInfo } from './analysisTree';
 import type { GameTree } from '../types/gameTree';
 
 const moves = (tree: GameTree) => mainLineFrom(tree.root, []).length;
@@ -17,6 +17,19 @@ describe('playMove', () => {
 
   it('returns null for an illegal move', () => {
     expect(playMove(createTree(), { from: 'e2', to: 'e5' })).toBeNull();
+  });
+});
+
+describe('movesAlongPath', () => {
+  it('lists the SAN moves from the start to the current node, following variations', () => {
+    const { tree } = importPgn('1. e4 e5 (1... c5 2. Nf3) 2. Nf3 *');
+    const sicilian = tree.root.children[0].children[1];
+    const path = [tree.root.children[0].id, sicilian.id, sicilian.children[0].id];
+    expect(movesAlongPath(tree.root, path)).toEqual(['e4', 'c5', 'Nf3']);
+  });
+
+  it('is empty at the start position', () => {
+    expect(movesAlongPath(createTree().root, [])).toEqual([]);
   });
 });
 
