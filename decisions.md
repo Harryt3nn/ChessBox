@@ -118,3 +118,21 @@ The record of design choices, the features added and dropped, and the reasons. R
 - **Revisit if:** Harry's feature md changes the design.
 - **Evidence:** TBD (T3 tests).
 - **One-liner:** Walk the game down your graph and stop at the first surprise.
+
+### D12 · testing · Vitest, test-first bug fixing: Status: Built · Updated: 2026-11-18 18:10
+- **Decision:** Harry picked Vitest 5.1 as the test runner (`npm test`, config `apps/desktop/vitest.config.mts`, tests in `src/**/*.test.ts`). Every bug fix starts with a failing test.
+- **Why:** zero-config TypeScript/ESM, a Jest-style API, and easy mocking of `electron` and `fetch`.
+- **Alternatives rejected:** Jest + ts-jest (fiddly ESM / alias config, slower); `node:test` (clunky module mocking, aliases need a custom loader).
+- **Trade-off / risk:** pulls in Vite as a dev dependency next to the webpack build. No DOM tests yet (that needs jsdom + Testing Library).
+- **Revisit if:** component tests are needed (add jsdom), or the suite gets slow.
+- **Evidence:** 46 tests in 6 files; the run takes about 0.7 s for the sanitiser file alone (local).
+- **One-liner:** Every bug gets a failing test before it gets a fix.
+
+### D13 · failure mode · Startup session check survives the server being offline: Status: Built · Updated: 2026-11-18 18:10
+- **Decision:** Harry picked: `restoreAuthToken` clears the saved token only when the server answers `UNAUTHORIZED`. A network error or any other server error → `unverified`: the token is kept, the app stays unlocked, and a toast says the server can't be reached.
+- **Why:** the Pi or Tailscale being down says nothing about whether the session is valid. Before this, you were signed out every time.
+- **Alternatives rejected:** keep "any error signs you out".
+- **Trade-off / risk:** while `unverified`, `currentUser` is null, so game imports ask you to sign in. A deleted account (`NOT_FOUND`) keeps its token (open question in plan §8).
+- **Revisit if:** offline mode needs the cached user (e.g. imports while offline).
+- **Evidence:** `src/trpc.test.ts` covers accepted / missing / rejected / unreachable / 500.
+- **One-liner:** An unreachable server no longer logs you out.

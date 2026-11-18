@@ -15,6 +15,8 @@ A bare § means this file. `tasks.md` holds the ranked work; `decisions.md` hold
 - D9: Email verification, password reset and sign-out-everywhere were reverted on 2026-10-05 (Dropped for now).
 - D10: Dead code and unused deps were removed on 2026-11-18; deps the code uses are declared.
 - D11 (Planned): Novelty finder = layered derived data + a deterministic ply-by-ply walk.
+- D12: Tests run on Vitest (`npm test`); bugs are fixed test-first.
+- D13: A saved session is cleared only when the server answers `UNAUTHORIZED`; unreachable / erroring server → stay signed in, toast, local features keep working.
 
 **Pending / Unconfirmed** (*not decided*; each with the condition that decides it):
 - What "1.0 done" means, and the deadline. *Decided by Harry's feature md.*
@@ -53,7 +55,7 @@ The user is Harry (a single user for now; accounts exist on the server).
 | R5 | Settings: profile card, permanent Lichess / Chess.com links | Built |
 | R6 | Analysis board: move tree with variations, PGN/FEN import + export, promotion, highlights, keys | Built |
 | R7 | Designed shells for Home, Analytics, NoveltyFinder, TrainingToolkit (no logic behind them yet) | Built |
-| R8 | Test harness with `npm test`, starting with the import sanitiser | Planned |
+| R8 | Test harness with `npm test`, starting with the import sanitiser | Built |
 | R9 | Novelty-finder walk: deepest match + first deviation per game | Planned |
 | R10 | Single-response constraint: an editor block + an import-time resolution gate | Planned |
 | R11 | Server: login / register rate limits; deploy the pending server update to the Pi | Planned |
@@ -102,7 +104,7 @@ Full tables: `documentation/ARCHITECTURE.md`.
 | Corrupt JSON on disk | parse error | rename to `.corrupt-<ts>` and carry on without it |
 | Bad repertoire import | sanitiser | drop or repair the bad parts and show warnings; `ImportError` if nothing is usable |
 | Bad game in an import | per-game check | skip that game, keep importing |
-| Pi server unreachable | {{…}} | {{undecided: the old TODO wants a real message, not a hang}} |
+| Pi server unreachable at startup | `restoreAuthToken` → `unverified` (fetch fails or non-`UNAUTHORIZED` error) | keep the token, keep the app unlocked, show a toast (D13) |
 | Desktop and server versions out of step | sign-in breaks | deploy the server first (D9 lesson) |
 
 ## 7. Milestones
@@ -111,6 +113,7 @@ Full tables: `documentation/ARCHITECTURE.md`.
 ## 8. Open questions
 - What 1.0 means and when (Harry's md).
 - JWT expiry: 3 or 7 days?
+- `auth.me` answers `NOT_FOUND` for a deleted account. D13 treats that as `unverified` (token kept). Should it sign out too?
 - `docker-compose.yml` references `apps/api/Dockerfile`, but the tracked file is `apps/api/dockerfile` (Linux paths are case-sensitive).
 - Does `.gitignore` in the server repo cover `apps/api/src/generated/` and `packages/shared/dist/`?
 
