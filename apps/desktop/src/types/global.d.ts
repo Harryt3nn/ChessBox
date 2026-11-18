@@ -17,6 +17,7 @@ declare global {
       loadRepertoires(): Promise<Repertoire[]>;
       saveRepertoire(rep: Repertoire): Promise<void>;
       loadNodes(): Promise<Record<string, Node>>;
+      saveNodes(patch: Record<string, Node>): Promise<void>;
       openFileDialog(options: Electron.OpenDialogOptions): Promise<string[]>;
       readFile(filePath: string): Promise<string>;
       importRepertoires(payload: ImportRepertoiresPayload): Promise<{ success: boolean }>;

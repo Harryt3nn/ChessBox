@@ -42,6 +42,19 @@ export function getNodeAtPath(root: MoveNode, path: string[]): MoveNode {
   return node;
 }
 
+/** the longest start of `path` whose ids still exist, e.g. after the tree was rebuilt */
+export function existingPath(root: MoveNode, path: string[]): string[] {
+  const out: string[] = [];
+  let node = root;
+  for (const id of path) {
+    const next = node.children.find(c => c.id === id);
+    if (!next) break;
+    out.push(id);
+    node = next;
+  }
+  return out;
+}
+
 /** the SAN moves from the root to the node at `path`; stops early if an id isn't found */
 export function movesAlongPath(root: MoveNode, path: string[]): string[] {
   const moves: string[] = [];

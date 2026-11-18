@@ -361,3 +361,9 @@
 .toggleWrapper {
   flex-shrink: 0;
 }
+
+.bannerActions {
+  display: flex;
+  gap: 8px;
+  flex-shrink: 0;
+}

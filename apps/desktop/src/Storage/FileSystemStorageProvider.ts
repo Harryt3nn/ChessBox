@@ -25,4 +25,8 @@ export class FileSystemStorageProvider implements StorageProvider {
   async loadNodes(): Promise<Record<string, Node>> {
     return await window.storage.loadNodes();
   }
+
+  async saveNodes(patch: Record<string, Node>): Promise<void> {
+    await window.storage.saveNodes(patch);
+  }
 }

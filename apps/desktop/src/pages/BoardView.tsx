@@ -5,12 +5,15 @@ import { Chessboard } from 'react-chessboard';
 import { Chess, Square } from 'chess.js';
 import type { GameTree } from '../types/gameTree';
 import type { Repertoire } from '../types/Repertoire';
+import type { Node } from '../types/Node';
 import { repertoireToTree } from '../chess/repertoireTree';
+import { collectRepertoireEdits } from '../chess/repertoireEdits';
 import { FileSystemStorageProvider } from '../Storage/FileSystemStorageProvider';
 import {
   createTree,
   getNodeAtPath,
   mainLineFrom,
+  existingPath,
   movesAlongPath,
   playMove,
   isPromotionMove,
@@ -123,7 +126,7 @@ const BoardView = ({ repertoire, onCloseRepertoire }: BoardViewProps) => {
     setPendingPromotion(null);
   };
 
-  // replaces the whole analysis (import, FEN load, reset)
+  // replaces the whole board (repertoire load, import, FEN load, reset)
   const loadTree = (next: GameTree, note?: string) => {
     setTree(next);
     clearSelection();
@@ -138,22 +141,61 @@ const BoardView = ({ repertoire, onCloseRepertoire }: BoardViewProps) => {
 
   // opening a repertoire replaces the board with its moves, seen from the repertoire's side
   const storage = useMemo(() => new FileSystemStorageProvider(), []);
+  const [repertoireNodes, setRepertoireNodes] = useState<Record<string, Node> | null>(null);
   useEffect(() => {
+    setRepertoireNodes(null);
     if (!repertoire) return;
     storage.loadNodes().then(nodes => {
       try {
         const { tree: next, skipped } = repertoireToTree(repertoire.rootNodeId, nodes, { Event: repertoire.name });
         loadTree(next, skipped ? `${skipped} move${skipped === 1 ? '' : 's'} in this repertoire couldn't be played and ${skipped === 1 ? 'was' : 'were'} left out.` : undefined);
         setOrientation(repertoire.side);
+        setRepertoireNodes(nodes);
       } catch (err) {
         setMessage({ kind: 'error', text: err instanceof Error ? err.message : "That repertoire couldn't be opened." });
       }
     });
   }, [repertoire, storage]);
 
+  // moves played on the board that the repertoire doesn't have yet
+  const pendingEdits = useMemo(
+    () => (repertoire && repertoireNodes ? collectRepertoireEdits(tree, repertoire, repertoireNodes) : null),
+    [tree, repertoire, repertoireNodes],
+  );
+  const unsaved = pendingEdits ? pendingEdits.added + pendingEdits.transpositions : 0;
+
+  const saveToRepertoire = async () => {
+    if (!repertoire || !pendingEdits) return;
+    const { patch, added, transpositions, rejected } = pendingEdits;
+    try {
+      if (unsaved > 0) {
+        await storage.saveNodes(patch);
+        await storage.saveRepertoire({ ...repertoire, updatedAt: Date.now() });
+      }
+      // rebuilt from disk so saved transpositions show as links and can't be saved twice
+      const nodes = await storage.loadNodes();
+      const { tree: next } = repertoireToTree(repertoire.rootNodeId, nodes, tree.headers);
+      setTree({ ...next, currentPath: existingPath(next.root, tree.currentPath) });
+      setRepertoireNodes(nodes);
+
+      const plural = (n: number, word: string) => `${n} ${word}${n === 1 ? '' : 's'}`;
+      const saved = [added > 0 && plural(added, 'move'), transpositions > 0 && plural(transpositions, 'transposition')].filter(Boolean);
+      const lines = [saved.length ? `Saved ${saved.join(' and ')}.` : 'Nothing new to save.', ...rejected.map(r => `Not saved: ${r}.`)];
+      setMessage({ kind: rejected.length ? 'error' : 'info', text: lines.join(' ') });
+    } catch {
+      setMessage({ kind: 'error', text: "Couldn't save to the repertoire." });
+    }
+  };
+
   const closeRepertoire = () => {
     onCloseRepertoire();
     loadTree(createTree());
+  };
+
+  // loading something else onto the board leaves the repertoire, so its moves can't be saved into it
+  const replaceBoard = (next: GameTree, note?: string) => {
+    if (repertoire) onCloseRepertoire();
+    loadTree(next, note);
   };
 
   // -------------------------------------------------------------------------
@@ -301,7 +343,7 @@ const BoardView = ({ repertoire, onCloseRepertoire }: BoardViewProps) => {
     try {
       const next = importFen(fenDraft);
       if (!confirmDiscard()) return;
-      loadTree(next);
+      replaceBoard(next);
     } catch (err) {
       setMessage({ kind: 'error', text: errorText(err) });
     }
@@ -312,7 +354,7 @@ const BoardView = ({ repertoire, onCloseRepertoire }: BoardViewProps) => {
     try {
       const { tree: next, gameCount } = importPgn(pgnDraft);
       if (!confirmDiscard()) return;
-      loadTree(next, gameCount > 1 ? `That PGN had ${gameCount} games — the first one was imported.` : undefined);
+      replaceBoard(next, gameCount > 1 ? `That PGN had ${gameCount} games — the first one was imported.` : undefined);
     } catch (err) {
       setMessage({ kind: 'error', text: errorText(err) });
     }
@@ -330,7 +372,7 @@ const BoardView = ({ repertoire, onCloseRepertoire }: BoardViewProps) => {
       try {
         const { tree: next, note } = importAny(text, file.name);
         if (!confirmDiscard()) return;
-        loadTree(next, note);
+        replaceBoard(next, note);
       } catch (err) {
         setMessage({ kind: 'error', text: errorText(err) });
       }
@@ -346,7 +388,7 @@ const BoardView = ({ repertoire, onCloseRepertoire }: BoardViewProps) => {
 
   const resetBoard = () => {
     if (!confirmDiscard()) return;
-    loadTree(createTree());
+    replaceBoard(createTree());
   };
 
   // -------------------------------------------------------------------------
@@ -421,9 +463,19 @@ return (
       {repertoire && (
         <div className={styles.repertoireBanner}>
           <span>
-            <strong>{repertoire.name}</strong> · plays {repertoire.side} · read-only for now, changes aren't saved
+            <strong>{repertoire.name}</strong> · plays {repertoire.side} · {unsaved > 0 ? `${unsaved} unsaved` : 'no unsaved moves'}
           </span>
-          <button className={styles.btnSecondary} onClick={closeRepertoire}>Close</button>
+          <div className={styles.bannerActions}>
+            <button
+              className={`${styles.btnSecondary} ${styles.btnPrimarySmall}`}
+              onClick={saveToRepertoire}
+              disabled={unsaved === 0 && !pendingEdits?.rejected.length}
+              title="Add the moves you played here to the repertoire"
+            >
+              Save to repertoire
+            </button>
+            <button className={styles.btnSecondary} onClick={closeRepertoire}>Close</button>
+          </div>
         </div>
       )}
 

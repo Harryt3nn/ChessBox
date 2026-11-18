@@ -119,7 +119,7 @@ export function sanitiseRepertoire(r: unknown, now = Date.now()): Repertoire | n
 
 // ── nodes ─────────────────────────────────────────────────────────────────────
 
-function sanitiseNode(n: Record<string, unknown>): Node | null {
+export function sanitiseNode(n: Record<string, unknown>): Node | null {
   if (!isSafeId(n.id)) return null;
 
   // chessgraph exports have used childIds / children for the same list

@@ -27,6 +27,9 @@ contextBridge.exposeInMainWorld("storage", {
   loadNodes: (): Promise<Record<string, Node>> =>
     ipcRenderer.invoke("storage:loadNodes"),
 
+  saveNodes: (patch: Record<string, Node>): Promise<void> =>
+    ipcRenderer.invoke("storage:saveNodes", patch),
+
   openFileDialog: (options: Electron.OpenDialogOptions): Promise<string[]> =>
     ipcRenderer.invoke("storage:openFileDialog", options),
 

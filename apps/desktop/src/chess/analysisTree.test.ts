@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { BoardImportError, createTree, exportPgn, importAny, importPgn, mainLineFrom, movesAlongPath, playMove, plyInfo } from './analysisTree';
+import { BoardImportError, createTree, existingPath, exportPgn, importAny, importPgn, mainLineFrom, movesAlongPath, playMove, plyInfo } from './analysisTree';
 import type { GameTree } from '../types/gameTree';
 
 const moves = (tree: GameTree) => mainLineFrom(tree.root, []).length;
@@ -30,6 +30,16 @@ describe('movesAlongPath', () => {
 
   it('is empty at the start position', () => {
     expect(movesAlongPath(createTree().root, [])).toEqual([]);
+  });
+});
+
+describe('existingPath', () => {
+  it('keeps the part of a path that still exists in the tree', () => {
+    const { tree } = importPgn('1. e4 e5 2. Nf3 *');
+    const e4 = tree.root.children[0];
+    const e5 = e4.children[0];
+    expect(existingPath(tree.root, [e4.id, e5.id])).toEqual([e4.id, e5.id]);
+    expect(existingPath(tree.root, [e4.id, 'gone', e5.id])).toEqual([e4.id]);
   });
 });
 

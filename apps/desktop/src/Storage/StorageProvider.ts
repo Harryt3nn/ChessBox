@@ -11,4 +11,5 @@ export interface StorageProvider {
   saveRepertoire(rep: Repertoire): Promise<void>;
 
   loadNodes(): Promise<Record<string, Node>>;
+  saveNodes(patch: Record<string, Node>): Promise<void>;
 }

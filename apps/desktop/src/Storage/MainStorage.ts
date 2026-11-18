@@ -6,7 +6,7 @@ import { app, safeStorage } from "electron";
 import type { Folder } from "../types/Folder";
 import type { Repertoire } from "../types/Repertoire";
 import type { Node } from "../types/Node";
-import { isSafeId } from "../importsAndExports/sanitiseImport";
+import { isSafeId, sanitiseNode } from "../importsAndExports/sanitiseImport";
 
 /* -------------------------------------------------------
    PATHS
@@ -180,6 +180,27 @@ export async function loadNodes(): Promise<Record<string, Node>> {
   } catch {
     return {};
   }
+}
+
+/**
+ * writes changed and new nodes (from the board's "save to repertoire"), keeping all others.
+ * The patch comes from the renderer, so each node is sanitised and must sit under its own id.
+ */
+export async function saveNodePatch(patch: unknown): Promise<void> {
+  if (!patch || typeof patch !== "object" || Array.isArray(patch)) throw new Error("Invalid node update");
+
+  const clean: Record<string, Node> = {};
+  for (const [key, raw] of Object.entries(patch)) {
+    const node = raw && typeof raw === "object" && !Array.isArray(raw) ? sanitiseNode(raw as Record<string, unknown>) : null;
+    if (node && node.id === key) clean[key] = node;
+  }
+
+  const nodes = await loadNodes();
+  for (const [id, node] of Object.entries(clean)) {
+    // defineProperty, so an id like "__proto__" is stored as data, never as the object's prototype
+    Object.defineProperty(nodes, id, { value: node, enumerable: true, writable: true, configurable: true });
+  }
+  await saveNodes(nodes);
 }
 
 export async function saveNodes(nodes: Record<string, Node>): Promise<void> {
