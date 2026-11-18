@@ -16,24 +16,27 @@ A bare § means this file. `tasks.md` holds the ranked work; `decisions.md` hold
 - D10: Dead code and unused deps were removed on 2026-11-18; deps the code uses are declared.
 - D11 (Planned): Novelty finder = layered derived data + a deterministic ply-by-ply walk.
 - D12: Tests run on Vitest (`npm test`); bugs are fixed test-first.
+- D14: Stockfish = WASM in a Web Worker: lite build for the live board, full multi-threaded build for deep novelty checks.
+- D15: The user picks the repertoire before every novelty-finder run; Novelty Finder and WeakPoints are Toolkit tools.
+- D16: Novelty-finder results are stored locally under `%APPDATA%/ChessBox/ChessBox-data/novelty/`.
+- D17: Exactly one prepared reply per position on the user's move (D11's single-response constraint); multi-reply alternatives are stage 2.
 - D13: A saved session is cleared only when the server answers `UNAUTHORIZED` or `NOT_FOUND` (deleted account); unreachable / erroring server → stay signed in, toast, local features keep working.
 
 **Pending / Unconfirmed** (*not decided*; each with the condition that decides it):
-- What "1.0 done" means, and the deadline. *Decided by Harry's feature md.*
-- How Stockfish gets integrated (dep installed, unused). *Decided by Harry's feature md.*
-- The deviation store: Postgres (as sketched in D11) or local. *Decide when the novelty finder moves past the pure walk (T2).*
+- Deadline: none stated in `system.md`. *Decide if a date matters.*
+- Novelty-finder result file format (T15). *Shown to Harry before it is written.*
 - JWT expiry: ARCHITECTURE.md says 3 days, the old TODO says 7. *Decide when someone checks the server code.*
 
 **Active gates** (date · what must work · what we fall back to if it doesn't):
 - {{none yet: set from Harry's feature md}}
 
 ## 1. Summary
-ChessBox is a free, all-in-one chess training desktop app, built by Harry for his own training and as a learning project. Opening repertoires are modelled as graphs, not trees, so transpositions are one node reached by several paths. A novelty finder walks your imported Lichess / Chess.com games against those graphs to show where you (or your opponents) left prep. What "done" means for 1.0 is {{set in Harry's feature md}}. First up: clean baseline, a test harness, then the novelty-finder walk.
+ChessBox is a free, all-in-one chess training desktop app, built by Harry for his own training and as a learning project. Opening repertoires are modelled as graphs, not trees, so transpositions are one node reached by several paths. A novelty finder walks your imported Lichess / Chess.com games against those graphs to show where you (or your opponents) left prep. Stage-1 MVP (`system.md`): a home hub, a Lichess-style analysis board with Stockfish, repertoires you can open and build visually, the novelty finder, one settings page, and the WeakPoints trainer. First up: the layout, then the analysis board.
 
 ## 2. Goals, non-goals, success metrics
 - **Goals:** one free place for the chess training tools Harry actually wants, built on his own game data. Learn the full stack in depth (frontend, backend, infrastructure, deployment) and have fun.
 - **Non-goals:** the next big chess app or a startup. No team-scale infrastructure (Vault, Turborepo, Sentry, CI/CD migration pipelines, Redis) unless a real need shows up.
-- **Done when:** {{a measurable 1.0 check: from Harry's feature md}}
+- **Done when (stage-1 MVP):** every ▶ Now task for M1–M7 in `tasks.md` is done: home hub, analysis board with Stockfish + eval bar + graveyard, repertoires openable in the board, novelty finder (single + bulk) with engine verdicts, a visual repertoire builder, one settings page with password / username changes and login rate limits, and the WeakPoints trainer.
 
 ## 3. Users and main flow
 The user is Harry (a single user for now; accounts exist on the server).
@@ -108,7 +111,8 @@ Full tables: `documentation/ARCHITECTURE.md`.
 | Desktop and server versions out of step | sign-in breaks | deploy the server first (D9 lesson) |
 
 ## 7. Milestones
-{{From Harry's feature md.}}
+Stage-1 MVP (from `system.md`), in build order, each gated by its tasks' "Done when" in `tasks.md`:
+M1 Layout → M2 Analysis board → M3 Repertoire ↔ board → M4 Novelty finder → M5 Repertoire builder → M6 Profile and settings → M7 WeakPoints. Then stage 2 (Parked).
 
 ## 8. Open questions
 - What 1.0 means and when (Harry's md).

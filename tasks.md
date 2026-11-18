@@ -7,13 +7,43 @@ Work **▶ Now** top to bottom. Tags: `[🟠 your call: …]` = a design decisio
 - **`main` at:** db26f39 (pushed) · **open branches:** none · **Electron:** 42.11.18
 - **Tests:** 47 passing (6 files) · **npm audit:** 47 (3 critical, 34 high), all in build / dev tooling, none in Electron · **Key numbers:** `tsc` 0 errors · lint 0 errors / 5 warnings · `electron-forge package` OK
 
-## ▶ Now (ranked)
-- [ ] **T3 · Novelty-finder walk (pure logic)** `[⏸ waits on: Harry's feature md]` · Done when: tests show a game walked against same-side repertoires returns the deepest match, the first deviation (`prep-miss` / `opponent-gap`), and follows transpositions.
-- [ ] **T4 · Single-response constraint** `[⏸ waits on: Harry's feature md]` · Done when: the editor blocks a second child on a user-to-move node, and an import flags the violating nodes for resolution.
-- [ ] **T6 · Check B8 in the app:** in EditRepertoires, click New Folder, then press Escape. Does a "New Folder" still get created (because `onBlur={createFolder}` fires)? · Done when: confirmed by hand. If yes → failing test + fix (a test needs jsdom + Testing Library: 🟠 new deps).
-- [ ] **T5 · Server: rate-limit `auth.login` + `auth.register`, then deploy to the Pi** · Done when: repeated bad logins from one IP are refused after the limit, and the Pi runs the new build (server first, desktop second).
+## ▶ Now (ranked): stage-1 MVP from `system.md` (2026-11-18)
+**M1 · Layout**
+- [ ] **T7 · Home hub replaces the sidebar** (UI: Claude's call) · Done when: no page renders the sidebar; Home shows a card per section (Analysis board, Repertoires, Toolkit, Analytics, Settings); every page has a top bar back to Home; the app builds and `npm test` is green.
+- [ ] **T8 · Toolkit page lists its tools** · Done when: Novelty Finder and WeakPoints open from the Toolkit (Novelty Finder is a toolkit tool, D15).
+
+**M2 · Analysis board**
+- [ ] **T9 · Captured-pieces graveyard** · Done when: a pure captured-pieces helper is tested for normal captures, promotions, en passant and custom-FEN starts, and is shown beside the board with the material difference.
+- [ ] **T10 · Borderline / invalid input tests** · Done when: tests cover a bad FEN (wrong ranks, missing king, side not to move in check), a PGN with an illegal move, an empty PGN, an oversized PGN, a multi-game PGN, promotion with check, castling through check; all pass (anything failing is fixed test-first).
+- [ ] **T11 · Engine service (D14)** · Done when: a Stockfish Web Worker wrapper speaks UCI (`isready`, `position`, `go depth/movetime`, `stop`), is tested with a fake worker, and runs lite on the board.
+- [ ] **T12 · Eval bar + engine lines** · Done when: the board shows an eval bar (cp / mate, from White's side), the best line(s) and an engine toggle; changing position stops the old search.
+
+**M3 · Repertoire ↔ board**
+- [ ] **T13 · Open a repertoire in the analysis board** · Done when: a pure graph → tree conversion (transpositions shown, no infinite loops) is tested, and "Open in board" works from Repertoires (read-only).
+- [ ] **T14 · Edit a repertoire from the board** · Done when: moves added on the board can be saved back as nodes, respecting the single-response rule (D17).
+
+**M4 · Novelty finder (toolkit tool)**
+- [ ] **T4 · Single-response constraint (D17)** · Done when: the editor blocks a second reply on your move, and an import flags violating nodes for you to resolve.
+- [ ] **T3 · The walk** · Done when: tests show a game walked against the chosen repertoire (D15) returns its matches, the first deviation (`prep-miss`) or novelty (`opponent-gap` / past a leaf), and follows transpositions.
+- [ ] **T15 · Single + bulk runs, results saved locally (D16)** · Done when: picking a repertoire and one game or all imported games writes results under `ChessBox-data/novelty/` (format shown to Harry first: a 🟠 schema decision).
+- [ ] **T16 · Stockfish verdict + add to repertoire + open in board** · Done when: each novelty / deviation gets a full-engine eval and can be added as a node or opened in the analysis board.
+
+**M5 · Repertoire builder**
+- [ ] **T17 · Visual graph builder (chessgraph style), CRUD, folders** `[🟠 your call: graph library, at the time]` · Done when: create / rename / delete repertoires and nodes visually, saved to disk.
+
+**M6 · Profile and settings**
+- [ ] **T18 · One settings page replaces the profile cards** (UI: Claude's call) · Done when: profile info, linked accounts, change password and change username live on one page; forms have correct `autocomplete` attributes.
+- [ ] **T19 · Server: change password / username + rate-limit login and register (was T5)** · Done when: tested on the server, deployed to the Pi first, then the desktop switched over.
+
+**M7 · WeakPoints trainer (toolkit tool)**
+- [ ] **T20 · Research pass: spaced repetition (Anki SM-2 / FSRS) + Aimchess** · Done when: `research.md` Pass 1 is graded and a recommendation is ready for Harry.
+- [ ] **T21 · WeakPoints drills** · Done when: short move sequences from saved deviations, rarely hit nodes and strong nodes are drilled on a blank board, scheduled by the chosen algorithm.
+
+**Loose ends**
+- [ ] **T6 · Check B8 in the app** (Escape in "New Folder" may still create one).
 
 ## 🅿️ Parked (ideas, not agreed work; offered when ▶ Now is empty)
+*Stage 2, from `system.md`:* repertoires on a server (maybe MongoDB, user details stay in Postgres) · email verification · MFA · Google sign-in / sign-up · AI move explanations (theory presets + interpreting Stockfish, no paid API keys) · AI "add suggestions" for repertoires · a private chess-theory knowledge base · multi-reply "acceptable alternatives" so a reasonable non-prep move isn't penalised (D17) · more toolkit tools.
 *From the 2026-11-18 bug sweep (not bugs that need fixing now):*
 - Lichess requests have no timeout (Chess.com uses 30 s); a total timeout would cut long game streams, so it needs an idle timeout.
 - An import always brings in every node, even for repertoires you didn't select, so orphan nodes pile up in `nodes.json`.
