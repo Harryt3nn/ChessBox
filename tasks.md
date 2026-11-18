@@ -39,7 +39,7 @@ Work **▶ Now** top to bottom. Tags: `[🟠 your call: …]` = a design decisio
 - [ ] **T19 · Server: change password / username + rate-limit login and register (was T5)** · Done when: tested on the server, deployed to the Pi first, then the desktop switched over.
 
 **M7 · WeakPoints trainer (toolkit tool)**
-- [ ] **T20 · Research pass: spaced repetition (Anki SM-2 / FSRS) + Aimchess** · Done when: `research.md` Pass 1 is graded and a recommendation is ready for Harry.
+- [x] **T20 · Research pass: spaced repetition (Anki SM-2 / FSRS) + Aimchess** · Done when: `research.md` Pass 1 is graded and a recommendation is ready for Harry.
 - [ ] **T21 · WeakPoints drills** · Done when: short move sequences from saved deviations, rarely hit nodes and strong nodes are drilled on a blank board, scheduled by the chosen algorithm.
 
 **Loose ends**
@@ -79,6 +79,7 @@ Work **▶ Now** top to bottom. Tags: `[🟠 your call: …]` = a design decisio
 ## ── Archived (superseded, do NOT action) ──
 
 ## ✅ Done log (newest first)
+- 2026-11-19 03:00 · T20 research Pass 1 (WeakPoints): FSRS via ts-fsrs 5.4.2 recommended; drill = short sequence ending in your prepared reply; cards from deviations, rarely hit and strong lines · `research.md` Pass 1
 - 2026-11-19 02:30 · T17 visual builder (React Flow 12.12 + @dagrejs/dagre 3.1, D20): layout, mini board add (drag or click), comments, delete branch, new / delete repertoire; found + fixed: the start position lost its graph id in the board tree (adding from the start silently failed); verified in the app on real data, then restored from backup · `main@bb66569` · 11 tests
 - 2026-11-19 01:30 · T22 account picker (D19): with lichess/theoneandonlylipika unticked, a full check covers 4,171 of Harry's own games instead of 4,396 · 3 tests
 - 2026-11-19 01:00 · T16 finding actions: open in board at the position (save from there), full-Stockfish verdict (score after the move + engine best; 4.0 s at depth 18 in the app), dismiss/restore · `main@57efe74` · 6 tests
