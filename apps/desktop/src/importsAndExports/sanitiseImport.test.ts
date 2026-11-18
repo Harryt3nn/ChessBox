@@ -1,0 +1,104 @@
+import { describe, expect, it } from 'vitest';
+import { IMPORT_LIMITS, ImportError, sanitiseFolders, sanitiseImport, sanitiseRepertoire } from './sanitiseImport';
+
+const rep = (overrides: Record<string, unknown> = {}) => ({
+  id: 'rep1', name: 'Italian', side: 'white', rootNodeId: 'root', folderId: null, ...overrides,
+});
+
+const node = (id: string, childIDs: string[] = [], extra: Record<string, unknown> = {}) => ({
+  id, parentId: null, move: 'e4', childIDs, ...extra,
+});
+
+describe('sanitiseImport', () => {
+  it('keeps a valid export and reports no warnings', () => {
+    const result = sanitiseImport({
+      folders: [{ id: 'f1', name: 'White' }],
+      repertoires: [rep({ folderId: 'f1' })],
+      nodes: { root: node('root', ['a']), a: node('a') },
+    });
+
+    expect(result.warnings).toEqual([]);
+    expect(result.repertoires).toHaveLength(1);
+    expect(result.repertoires[0].folderId).toBe('f1');
+    expect(Object.keys(result.nodes).sort()).toEqual(['a', 'root']);
+  });
+
+  it('accepts nodes as an array (chessgraph v3) as well as an id-keyed object', () => {
+    const result = sanitiseImport({ repertoires: [rep()], nodes: [node('root')] });
+    expect(result.nodes.root).toBeDefined();
+  });
+
+  it.each(['childIds', 'children'])('normalises chessgraph "%s" to childIDs', key => {
+    const result = sanitiseImport({
+      repertoires: [rep()],
+      nodes: [{ id: 'root', move: null, [key]: ['a'] }, node('a')],
+    });
+    expect(result.nodes.root.childIDs).toEqual(['a']);
+  });
+
+  it.each(['../evil', '..\\evil', 'a/b', '', 'x'.repeat(65)])('rejects the unsafe id %j', id => {
+    const result = sanitiseImport({ repertoires: [rep(), rep({ id })], nodes: [node('root')] });
+    expect(result.repertoires.map(r => r.id)).toEqual(['rep1']);
+    expect(result.warnings).toContain('Skipped 1 invalid repertoire.');
+  });
+
+  it('skips a repertoire whose root position is missing', () => {
+    expect(() => sanitiseImport({ repertoires: [rep({ rootNodeId: 'gone' })], nodes: [node('root')] }))
+      .toThrow(new ImportError('No valid repertoires were found in this file.'));
+  });
+
+  it('removes links to missing positions', () => {
+    const result = sanitiseImport({ repertoires: [rep()], nodes: [node('root', ['gone'])] });
+    expect(result.nodes.root.childIDs).toEqual([]);
+    expect(result.warnings).toContain('Removed 1 move link to missing positions.');
+  });
+
+  it('cuts cycles so the graph can be walked safely', () => {
+    const result = sanitiseImport({
+      repertoires: [rep()],
+      nodes: [node('root', ['a']), node('a', ['b']), node('b', ['root'])],
+    });
+    expect(result.nodes.b.childIDs).toEqual([]);
+    expect(result.warnings).toContain('Removed 1 looping move link.');
+  });
+
+  it('handles a very deep line without overflowing the stack', () => {
+    const depth = 50_000;
+    const nodes = Array.from({ length: depth }, (_, i) => node(`n${i}`, i < depth - 1 ? [`n${i + 1}`] : []));
+    const result = sanitiseImport({ repertoires: [rep({ rootNodeId: 'n0' })], nodes });
+    expect(Object.keys(result.nodes)).toHaveLength(depth);
+  });
+
+  it('drops a non-SAN move and unknown fields', () => {
+    const result = sanitiseImport({
+      repertoires: [rep()],
+      nodes: [node('root', [], { move: '<script>', evil: true })],
+    });
+    expect(result.nodes.root.move).toBeNull();
+    expect(result.nodes.root).not.toHaveProperty('evil');
+  });
+
+  it('refuses more positions than the limit', () => {
+    const tooMany = Array.from({ length: IMPORT_LIMITS.maxNodes + 1 }, (_, i) => ({ id: `n${i}` }));
+    expect(() => sanitiseImport({ repertoires: [rep()], nodes: tooMany })).toThrow(ImportError);
+  });
+
+  it('rejects something that is not an object', () => {
+    expect(() => sanitiseImport([])).toThrow(new ImportError('File is not a valid repertoire export.'));
+  });
+});
+
+describe('sanitiseFolders', () => {
+  it('drops duplicate and unsafe folder ids', () => {
+    const warnings: string[] = [];
+    const folders = sanitiseFolders([{ id: 'f1' }, { id: 'f1' }, { id: '../x' }], warnings);
+    expect(folders.map(f => f.id)).toEqual(['f1']);
+    expect(warnings).toEqual(['Skipped 2 invalid folders.']);
+  });
+});
+
+describe('sanitiseRepertoire', () => {
+  it('rejects a side that is not white or black', () => {
+    expect(sanitiseRepertoire(rep({ side: 'red' }))).toBeNull();
+  });
+});
