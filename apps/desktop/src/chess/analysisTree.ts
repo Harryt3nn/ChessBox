@@ -300,12 +300,27 @@ export function exportPgn(tree: GameTree): string {
 // IMPORT
 // ---------------------------------------------------------------------------
 
+/**
+ * why `fen` can't be played from, or null if it can. chess.js checks the layout; on top of that
+ * the side that just moved can't be in check, or the side to move could capture a king.
+ */
+export function fenProblem(fen: string): string | null {
+  const check = validateFen(fen);
+  // chess.js messages already start with "Invalid FEN:"
+  if (!check.ok) return check.error ?? 'Invalid FEN.';
+
+  const parts = fen.split(' ');
+  parts[1] = parts[1] === 'w' ? 'b' : 'w';
+  parts[3] = '-'; // an en passant square is only valid for the real side to move
+  if (new Chess(parts.join(' ')).inCheck()) return 'Invalid FEN: the side that just moved is in check.';
+  return null;
+}
+
 /** a position: validates the FEN and starts a fresh analysis from it */
 export function importFen(text: string): GameTree {
   const fen = text.trim().replace(/\s+/g, ' ');
-  const check = validateFen(fen);
-  // chess.js messages already start with "Invalid FEN:"
-  if (!check.ok) throw new BoardImportError(check.error ?? 'Invalid FEN.');
+  const problem = fenProblem(fen);
+  if (problem) throw new BoardImportError(problem);
   return createTree(fen);
 }
 
@@ -361,8 +376,8 @@ export function importPgn(text: string): { tree: GameTree; gameCount: number } {
   }
 
   const startFen = headers.FEN?.trim() || DEFAULT_POSITION;
-  const fenCheck = validateFen(startFen);
-  if (!fenCheck.ok) throw new BoardImportError(`The PGN's FEN tag is invalid: ${fenCheck.error}`);
+  const fenError = fenProblem(startFen);
+  if (fenError) throw new BoardImportError(`The PGN's FEN tag is invalid: ${fenError}`);
 
   const tree = createTree(startFen, headers);
   let count = 0;
@@ -417,7 +432,7 @@ export function importLegacyJson(text: string): GameTree {
   }
 
   const root = (data as { root?: { fen?: unknown } })?.root;
-  if (!root || typeof root.fen !== 'string' || !validateFen(root.fen).ok) {
+  if (!root || typeof root.fen !== 'string' || fenProblem(root.fen) !== null) {
     throw new BoardImportError('That JSON file is not a saved analysis board.');
   }
 
