@@ -9,6 +9,7 @@ import { Icon } from "../Icon";
 import folderClosedIcon from "../../assets/icons/096-folder-29.png";
 import folderOpenIcon from "../../assets/icons/196-folder-8.png";
 import removeGlyph from "../../assets/icons/031-remove.png";
+import { UNCATEGORISED_ID } from "./uncategorised";
 
 // UI component to display available 'folders' (JSON objects)
 // ensures folders can collapse
@@ -35,6 +36,7 @@ const FolderSelection: React.FC<FolderSelectionProps> = ({folder, repertoires, o
 }) => { const [editingFolder, setEditingFolder] = useState(false);
   const [folderName, setFolderName] = useState(folder.name); 
   const folderInputRef = useRef<HTMLInputElement>(null);
+  const permanent = folder.id === UNCATEGORISED_ID;
 
   // name cannot be empty
   const startFolderRename = () => {
@@ -92,7 +94,7 @@ const FolderSelection: React.FC<FolderSelectionProps> = ({folder, repertoires, o
         )}
 
         {/* RENAME BUTTON */}
-        {!editingFolder && (
+        {!editingFolder && !permanent && (
           <button
             onClick={startFolderRename}
             className={`${styles.folderBtn} ${styles.folderBtnRename}`}
@@ -103,13 +105,15 @@ const FolderSelection: React.FC<FolderSelectionProps> = ({folder, repertoires, o
         )}
 
         {/* DELETE BUTTON */}
-        <button
-          onClick={() => onDeleteFolder(folder.id)}
-          className={`${styles.folderBtn} ${styles.folderBtnDelete}`}
-          title="Delete folder"
-        >
-          <Icon src={removeGlyph} size={14} />
-        </button>
+        {!permanent && (
+          <button
+            onClick={() => onDeleteFolder(folder.id)}
+            className={`${styles.folderBtn} ${styles.folderBtnDelete}`}
+            title="Delete folder"
+          >
+            <Icon src={removeGlyph} size={14} />
+          </button>
+        )}
       </div>
 
       {/* Repertoires */}

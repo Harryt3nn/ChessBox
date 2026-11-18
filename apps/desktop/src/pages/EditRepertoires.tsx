@@ -12,6 +12,7 @@ import type { Folder } from '../types/Folder'
 import styles from './EditRepertoires.module.css';
 import Sidebar from '../components/SidebarModule';
 import FolderSelection from "../components/editRepertoireComponents/FolderSelection";
+import { UNCATEGORISED_ID, storedFolders, withUncategorised } from "../components/editRepertoireComponents/uncategorised";
 import { Icon } from "../components/Icon";
 import folderPlusIcon from "../assets/icons/213-folder-3.png";
 import folderIcon from "../assets/icons/096-folder-29.png";
@@ -88,7 +89,7 @@ useEffect(() => {
     if (creatingFolder) newFolderRef.current?.focus();
   }, [creatingFolder]);
   useEffect(() => {
-    storage.loadFolders().then(setFolders);
+    storage.loadFolders().then(f => setFolders(withUncategorised(f)));
     storage.loadRepertoires().then(setRepertoires);
   }, []);
   
@@ -97,7 +98,7 @@ useEffect(() => {
     const updated = prev.map(f =>
       f.id === id ? { ...f, collapsed: !f.collapsed, updatedAt: Date.now() } : f
     );
-    storage.saveFolders(updated);
+    storage.saveFolders(storedFolders(updated));
     return updated;
   });
 };
@@ -107,7 +108,7 @@ const renameFolder = async (id: string, name: string) => {
     const updated = prev.map(f =>
       f.id === id ? { ...f, name, updatedAt: Date.now() } : f
     );
-    storage.saveFolders(updated);
+    storage.saveFolders(storedFolders(updated));
     return updated;
   });
 };
@@ -133,8 +134,8 @@ const createFolder = async () => {
   };
   
   setFolders(prev => {
-    const updated = [...prev, newFolder];
-    storage.saveFolders(updated);
+    const updated = withUncategorised([...prev, newFolder]);
+    storage.saveFolders(storedFolders(updated));
     return updated;
   });
   setNewFolderName("");
@@ -149,30 +150,20 @@ const deleteFolder = async (folderId: string) => {
   const updatedFolders = folders.filter(f => f.id !== folderId);
   const updatedRepertoires = repertoires.map(rep =>
     rep.folderId === folderId ? { ...rep, folderId: null } : rep);
-    await storage.saveFolders(updatedFolders);
+    await storage.saveFolders(storedFolders(updatedFolders));
     for (const rep of updatedRepertoires) {await storage.saveRepertoire(rep);}
     setFolders(updatedFolders);
     setRepertoires(updatedRepertoires);
   };
-  const UNCATEGORISED_FOLDER: Folder = {
-    id: '__uncategorised__',
-    name: 'Uncategorised',
-    collapsed: false,
-    sortOrder: 9999,
-    createdAt: 0,
-    updatedAt: 0,
-  };
   const reloadData = async () => {
     const loadedFolders = await storage.loadFolders();
     const loadedRepertoires = await storage.loadRepertoires();
-    console.log("folders", loadedFolders);
-    console.log("repertoires", loadedRepertoires);
-    setFolders([...loadedFolders.filter(f => f.id !== '__uncategorised__'),UNCATEGORISED_FOLDER,]);
+    setFolders(withUncategorised(loadedFolders));
     setRepertoires(loadedRepertoires);
 };
 
 const filtered = folders.map(folder => ({...folder, filteredRepertoires: repertoires.filter(r => (
-  folder.id === '__uncategorised__' ? r.folderId === null : r.folderId === folder.id) &&(
+  folder.id === UNCATEGORISED_ID ? r.folderId === null : r.folderId === folder.id) &&(
     search.trim() === '' || r.name.toLowerCase().includes(search.toLowerCase()))),}))
     .filter(folder => search.trim() === '' ||
     folder.name.toLowerCase().includes(search.toLowerCase()) ||
