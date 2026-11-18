@@ -40,7 +40,7 @@ Work **▶ Now** top to bottom. Tags: `[🟠 your call: …]` = a design decisio
 
 **M7 · WeakPoints trainer (toolkit tool)**
 - [x] **T20 · Research pass: spaced repetition (Anki SM-2 / FSRS) + Aimchess** · Done when: `research.md` Pass 1 is graded and a recommendation is ready for Harry.
-- [ ] **T21 · WeakPoints drills** · Done when: short move sequences from saved deviations, rarely hit nodes and strong nodes are drilled on a blank board, scheduled by the chosen algorithm.
+- [ ] **T21 · WeakPoints drills (D21–D23)** · Done when: cards from deviations (minus ones within 0.3 pawns), rarely hit and strong lines are drilled as short sequences on a board without analysis, auto-graded and scheduled by FSRS, saved to `weakpoints/<id>.json`; verdict gains the prepared-move score; deleting a repertoire removes its weakpoints file.
 
 **Loose ends**
 - [x] **T6 · Check B8 in the app** (Escape in "New Folder" may still create one).

@@ -200,3 +200,30 @@ The record of design choices, the features added and dropped, and the reasons. R
 - **Revisit if:** 900+ node repertoires feel slow.
 - **Evidence:** the 888-node White Aggressive Italian renders in ~1.2 s in the dev app (observed 1,184 / 1,281 ms). Versions pinned to stable releases: `@xyflow/react` 12.12.0 (not the 2-day-old 13.0 major), `@dagrejs/dagre` 3.1.3 (the maintained, typed `dagre`).
 - **One-liner:** A React canvas for graphs plus an automatic layout.
+
+### D21 · training · WeakPoints scheduled with FSRS (ts-fsrs 5.4.2): Status: Planned · Updated: 2026-11-19 03:15
+- **Decision:** Harry picked FSRS via `ts-fsrs` 5.4.2 (MIT, no dependencies, Node ≥ 20), default parameters, desired retention 90%. A card = one prepared reply on your move, drilled as a short sequence (starting 2–3 moves earlier, opponent moves auto-played), auto-graded: wrong move → Again, right first time → Good.
+- **Why:** FSRS beat SM-2 on 99.6% of ~10k benchmarked Anki collections and is Anki's built-in alternative (research Pass 1).
+- **Alternatives rejected:** SM-2 by hand (less accurate, can't be tuned); `ts-fsrs` 6.0 (3 weeks old, Node ≥ 24, adds a dependency).
+- **Trade-off / risk:** a new dependency; no source measures FSRS on chess-move cards.
+- **Revisit if:** enough review history builds up to fit parameters (separate optimiser package).
+- **Evidence:** research.md Pass 1.
+- **One-liner:** The drills come back just before you'd forget them.
+
+### D22 · storage · WeakPoints schedules in weakpoints/<repertoireId>.json: Status: Planned · Updated: 2026-11-19 03:15
+- **Decision:** Harry: one local file per repertoire in `ChessBox-data/weakpoints/`, cards keyed by repertoire node id (FSRS state + review log), separate from `novelty/`.
+- **Why:** re-running the novelty finder (which rebuilds its derived data) never touches drill history.
+- **Alternatives rejected:** a `cards` section inside the novelty file.
+- **Trade-off / risk:** two files per repertoire; a deleted repertoire must remove both.
+- **Revisit if:** data moves to a server.
+- **Evidence:** n/a.
+- **One-liner:** Your practice history lives on its own.
+
+### D23 · training · A deviation within 0.3 pawns of the prepared move isn't drilled: Status: Planned · Updated: 2026-11-19 03:15
+- **Decision:** Harry: if full Stockfish rates the deviation within 0.3 pawns (TUNE) of the prepared move, it isn't drilled as a mistake; deviations without a verdict are drilled.
+- **Why:** system.md: "a deviation doesn't necessarily mean it's a bad move… should be taken into account by stockfish".
+- **Alternatives rejected:** drill every deviation; decide each one by hand.
+- **Trade-off / risk:** needs the score after the prepared move too, so the verdict gains a third search (~2 s more).
+- **Revisit if:** the threshold skips moves Harry wants drilled, or vice versa.
+- **Evidence:** TBD (how many of the 154 Italian deviations fall inside 0.3).
+- **One-liner:** Only real mistakes become drills.

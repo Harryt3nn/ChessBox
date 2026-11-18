@@ -23,6 +23,9 @@ A bare § means this file. `tasks.md` holds the ranked work; `decisions.md` hold
 - D18: Novelty results = one JSON per repertoire in `novelty/` (games → derived findings + node hits).
 - D19: The novelty finder only uses the imported accounts you tick (remembered per repertoire).
 - D20: Repertoire builder = React Flow + dagre.
+- D21: WeakPoints = FSRS (ts-fsrs 5.4.2), card = your prepared reply drilled as a short sequence.
+- D22: WeakPoints schedules in `weakpoints/<repertoireId>.json`.
+- D23: Deviations within 0.3 pawns (TUNE) of the prepared move aren't drilled.
 - D13: A saved session is cleared only when the server answers `UNAUTHORIZED` or `NOT_FOUND` (deleted account); unreachable / erroring server → stay signed in, toast, local features keep working.
 
 **Pending / Unconfirmed** (*not decided*; each with the condition that decides it):
