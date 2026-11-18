@@ -3,20 +3,20 @@
 Work **▶ Now** top to bottom. Tags: `[🟠 your call: …]` = a design decision for the builder (CLAUDE.md §1) · `[⏸ waits on: …]` = blocked.
 
 ## 📊 Latest (the only home of volatile facts)
-- **Updated:** 2026-11-18 19:00
-- **`main` at:** db26f39 (pushed) · **open branches:** none · **Electron:** 42.11.18
-- **Tests:** 47 passing (6 files) · **npm audit:** 47 (3 critical, 34 high), all in build / dev tooling, none in Electron · **Key numbers:** `tsc` 0 errors · lint 0 errors / 5 warnings · `electron-forge package` OK
+- **Updated:** 2026-11-18 21:30
+- **`main` at:** cb7e11c (pushed) · **open branches:** none · **Electron:** 42.11.18
+- **Tests:** 96 passing (10 files) · **Engine:** lite reaches depth 20 in a few seconds after 1.e4 e5 2.Nf3 (seen in the app, not timed) · **npm audit:** 47, all build / dev tooling
 
 ## ▶ Now (ranked): stage-1 MVP from `system.md` (2026-11-18)
 **M1 · Layout**
-- [ ] **T7 · Home hub replaces the sidebar** (UI: Claude's call) · Done when: no page renders the sidebar; Home shows a card per section (Analysis board, Repertoires, Toolkit, Analytics, Settings); every page has a top bar back to Home; the app builds and `npm test` is green.
-- [ ] **T8 · Toolkit page lists its tools** · Done when: Novelty Finder and WeakPoints open from the Toolkit (Novelty Finder is a toolkit tool, D15).
+- [x] **T7 · Home hub replaces the sidebar** (UI: Claude's call) · Done when: no page renders the sidebar; Home shows a card per section (Analysis board, Repertoires, Toolkit, Analytics, Settings); every page has a top bar back to Home; the app builds and `npm test` is green.
+- [x] **T8 · Toolkit page lists its tools** · Done when: Novelty Finder and WeakPoints open from the Toolkit (Novelty Finder is a toolkit tool, D15).
 
 **M2 · Analysis board**
-- [ ] **T9 · Captured-pieces graveyard** · Done when: a pure captured-pieces helper is tested for normal captures, promotions, en passant and custom-FEN starts, and is shown beside the board with the material difference.
-- [ ] **T10 · Borderline / invalid input tests** · Done when: tests cover a bad FEN (wrong ranks, missing king, side not to move in check), a PGN with an illegal move, an empty PGN, an oversized PGN, a multi-game PGN, promotion with check, castling through check; all pass (anything failing is fixed test-first).
-- [ ] **T11 · Engine service (D14)** · Done when: a Stockfish Web Worker wrapper speaks UCI (`isready`, `position`, `go depth/movetime`, `stop`), is tested with a fake worker, and runs lite on the board.
-- [ ] **T12 · Eval bar + engine lines** · Done when: the board shows an eval bar (cp / mate, from White's side), the best line(s) and an engine toggle; changing position stops the old search.
+- [x] **T9 · Captured-pieces graveyard** · Done when: a pure captured-pieces helper is tested for normal captures, promotions, en passant and custom-FEN starts, and is shown beside the board with the material difference.
+- [x] **T10 · Borderline / invalid input tests** · Done when: tests cover a bad FEN (wrong ranks, missing king, side not to move in check), a PGN with an illegal move, an empty PGN, an oversized PGN, a multi-game PGN, promotion with check, castling through check; all pass (anything failing is fixed test-first).
+- [x] **T11 · Engine service (D14)** · Done when: a Stockfish Web Worker wrapper speaks UCI (`isready`, `position`, `go depth/movetime`, `stop`), is tested with a fake worker, and runs lite on the board.
+- [x] **T12 · Eval bar + engine lines** · Done when: the board shows an eval bar (cp / mate, from White's side), the best line(s) and an engine toggle; changing position stops the old search.
 
 **M3 · Repertoire ↔ board**
 - [ ] **T13 · Open a repertoire in the analysis board** · Done when: a pure graph → tree conversion (transpositions shown, no infinite loops) is tested, and "Open in board" works from Repertoires (read-only).
@@ -32,7 +32,7 @@ Work **▶ Now** top to bottom. Tags: `[🟠 your call: …]` = a design decisio
 - [ ] **T17 · Visual graph builder (chessgraph style), CRUD, folders** `[🟠 your call: graph library, at the time]` · Done when: create / rename / delete repertoires and nodes visually, saved to disk.
 
 **M6 · Profile and settings**
-- [ ] **T18 · One settings page replaces the profile cards** (UI: Claude's call) · Done when: profile info, linked accounts, change password and change username live on one page; forms have correct `autocomplete` attributes.
+- [ ] **T18 · One settings page replaces the profile cards** (UI: Claude's call) · Note: today's Settings hangs on "Loading profile…" when the Pi is unreachable. · Done when: profile info, linked accounts, change password and change username live on one page; forms have correct `autocomplete` attributes.
 - [ ] **T19 · Server: change password / username + rate-limit login and register (was T5)** · Done when: tested on the server, deployed to the Pi first, then the desktop switched over.
 
 **M7 · WeakPoints trainer (toolkit tool)**
@@ -40,11 +40,12 @@ Work **▶ Now** top to bottom. Tags: `[🟠 your call: …]` = a design decisio
 - [ ] **T21 · WeakPoints drills** · Done when: short move sequences from saved deviations, rarely hit nodes and strong nodes are drilled on a blank board, scheduled by the chosen algorithm.
 
 **Loose ends**
-- [ ] **T6 · Check B8 in the app** (Escape in "New Folder" may still create one).
+- [x] **T6 · Check B8 in the app** (Escape in "New Folder" may still create one).
 
 ## 🅿️ Parked (ideas, not agreed work; offered when ▶ Now is empty)
 *Stage 2, from `system.md`:* repertoires on a server (maybe MongoDB, user details stay in Postgres) · email verification · MFA · Google sign-in / sign-up · AI move explanations (theory presets + interpreting Stockfish, no paid API keys) · AI "add suggestions" for repertoires · a private chess-theory knowledge base · multi-reply "acceptable alternatives" so a reasonable non-prep move isn't penalised (D17) · more toolkit tools.
 *From the 2026-11-18 bug sweep (not bugs that need fixing now):*
+- The `locked` class on the app layout never applied (it lives in a CSS module, so its name is hashed); the login overlay covers the page anyway.
 - Lichess requests have no timeout (Chess.com uses 30 s); a total timeout would cut long game streams, so it needs an idle timeout.
 - An import always brings in every node, even for repertoires you didn't select, so orphan nodes pile up in `nodes.json`.
 - The server URL is hard-coded in `trpc.ts` (tailnet IP).
@@ -59,7 +60,7 @@ Work **▶ Now** top to bottom. Tags: `[🟠 your call: …]` = a design decisio
 - Training tools page.
 - Presaved / shared repertoires, maybe a community platform (needs password reset + email verification first).
 - Email verification, password reset, change password, sign out everywhere (D9: rebuild with the server deployed first).
-- Tighten the CSP before packaging: drop `unsafe-eval` and `ws://localhost:3000` (`index.html`, `forge.config.ts`).
+- Tighten the CSP before packaging: drop `unsafe-eval` and `ws://localhost:3000` (`index.html`, `forge.config.ts`); keep `'wasm-unsafe-eval'` so Stockfish still loads. Ship Stockfish's full GPL text (`node_modules/stockfish/Copying.txt`) with releases.
 - Case-insensitive usernames (`Harry` and `harry` can both exist).
 - Graceful "server unreachable" UI.
 - Style `ImportModal.tsx` (it uses unstyled global class names).
@@ -75,6 +76,11 @@ Work **▶ Now** top to bottom. Tags: `[🟠 your call: …]` = a design decisio
 ## ── Archived (superseded, do NOT action) ──
 
 ## ✅ Done log (newest first)
+- 2026-11-18 21:30 · T11 + T12 Stockfish 18 lite in a Web Worker (UCI wrapper, tested with a fake worker), eval bar, 2 engine lines, toggle; engine files verified inside the packaged app · `main@cb7e11c` · 19 tests
+- 2026-11-18 20:55 · T10 board edge-case tests; found + fixed: positions where the side not to move is in check were accepted · `main@ca0e9ae` · 21 tests
+- 2026-11-18 20:40 · T9 captured-pieces graveyard + material lead, flips with the board · `main@20c5f61` · 10 tests
+- 2026-11-18 20:20 · T7 + T8 home hub (top bar replaces the sidebar), Toolkit lists Novelty Finder + WeakPoints; screenshots checked in the running app · `main@99526de`
+- 2026-11-18 20:20 · T6 closed: in the running app, Escape on "New Folder" saves nothing (B8 was not a bug). B4 toast and B5/B6 Uncategorised fix also confirmed in the app
 - 2026-11-18 19:00 · Electron 42.11.2 → 42.11.18 (clears its high-severity advisory); tests, tsc, package build OK · `main@db26f39`
 - 2026-11-18 18:40 · Deleted account (`NOT_FOUND`) also clears the saved session (D13) · `main@9506805` · 1 test
 - 2026-11-18 18:10 · B4 Pi offline at startup no longer signs you out (D13) · `main@5dca4dd` · 5 tests

@@ -137,13 +137,13 @@ The record of design choices, the features added and dropped, and the reasons. R
 - **Evidence:** `src/trpc.test.ts` covers accepted / missing / rejected / unreachable / 500.
 - **One-liner:** An unreachable server no longer logs you out.
 
-### D14 · engine · Stockfish as WASM in a Web Worker, lite + full: Status: Planned · Updated: 2026-11-18 19:20
+### D14 · engine · Stockfish as WASM in a Web Worker, lite + full: Status: Built (lite) · Updated: 2026-11-18 21:30
 - **Decision:** Harry picked: the `stockfish` npm package (v18, GPL-3, already installed). The lite build (≈7 MB) powers the live eval bar; the full multi-threaded build (≈113 MB) is used for deep novelty checks. One UCI wrapper, so the engine can be swapped later.
 - **Why:** no new dependency, runs offline, never blocks the board; the full build gives "high power" where it matters.
 - **Alternatives rejected:** a native Stockfish binary in main (strongest, but a new ~80 MB per-OS artifact to ship and update); lite only (too weak for judging novelties).
 - **Trade-off / risk:** roughly half native speed (to measure); the full build needs cross-origin isolation (COOP/COEP) for threads. GPL: Stockfish stays a separate file with its licence, never copied into ChessBox code.
 - **Revisit if:** deep checks are too slow → native binary behind the same interface.
-- **Evidence:** TBD (time to depth 20, lite vs full, measure in T11/T16).
+- **Evidence:** lite: depth 20 after 1.e4 e5 2.Nf3 within ~9 s in the dev app (observed, not timed). Full: TBD (T16). Loaded via webpack `?url` assets: the worker gets `script.js#<wasm url>`.
 - **One-liner:** A small engine for instant feedback, a big one for verdicts.
 
 ### D15 · novelty finder · The user picks the repertoire; it is a Toolkit tool: Status: Planned · Updated: 2026-11-18 19:20
@@ -156,7 +156,7 @@ The record of design choices, the features added and dropped, and the reasons. R
 - **One-liner:** You choose the repertoire; the finder checks your games against it.
 
 ### D16 · storage · Novelty results stored locally: Status: Planned · Updated: 2026-11-18 19:20
-- **Decision:** Harry: local filesystem, next to the existing data at `%APPDATA%/ChessBox/ChessBox-data/` (on his machine `C:\\Users\\harry\\AppData\\Roaming\\ChessBox\\ChessBox-data\\`), in a new `novelty/` folder. Exact format shown to Harry before it is written (T15).
+- **Decision:** Harry: local filesystem, next to the existing data at `%APPDATA%/ChessBox/ChessBox-data/` (on his machine `C:\Users\harry\AppData\Roaming\ChessBox\ChessBox-data\`), in a new `novelty/` folder. Exact format shown to Harry before it is written (T15).
 - **Why:** repertoires and games are already local; works offline; no server work for the MVP.
 - **Alternatives rejected:** Postgres on the Pi now (D11's sketch).
 - **Trade-off / risk:** not synced between devices.
