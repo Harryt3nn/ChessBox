@@ -28,8 +28,10 @@ Work **▶ Now** top to bottom. Tags: `[🟠 your call: …]` = a design decisio
 - [x] **T15 · Single + bulk runs, results saved locally (D16)** · Done when: picking a repertoire and one game or all imported games writes results under `ChessBox-data/novelty/` (format shown to Harry first: a 🟠 schema decision).
 - [x] **T16 · Stockfish verdict + add to repertoire + open in board** · Done when: each novelty / deviation gets a full-engine eval and can be added as a node or opened in the analysis board.
 
+- [ ] **T22 · Account picker (D19)** · Done when: the run only reads games from ticked `<site>/<username>` folders, tested; the choice is saved per repertoire.
+
 **M5 · Repertoire builder**
-- [ ] **T17 · Visual graph builder (chessgraph style), CRUD, folders** `[🟠 your call: graph library, at the time]` · Done when: create / rename / delete repertoires and nodes visually, saved to disk.
+- [ ] **T17 · Visual graph builder (chessgraph style), CRUD, folders** (React Flow + dagre, D20) · Done when: create / rename / delete repertoires and nodes visually, saved to disk.
 
 **M6 · Profile and settings**
 - [ ] **T18 · One settings page replaces the profile cards** (UI: Claude's call) · Note: today's Settings hangs on "Loading profile…" when the Pi is unreachable. · Done when: profile info, linked accounts, change password and change username live on one page; forms have correct `autocomplete` attributes.
