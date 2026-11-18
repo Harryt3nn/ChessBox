@@ -9,6 +9,10 @@ const rejected = () => new Response(
   JSON.stringify([{ error: { message: 'UNAUTHORIZED', code: -32001, data: { code: 'UNAUTHORIZED', httpStatus: 401, path: 'auth.me' } } }]),
   { status: 401 },
 );
+const deletedAccount = () => new Response(
+  JSON.stringify([{ error: { message: 'NOT_FOUND', code: -32004, data: { code: 'NOT_FOUND', httpStatus: 404, path: 'auth.me' } } }]),
+  { status: 404 },
+);
 const serverError = () => new Response(
   JSON.stringify([{ error: { message: 'Something went wrong.', code: -32603, data: { code: 'INTERNAL_SERVER_ERROR', httpStatus: 500, path: 'auth.me' } } }]),
   { status: 500 },
@@ -36,6 +40,12 @@ describe('restoreAuthToken', () => {
 
   it('forgets the token when the server rejects it', async () => {
     vi.stubGlobal('fetch', vi.fn(async () => rejected()));
+    expect(await restoreAuthToken()).toEqual({ status: 'signedOut' });
+    expect(storage.clearAuthToken).toHaveBeenCalled();
+  });
+
+  it('forgets the token when its account no longer exists', async () => {
+    vi.stubGlobal('fetch', vi.fn(async () => deletedAccount()));
     expect(await restoreAuthToken()).toEqual({ status: 'signedOut' });
     expect(storage.clearAuthToken).toHaveBeenCalled();
   });

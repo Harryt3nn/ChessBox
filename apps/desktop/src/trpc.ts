@@ -36,8 +36,10 @@ export async function restoreAuthToken(): Promise<RestoredSession> {
   try {
     return { status: 'signedIn', user: await trpc.auth.me.query() };
   } catch (err) {
-    // only the server rejecting the token ends the session; the Pi being off says nothing about it
-    if (err instanceof TRPCClientError && err.data?.code === 'UNAUTHORIZED') {
+    // only the server rejecting the token (or its account being gone) ends the session;
+    // the Pi being off says nothing about it
+    const code = err instanceof TRPCClientError ? err.data?.code : undefined;
+    if (code === 'UNAUTHORIZED' || code === 'NOT_FOUND') {
       setAuthToken(null);
       await window.storage.clearAuthToken();
       return { status: 'signedOut' };
