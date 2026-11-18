@@ -16,7 +16,7 @@ A bare § means this file. `tasks.md` holds the ranked work; `decisions.md` hold
 - D10: Dead code and unused deps were removed on 2026-11-18; deps the code uses are declared.
 - D11 (Planned): Novelty finder = layered derived data + a deterministic ply-by-ply walk.
 - D12: Tests run on Vitest (`npm test`); bugs are fixed test-first.
-- D13: A saved session is cleared only when the server answers `UNAUTHORIZED`; unreachable / erroring server → stay signed in, toast, local features keep working.
+- D13: A saved session is cleared only when the server answers `UNAUTHORIZED` or `NOT_FOUND` (deleted account); unreachable / erroring server → stay signed in, toast, local features keep working.
 
 **Pending / Unconfirmed** (*not decided*; each with the condition that decides it):
 - What "1.0 done" means, and the deadline. *Decided by Harry's feature md.*
@@ -113,7 +113,6 @@ Full tables: `documentation/ARCHITECTURE.md`.
 ## 8. Open questions
 - What 1.0 means and when (Harry's md).
 - JWT expiry: 3 or 7 days?
-- `auth.me` answers `NOT_FOUND` for a deleted account. D13 treats that as `unverified` (token kept). Should it sign out too?
 - `docker-compose.yml` references `apps/api/Dockerfile`, but the tracked file is `apps/api/dockerfile` (Linux paths are case-sensitive).
 - Does `.gitignore` in the server repo cover `apps/api/src/generated/` and `packages/shared/dist/`?
 

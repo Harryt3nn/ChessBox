@@ -3,9 +3,9 @@
 Work **▶ Now** top to bottom. Tags: `[🟠 your call: …]` = a design decision for the builder (CLAUDE.md §1) · `[⏸ waits on: …]` = blocked.
 
 ## 📊 Latest (the only home of volatile facts)
-- **Updated:** 2026-11-18 18:10
-- **`main` at:** 5dca4dd (local, 9 commits ahead of origin, not pushed) · **open branches:** none
-- **Tests:** 46 passing (6 files) · **Key numbers:** `tsc` 0 errors · lint 0 errors / 5 warnings · `electron-forge package` OK
+- **Updated:** 2026-11-18 19:00
+- **`main` at:** db26f39 (pushed) · **open branches:** none · **Electron:** 42.11.18
+- **Tests:** 47 passing (6 files) · **npm audit:** 47 (3 critical, 34 high), all in build / dev tooling, none in Electron · **Key numbers:** `tsc` 0 errors · lint 0 errors / 5 warnings · `electron-forge package` OK
 
 ## ▶ Now (ranked)
 - [ ] **T3 · Novelty-finder walk (pure logic)** `[⏸ waits on: Harry's feature md]` · Done when: tests show a game walked against same-side repertoires returns the deepest match, the first deviation (`prep-miss` / `opponent-gap`), and follows transpositions.
@@ -45,6 +45,8 @@ Work **▶ Now** top to bottom. Tags: `[🟠 your call: …]` = a design decisio
 ## ── Archived (superseded, do NOT action) ──
 
 ## ✅ Done log (newest first)
+- 2026-11-18 19:00 · Electron 42.11.2 → 42.11.18 (clears its high-severity advisory); tests, tsc, package build OK · `main@db26f39`
+- 2026-11-18 18:40 · Deleted account (`NOT_FOUND`) also clears the saved session (D13) · `main@9506805` · 1 test
 - 2026-11-18 18:10 · B4 Pi offline at startup no longer signs you out (D13) · `main@5dca4dd` · 5 tests
 - 2026-11-18 18:00 · B3 Chess.com import skips variant games (`rules` ≠ `chess`) · `main@6c357a3` · 3 tests
 - 2026-11-18 17:50 · B5/B6 Uncategorised folder: shown on first load, can't be deleted or renamed, never saved to disk · `main@6b35228` · 4 tests (UI wiring not clicked through in the app)

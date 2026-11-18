@@ -128,11 +128,11 @@ The record of design choices, the features added and dropped, and the reasons. R
 - **Evidence:** 46 tests in 6 files; the run takes about 0.7 s for the sanitiser file alone (local).
 - **One-liner:** Every bug gets a failing test before it gets a fix.
 
-### D13 · failure mode · Startup session check survives the server being offline: Status: Built · Updated: 2026-11-18 18:10
-- **Decision:** Harry picked: `restoreAuthToken` clears the saved token only when the server answers `UNAUTHORIZED`. A network error or any other server error → `unverified`: the token is kept, the app stays unlocked, and a toast says the server can't be reached.
+### D13 · failure mode · Startup session check survives the server being offline: Status: Built · Updated: 2026-11-18 19:00
+- **Decision:** Harry picked: `restoreAuthToken` clears the saved token only when the server answers `UNAUTHORIZED`, or `NOT_FOUND` for a deleted account (added 2026-11-18 at Harry's request). A network error or any other server error → `unverified`: the token is kept, the app stays unlocked, and a toast says the server can't be reached.
 - **Why:** the Pi or Tailscale being down says nothing about whether the session is valid. Before this, you were signed out every time.
 - **Alternatives rejected:** keep "any error signs you out".
-- **Trade-off / risk:** while `unverified`, `currentUser` is null, so game imports ask you to sign in. A deleted account (`NOT_FOUND`) keeps its token (open question in plan §8).
+- **Trade-off / risk:** while `unverified`, `currentUser` is null, so game imports ask you to sign in. Any other server error (e.g. 500) keeps the token.
 - **Revisit if:** offline mode needs the cached user (e.g. imports while offline).
 - **Evidence:** `src/trpc.test.ts` covers accepted / missing / rejected / unreachable / 500.
 - **One-liner:** An unreachable server no longer logs you out.
