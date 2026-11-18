@@ -358,14 +358,11 @@ App.tsx
 | `FolderSelection.tsx` | Renders a single folder row with its repertoires |
 | `RepertoireRow.tsx` | Renders a single repertoire inside a folder (double-click to rename) |
 | `ImportModal.tsx` | Checkbox UI for selecting which repertoires to import, shows sanitiser warnings |
-| `RepList.tsx` | Simple debug/alternate list view of folders and repertoires |
 
 ---
 
 ## Known Quirks
 
-- `importANB.tsx` is an unfinished copy of `ImportModal.tsx` (no selection UI yet) and
-  isn't used anywhere.
 - `ImportModal.tsx` uses plain global class names that have no styles yet.
 - `index.html` and `forge.config.ts` CSPs still allow `unsafe-eval` and the dev server
   websocket — both need tightening before packaging.

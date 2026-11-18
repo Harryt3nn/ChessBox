@@ -93,3 +93,7 @@ out/
 
 .vscode/settings.json*.session.sql
 *.sql
+.env.*
+!.env.example
+.claude/
+.vscode/settings.json
