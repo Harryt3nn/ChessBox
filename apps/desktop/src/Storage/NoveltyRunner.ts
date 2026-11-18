@@ -27,6 +27,7 @@ interface GameFile {
   key: string; // "<site>:<gameId>"
   file: string;
   username: string; // the folder it was imported into: the account it belongs to
+  account: string; // "<site>/<username>"
 }
 
 function noveltyPath(repertoireId: string): string {
@@ -50,11 +51,24 @@ async function listGames(): Promise<GameFile[]> {
       const dir = path.join(siteDir, username);
       if (!(await fs.promises.stat(dir)).isDirectory()) continue;
       for (const name of await fs.promises.readdir(dir)) {
-        if (name.endsWith(".pgn")) out.push({ key: `${site}:${name.slice(0, -4)}`, file: path.join(dir, name), username });
+        if (name.endsWith(".pgn")) out.push({ key: `${site}:${name.slice(0, -4)}`, file: path.join(dir, name), username, account: `${site}/${username}` });
       }
     }
   }
   return out;
+}
+
+/** every imported account, as "<site>/<username>" */
+export async function listAccounts(): Promise<string[]> {
+  const accounts: string[] = [];
+  for (const site of SITES) {
+    const siteDir = path.join(GAMES_DIR, site);
+    if (!fs.existsSync(siteDir)) continue;
+    for (const username of await fs.promises.readdir(siteDir)) {
+      if ((await fs.promises.stat(path.join(siteDir, username))).isDirectory()) accounts.push(`${site}/${username}`);
+    }
+  }
+  return accounts.sort();
 }
 
 /** the tag pairs at the top of a PGN, without parsing the moves */
@@ -68,15 +82,20 @@ export async function runNovelty(
   repertoireId: string,
   mode: "latest" | "all",
   onProgress?: (done: number, total: number) => void,
+  // which imported accounts count (D19); defaults to the last pick for this repertoire, then all
+  accounts?: string[],
 ): Promise<RunSummary> {
   const target = noveltyPath(repertoireId);
   const repertoire = (await loadRepertoires()).find(r => r.id === repertoireId);
   if (!repertoire) throw new Error("That repertoire doesn't exist any more.");
   const nodes = await loadNodes();
+  const previous = await loadNovelty(repertoireId);
+  const picked = accounts ?? previous?.accounts;
 
-  // only games where the account owner played the repertoire's colour
+  // only games from picked accounts, where the account owner played the repertoire's colour
   const candidates: (GameFile & { text: string; tags: Record<string, string> })[] = [];
   for (const game of await listGames()) {
+    if (picked && !picked.includes(game.account)) continue;
     const text = await fs.promises.readFile(game.file, "utf8");
     const tags = readTags(text);
     const user = game.username.toLowerCase();
@@ -88,7 +107,6 @@ export async function runNovelty(
     ? candidates
     : candidates.sort((a, b) => gameInfo(b.tags).playedAt - gameInfo(a.tags).playedAt).slice(0, 1);
 
-  const previous = await loadNovelty(repertoireId);
   const games: Record<string, GameRecord> = mode === "all" ? {} : { ...(previous?.games ?? {}) };
   const summary: RunSummary = { walked: 0, deviations: 0, novelties: 0, inPrep: 0 };
 
@@ -126,6 +144,7 @@ export async function runNovelty(
     updatedAt: Date.now(),
     games,
     ...buildResults(games, previous?.findings ?? {}),
+    ...(picked ? { accounts: picked } : {}),
   };
   await fs.promises.mkdir(NOVELTY_DIR, { recursive: true });
   await fs.promises.writeFile(target, JSON.stringify(file), "utf8");

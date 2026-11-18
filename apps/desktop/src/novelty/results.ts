@@ -35,6 +35,8 @@ export interface NoveltyFile {
   games: Record<string, GameRecord>; // keyed "<site>:<gameId>"
   findings: Record<string, Finding>; // keyed "nodeId|move|kind"
   nodeHits: Record<string, { count: number; lastSeen: number }>;
+  // the imported accounts ("<site>/<username>") whose games count (D19); missing means all
+  accounts?: string[];
 }
 
 /** players, result and time from PGN tags; UTC tags first, as Lichess and Chess.com both write them */

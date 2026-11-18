@@ -57,8 +57,11 @@ contextBridge.exposeInMainWorld("api", {
   importChesscom: (username: string) =>
     ipcRenderer.invoke("import-chesscom", username),
 
-  runNovelty: (repertoireId: string, mode: "latest" | "all"): Promise<RunSummary> =>
-    ipcRenderer.invoke("novelty:run", repertoireId, mode),
+  runNovelty: (repertoireId: string, mode: "latest" | "all", accounts: string[]): Promise<RunSummary> =>
+    ipcRenderer.invoke("novelty:run", repertoireId, mode, accounts),
+
+  listAccounts: (): Promise<string[]> =>
+    ipcRenderer.invoke("novelty:accounts"),
 
   loadNovelty: (repertoireId: string): Promise<NoveltyFile | null> =>
     ipcRenderer.invoke("novelty:load", repertoireId),

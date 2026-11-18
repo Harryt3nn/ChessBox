@@ -11,7 +11,7 @@ const dataDir = await vi.hoisted(async () => {
 
 vi.mock('electron', () => ({ app: { getPath: () => dataDir }, safeStorage: {} }));
 
-import { loadNovelty, runNovelty, updateFinding } from './NoveltyRunner';
+import { listAccounts, loadNovelty, runNovelty, updateFinding } from './NoveltyRunner';
 import { saveNodes, saveRepertoires } from './MainStorage';
 
 const DATA = path.join(dataDir, 'ChessBox-data');
@@ -86,6 +86,18 @@ describe('runNovelty', () => {
     await updateFinding('rep', 'e5|Bc4|deviation', { status: 'deleted', eval: { score: 5 } } as never);
     expect((await loadNovelty('rep'))?.findings['e5|Bc4|deviation']).toMatchObject({ status: 'new' });
     expect((await loadNovelty('rep'))?.findings['e5|Bc4|deviation'].eval).toBeUndefined();
+  });
+
+  it('lists the imported accounts', async () => {
+    expect(await listAccounts()).toEqual(['chesscom/Harry_Tennant', 'lichess/harryt3nn']);
+  });
+
+  it('only reads games from the accounts you picked, and remembers the pick', async () => {
+    expect(await runNovelty('rep', 'all', undefined, ['lichess/harryt3nn'])).toMatchObject({ walked: 0 });
+    expect((await loadNovelty('rep'))?.accounts).toEqual(['lichess/harryt3nn']);
+    // no pick passed: the saved one is used
+    expect(await runNovelty('rep', 'all')).toMatchObject({ walked: 0 });
+    expect(await runNovelty('rep', 'all', undefined, ['chesscom/Harry_Tennant', 'lichess/harryt3nn'])).toMatchObject({ walked: 2 });
   });
 
   it('refuses an unsafe or unknown repertoire id', async () => {

@@ -30,7 +30,8 @@ declare global {
      api: {
       importLichess(username: string): Promise<ImportResult>;
       importChesscom(username: string): Promise<ImportResult>;
-      runNovelty(repertoireId: string, mode: "latest" | "all"): Promise<RunSummary>;
+      runNovelty(repertoireId: string, mode: "latest" | "all", accounts: string[]): Promise<RunSummary>;
+      listAccounts(): Promise<string[]>;
       loadNovelty(repertoireId: string): Promise<NoveltyFile | null>;
       updateFinding(repertoireId: string, key: string, update: FindingUpdate): Promise<void>;
       onNoveltyProgress(listener: (done: number, total: number) => void): () => void;

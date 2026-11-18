@@ -47,6 +47,8 @@ const NoveltyFinder = ({ currentUser, onOpenInBoard }: NoveltyFinderProps) => {
   const [results, setResults] = useState<NoveltyFile | null>(null);
   const [running, setRunning] = useState<{ done: number; total: number } | null>(null);
   const [summary, setSummary] = useState<string | null>(null);
+  const [accounts, setAccounts] = useState<string[]>([]);
+  const [picked, setPicked] = useState<string[]>([]);
 
   useEffect(() => {
     storage.loadRepertoires().then(reps => {
@@ -56,17 +58,28 @@ const NoveltyFinder = ({ currentUser, onOpenInBoard }: NoveltyFinderProps) => {
   }, [storage]);
 
   useEffect(() => {
+    window.api.listAccounts().then(setAccounts);
+  }, []);
+
+  useEffect(() => {
     setResults(null);
     setSummary(null);
-    if (repertoireId) window.api.loadNovelty(repertoireId).then(setResults);
-  }, [repertoireId]);
+    if (!repertoireId) return;
+    window.api.loadNovelty(repertoireId).then(file => {
+      setResults(file);
+      setPicked(file?.accounts ?? accounts);
+    });
+  }, [repertoireId, accounts]);
+
+  const togglePicked = (account: string) =>
+    setPicked(prev => (prev.includes(account) ? prev.filter(a => a !== account) : [...prev, account]));
 
   async function check(mode: 'latest' | 'all') {
     setRunning({ done: 0, total: 0 });
     setSummary(null);
     const stop = window.api.onNoveltyProgress((done, total) => setRunning({ done, total }));
     try {
-      const s = await window.api.runNovelty(repertoireId, mode);
+      const s = await window.api.runNovelty(repertoireId, mode, picked);
       setSummary(s.walked === 0
         ? 'No imported games where you played this repertoire\'s colour.'
         : `Checked ${s.walked} game${s.walked === 1 ? '' : 's'}: ${s.deviations} deviation${s.deviations === 1 ? '' : 's'}, ${s.novelties} novelt${s.novelties === 1 ? 'y' : 'ies'}, ${s.inPrep} stayed in prep.`);
@@ -238,9 +251,20 @@ const NoveltyFinder = ({ currentUser, onOpenInBoard }: NoveltyFinderProps) => {
             <select className={styles.select} value={repertoireId} onChange={e => setRepertoireId(e.target.value)} disabled={!!running}>
               {repertoires.map(r => <option key={r.id} value={r.id}>{r.name} ({r.side})</option>)}
             </select>
-            <button className={shared.btnPrimary} onClick={() => check('latest')} disabled={!repertoireId || !!running}>Check latest game</button>
-            <button className={shared.btnOutline} onClick={() => check('all')} disabled={!repertoireId || !!running}>Check all games</button>
+            <button className={shared.btnPrimary} onClick={() => check('latest')} disabled={!repertoireId || !picked.length || !!running}>Check latest game</button>
+            <button className={shared.btnOutline} onClick={() => check('all')} disabled={!repertoireId || !picked.length || !!running}>Check all games</button>
           </div>
+          {accounts.length > 0 && (
+            <div className={styles.accounts}>
+              <span className={styles.importHint}>Games from:</span>
+              {accounts.map(a => (
+                <label key={a} className={styles.account}>
+                  <input type="checkbox" checked={picked.includes(a)} onChange={() => togglePicked(a)} disabled={!!running} />
+                  {a}
+                </label>
+              ))}
+            </div>
+          )}
           {running && (
             <p className={styles.importHint}>
               Checking{running.total ? ` ${running.done} / ${running.total}` : '…'}

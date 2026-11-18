@@ -165,3 +165,20 @@
 .dismissed td {
   opacity: 0.45;
 }
+
+/* which imported accounts count (D19) */
+.accounts {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 14px;
+}
+
+.account {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--color-text-secondary);
+  font-size: 13px;
+  cursor: pointer;
+}
