@@ -137,13 +137,14 @@ The record of design choices, the features added and dropped, and the reasons. R
 - **Evidence:** `src/trpc.test.ts` covers accepted / missing / rejected / unreachable / 500.
 - **One-liner:** An unreachable server no longer logs you out.
 
-### D14 · engine · Stockfish as WASM in a Web Worker, lite + full: Status: Built (lite) · Updated: 2026-11-18 21:30
+### D14 · engine · Stockfish as WASM in a Web Worker, lite + full: Status: Built (lite + full single-threaded) · Updated: 2026-11-19 01:00
 - **Decision:** Harry picked: the `stockfish` npm package (v18, GPL-3, already installed). The lite build (≈7 MB) powers the live eval bar; the full multi-threaded build (≈113 MB) is used for deep novelty checks. One UCI wrapper, so the engine can be swapped later.
 - **Why:** no new dependency, runs offline, never blocks the board; the full build gives "high power" where it matters.
 - **Alternatives rejected:** a native Stockfish binary in main (strongest, but a new ~80 MB per-OS artifact to ship and update); lite only (too weak for judging novelties).
 - **Trade-off / risk:** roughly half native speed (to measure); the full build needs cross-origin isolation (COOP/COEP) for threads. GPL: Stockfish stays a separate file with its licence, never copied into ChessBox code.
 - **Revisit if:** deep checks are too slow → native binary behind the same interface.
-- **Evidence:** lite: depth 20 after 1.e4 e5 2.Nf3 within ~9 s in the dev app (observed, not timed). Full: TBD (T16). Loaded via webpack `?url` assets: the worker gets `script.js#<wasm url>`.
+- **Change (2026-11-19, needs Harry's OK):** the full build runs **single-threaded** for now. The multi-threaded build needs cross-origin isolation (COOP/COEP headers), which the packaged app's `file://` page can't get without more work. Same network strength, just slower.
+- **Evidence:** lite: depth 20 after 1.e4 e5 2.Nf3 within ~9 s in the dev app (observed, not timed). Full single-threaded: depth 18 verdict (two searches) in 4.0 s in the dev app. Full: TBD (T16). Loaded via webpack `?url` assets: the worker gets `script.js#<wasm url>`.
 - **One-liner:** A small engine for instant feedback, a big one for verdicts.
 
 ### D15 · novelty finder · The user picks the repertoire; it is a Toolkit tool: Status: Built · Updated: 2026-11-19 00:30

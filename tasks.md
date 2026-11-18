@@ -4,8 +4,8 @@ Work **▶ Now** top to bottom. Tags: `[🟠 your call: …]` = a design decisio
 
 ## 📊 Latest (the only home of volatile facts)
 - **Updated:** 2026-11-19 00:30
-- **`main` at:** fd04a4a (pushed) · **open branches:** none · **Electron:** 42.11.18
-- **Tests:** 141 passing (17 files) · **Novelty run:** "Check all games" on White Aggressive Italian = 4,396 games in 22 s in the dev app (2,627 deviations, 1,757 novelties, 12 in prep) · **Walk alone:** ~3 ms / game · **npm audit:** 47, build / dev tooling only
+- **`main` at:** 57efe74 (pushed) · **open branches:** none · **Electron:** 42.11.18
+- **Tests:** 147 passing (18 files) · **Verdict:** full Stockfish (single-threaded) depth 18 in ~4 s per finding · **Novelty run:** "Check all games" on White Aggressive Italian = 4,396 games in 22 s in the dev app (2,627 deviations, 1,757 novelties, 12 in prep) · **Walk alone:** ~3 ms / game · **npm audit:** 47, build / dev tooling only
 
 ## ▶ Now (ranked): stage-1 MVP from `system.md` (2026-11-18)
 **M1 · Layout**
@@ -26,7 +26,7 @@ Work **▶ Now** top to bottom. Tags: `[🟠 your call: …]` = a design decisio
 - [x] **T4 · Single-response constraint (D17)** · Done when: the editor blocks a second reply on your move, and an import flags violating nodes for you to resolve.
 - [x] **T3 · The walk** · Done when: tests show a game walked against the chosen repertoire (D15) returns its matches, the first deviation (`prep-miss`) or novelty (`opponent-gap` / past a leaf), and follows transpositions.
 - [x] **T15 · Single + bulk runs, results saved locally (D16)** · Done when: picking a repertoire and one game or all imported games writes results under `ChessBox-data/novelty/` (format shown to Harry first: a 🟠 schema decision).
-- [ ] **T16 · Stockfish verdict + add to repertoire + open in board** · Done when: each novelty / deviation gets a full-engine eval and can be added as a node or opened in the analysis board.
+- [x] **T16 · Stockfish verdict + add to repertoire + open in board** · Done when: each novelty / deviation gets a full-engine eval and can be added as a node or opened in the analysis board.
 
 **M5 · Repertoire builder**
 - [ ] **T17 · Visual graph builder (chessgraph style), CRUD, folders** `[🟠 your call: graph library, at the time]` · Done when: create / rename / delete repertoires and nodes visually, saved to disk.
@@ -76,6 +76,7 @@ Work **▶ Now** top to bottom. Tags: `[🟠 your call: …]` = a design decisio
 ## ── Archived (superseded, do NOT action) ──
 
 ## ✅ Done log (newest first)
+- 2026-11-19 01:00 · T16 finding actions: open in board at the position (save from there), full-Stockfish verdict (score after the move + engine best; 4.0 s at depth 18 in the app), dismiss/restore · `main@57efe74` · 6 tests
 - 2026-11-19 00:30 · T15 novelty runs: pick a repertoire, check latest / all games, results in `novelty/<id>.json` (D18), deviation + novelty tables; verified on real data in the app · `main@fd04a4a` · 8 tests
 - 2026-11-19 00:00 · T4 import gate for one reply on your move (D17): conflicts listed in a restyled import window, other branches dropped · `main@3f78ffd` · 5 tests (window not seen on screen: needs the native file picker)
 - 2026-11-18 23:45 · T3 novelty walk (deviation / opponent-move / end-of-line, transpositions followed); smoke-run on 8,340 real games · `main@2b3f9de` · 10 tests
