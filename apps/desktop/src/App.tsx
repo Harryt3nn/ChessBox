@@ -10,6 +10,7 @@ import BoardView from './pages/BoardView';
 import NoveltyFinder from './pages/NoveltyFinder';
 import Home from './pages/Home';
 import { LogIn } from './components/logIn';
+import { TopBar } from './components/TopBar';
 import { restoreAuthToken } from './trpc';
 import type { Page } from './types/Page';
 import type { inferRouterOutputs } from '@trpc/server';
@@ -42,14 +43,14 @@ const App = () => {
   }
 
   function renderPage() {
-    if (page === 'analytics') return <Analytics page={page} setPage={setPage} />;
-    if (page === 'repertoires') return <EditRepertoires page={page} setPage={setPage} />;
+    if (page === 'analytics') return <Analytics />;
+    if (page === 'repertoires') return <EditRepertoires />;
     if (page === 'tools') return <TrainingToolkit page={page} setPage={setPage} />;
-    if (page === 'settings') return <Settings page={page} setPage={setPage} onLogout={handleLogout} isAuthed={isAuthed} />;
-    if (page === 'board') return <BoardView page={page} setPage={setPage} />;
-    if (page === 'novelty') return <NoveltyFinder page={page} setPage={setPage} currentUser={currentUser} />;
+    if (page === 'settings') return <Settings page={page} onLogout={handleLogout} isAuthed={isAuthed} />;
+    if (page === 'board') return <BoardView />;
+    if (page === 'novelty') return <NoveltyFinder page={page} currentUser={currentUser} />;
 
-    return <Home setPage={setPage} />;
+    return <Home setPage={setPage} currentUser={currentUser} />;
   }
 
   return (
@@ -66,7 +67,8 @@ const App = () => {
           },
         }}
       />
-      <div className={authChecked && !isAuthed ? 'locked' : undefined}>
+      <div className={`app-layout ${authChecked && !isAuthed ? 'locked' : ''}`}>
+        <TopBar page={page} setPage={setPage} />
         {renderPage()}
       </div>
 

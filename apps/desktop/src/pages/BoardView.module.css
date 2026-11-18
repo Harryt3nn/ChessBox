@@ -4,7 +4,8 @@
   display: flex;
   gap: 32px;
   padding: 32px;
-  height: 100vh;
+  flex: 1;
+  min-height: 0;
   overflow: hidden;
   align-items: flex-start;
 }

@@ -1,57 +1,136 @@
 /* apps/desktop/src/pages/Home.tsx */
 
-import Sidebar from '../components/SidebarModule';
-import { PageHeader } from '../components/PageHeader';
+import { useEffect, useMemo, useState } from 'react';
 import shared from './PageShared.module.css';
+import styles from './Home.module.css';
 import type { Page } from '../types/Page';
+import type { Repertoire } from '../types/Repertoire';
+import type { Folder } from '../types/Folder';
+import { FileSystemStorageProvider } from '../Storage/FileSystemStorageProvider';
 
-import homeIcon from '../assets/icons/001-timer.png';
-import repertoiresIcon from '../assets/icons/015-chess.png';
 import boardIcon from '../assets/icons/021-chess board.png';
-import noveltyIcon from '../assets/icons/020-chess.png';
-import analyticsIcon from '../assets/icons/029-strategy.png';
+import repertoiresIcon from '../assets/icons/015-chess.png';
 import toolsIcon from '../assets/icons/007-king.png';
+import noveltyIcon from '../assets/icons/020-chess.png';
+import weakPointsIcon from '../assets/icons/041-checkmate.png';
+import analyticsIcon from '../assets/icons/029-strategy.png';
 import settingsIcon from '../assets/icons/003-chess.png';
+
+// the hub: every section is a tile, filled with whatever real data it already has
+
+interface HomeUser {
+  username: string;
+  lichessName: string | null;
+  chesscomName: string | null;
+}
 
 interface HomeProps {
   setPage: (page: Page) => void;
+  currentUser: HomeUser | null;
 }
 
-// shortcut cards — icons match the sidebar so each section reads the same everywhere
-const SHORTCUTS: { page: Page; icon: string; title: string; text: string }[] = [
-  { page: 'repertoires', icon: repertoiresIcon, title: 'Repertoires', text: 'Browse, organise and import your opening graphs.' },
-  { page: 'board', icon: boardIcon, title: 'Analysis Board', text: 'Play through lines, explore variations, copy FEN and PGN.' },
-  { page: 'novelty', icon: noveltyIcon, title: 'Novelty Finder', text: 'Import your games and find where they leave your prep.' },
-  { page: 'analytics', icon: analyticsIcon, title: 'Analytics', text: 'Opening success rates across Chess.com and Lichess.' },
-  { page: 'tools', icon: toolsIcon, title: 'Training Tools', text: 'Drill your repertoires and review recurring deviations.' },
-  { page: 'settings', icon: settingsIcon, title: 'Settings', text: 'Your profile and connected chess accounts.' },
-];
+const RECENT_REPERTOIRES = 4;
 
-const Home = ({ setPage }: HomeProps) => {
+const Home = ({ setPage, currentUser }: HomeProps) => {
+  const storage = useMemo(() => new FileSystemStorageProvider(), []);
+  const [repertoires, setRepertoires] = useState<Repertoire[]>([]);
+  const [folders, setFolders] = useState<Folder[]>([]);
+
+  useEffect(() => {
+    storage.loadRepertoires().then(setRepertoires);
+    storage.loadFolders().then(setFolders);
+  }, [storage]);
+
+  const recent = [...repertoires].sort((a, b) => b.updatedAt - a.updatedAt).slice(0, RECENT_REPERTOIRES);
+
   return (
-    <div className="app-layout">
-      <Sidebar setPage={setPage} />
+    <main className="main-content">
+      <div className={shared.page}>
+        <section className={styles.hero}>
+          <div>
+            <h1 className={styles.greeting}>{currentUser ? `Welcome back, ${currentUser.username}` : 'Welcome to ChessBox'}</h1>
+            <p className={styles.tagline}>Your openings, your games, one place to train.</p>
+          </div>
+          <div className={styles.heroActions}>
+            <button className={shared.btnPrimary} onClick={() => setPage('board')}>Analyse a position</button>
+            <button className={shared.btnOutline} onClick={() => setPage('novelty')}>Find novelties</button>
+          </div>
+        </section>
 
-      <main className="main-content">
-        <div className={shared.page}>
-          <PageHeader
-            icon={homeIcon}
-            title="ChessBox"
-            subtitle="Your openings, your games, one place to train."
-          />
+        <section className={styles.grid}>
+          {/* Analysis board: the biggest tile */}
+          <button className={`${styles.tile} ${styles.tileFeature}`} onClick={() => setPage('board')}>
+            <img src={boardIcon} className={styles.featureIcon} />
+            <span className={styles.tileTitle}>Analysis Board</span>
+            <span className={styles.tileText}>Play through lines, explore variations, import and export PGN or FEN.</span>
+          </button>
 
-          <section className={shared.cardGrid}>
-            {SHORTCUTS.map(s => (
-              <button key={s.page} className={shared.featureCard} onClick={() => setPage(s.page)}>
-                <img src={s.icon} className={shared.featureCardIcon} />
-                <span className={shared.featureCardTitle}>{s.title}</span>
-                <span className={shared.featureCardText}>{s.text}</span>
+          {/* Repertoires, with the most recently edited ones */}
+          <div className={`${styles.tile} ${styles.tileWide}`} onClick={() => setPage('repertoires')} role="button">
+            <div className={styles.tileHead}>
+              <img src={repertoiresIcon} className={styles.tileIcon} />
+              <span className={styles.tileTitle}>Repertoires</span>
+              <span className={styles.count}>
+                {repertoires.length} repertoire{repertoires.length === 1 ? '' : 's'} · {folders.length} folder{folders.length === 1 ? '' : 's'}
+              </span>
+            </div>
+            {recent.length > 0 ? (
+              <ul className={styles.list}>
+                {recent.map(r => (
+                  <li key={r.id} className={styles.listItem}>
+                    <span className={r.side === 'white' ? styles.sideWhite : styles.sideBlack} title={`Plays ${r.side}`} />
+                    {r.name}
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <span className={styles.tileText}>No repertoires yet. Import one from chessgraph to get started.</span>
+            )}
+          </div>
+
+          {/* Toolkit and its tools */}
+          <div className={`${styles.tile} ${styles.tileWide}`} onClick={() => setPage('tools')} role="button">
+            <div className={styles.tileHead}>
+              <img src={toolsIcon} className={styles.tileIcon} />
+              <span className={styles.tileTitle}>Toolkit</span>
+            </div>
+            <div className={styles.toolRow}>
+              <button className={styles.tool} onClick={e => { e.stopPropagation(); setPage('novelty'); }}>
+                <img src={noveltyIcon} className={styles.toolIcon} />
+                <span>Novelty Finder</span>
               </button>
-            ))}
-          </section>
-        </div>
-      </main>
-    </div>
+              <div className={`${styles.tool} ${styles.toolSoon}`}>
+                <img src={weakPointsIcon} className={styles.toolIcon} />
+                <span>WeakPoints</span>
+                <span className={shared.soonBadge}>Soon</span>
+              </div>
+            </div>
+          </div>
+
+          <button className={styles.tile} onClick={() => setPage('analytics')}>
+            <div className={styles.tileHead}>
+              <img src={analyticsIcon} className={styles.tileIcon} />
+              <span className={styles.tileTitle}>Analytics</span>
+            </div>
+            <span className={styles.tileText}>Opening success rates across Chess.com and Lichess.</span>
+          </button>
+
+          {/* Settings, showing which chess accounts are linked */}
+          <button className={styles.tile} onClick={() => setPage('settings')}>
+            <div className={styles.tileHead}>
+              <img src={settingsIcon} className={styles.tileIcon} />
+              <span className={styles.tileTitle}>Settings</span>
+            </div>
+            <span className={styles.account}>
+              Lichess: <strong>{currentUser?.lichessName ?? 'not linked'}</strong>
+            </span>
+            <span className={styles.account}>
+              Chess.com: <strong>{currentUser?.chesscomName ?? 'not linked'}</strong>
+            </span>
+          </button>
+        </section>
+      </div>
+    </main>
   );
 };
 

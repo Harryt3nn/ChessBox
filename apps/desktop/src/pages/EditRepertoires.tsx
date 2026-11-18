@@ -6,11 +6,9 @@ import { validateChessGraphExport } from "../importsAndExports/validateChessGrap
 import { ImportModal } from "../components/ImportModal";
 import { prepareForImport, type PreparedImportData } from "../importsAndExports/prepareForImport"
 import { ImportError } from "../importsAndExports/sanitiseImport";
-import type { Page } from '../types/Page';
 import type { Repertoire } from '../types/Repertoire'
 import type { Folder } from '../types/Folder'
 import styles from './EditRepertoires.module.css';
-import Sidebar from '../components/SidebarModule';
 import FolderSelection from "../components/editRepertoireComponents/FolderSelection";
 import { UNCATEGORISED_ID, storedFolders, withUncategorised } from "../components/editRepertoireComponents/uncategorised";
 import { Icon } from "../components/Icon";
@@ -22,16 +20,11 @@ import searchGlyph from "../assets/icons/032-search.png";
 
 
 
-interface EditRepertoiresProps {
-    page: Page;
-    setPage: (page: Page) => void;
-}
-
 function generateId(): string {
   return crypto.randomUUID();
 }
 
-const EditRepertoires = ({ setPage }: EditRepertoiresProps) => {
+const EditRepertoires = () => {
   const [folders, setFolders] = useState<Folder[]>([]);
   const [repertoires, setRepertoires] = useState<Repertoire[]>([]);
   const [search, setSearch] = useState("");
@@ -172,88 +165,85 @@ const filtered = folders.map(folder => ({...folder, filteredRepertoires: reperto
 
   // ── Render ─────────────────────────────────────────────────────────────────
 return (
-  <div className="app-layout">
-    <Sidebar setPage={setPage} />
-
-    {/* Main */}
-    <main className="main-content">
-      <div className={styles.topbar}>
-        <h1>Your Repertoires</h1>
-        <div className={styles.topbarActions}>
-          <button className={styles.btnOutline} onClick={() => setCreatingFolder(true)}>
-            <img src={folderPlusIcon} className={styles.btnImg} />
-            New Folder
-          </button>
-          <button className={styles.btnPrimary} onClick={() => {/* TODO */}}>
-            <Icon src={plusGlyph} size={14} />
-            New Graph
-          </button>
-          <button className={styles.btnOutline} onClick={handleImportClick}>
-            <Icon src={importGlyph} size={14} />
-            Import JSON
-          </button>
-        </div>
+  <>
+  <main className="main-content">
+    <div className={styles.topbar}>
+      <h1>Your Repertoires</h1>
+      <div className={styles.topbarActions}>
+        <button className={styles.btnOutline} onClick={() => setCreatingFolder(true)}>
+          <img src={folderPlusIcon} className={styles.btnImg} />
+          New Folder
+        </button>
+        <button className={styles.btnPrimary} onClick={() => {/* TODO */}}>
+          <Icon src={plusGlyph} size={14} />
+          New Graph
+        </button>
+        <button className={styles.btnOutline} onClick={handleImportClick}>
+          <Icon src={importGlyph} size={14} />
+          Import JSON
+        </button>
       </div>
+    </div>
 
 
-      {/* Search */}
-      <div className={styles.searchContainer}>
-        <div className={styles.searchWrapper}>
-          <Icon src={searchGlyph} size={14} className={styles.searchIcon} />
+    {/* Search */}
+    <div className={styles.searchContainer}>
+      <div className={styles.searchWrapper}>
+        <Icon src={searchGlyph} size={14} className={styles.searchIcon} />
+        <input
+          className={styles.searchInput}
+          value={search}
+          onChange={e => setSearch(e.target.value)}
+          placeholder="Search repertoires..."/>
+      </div>
+    </div>
+
+
+    {/* New folder inline input */}
+    {creatingFolder && (
+      <div className={styles.newFolderContainer}>
+        <div className={styles.newFolderInput}>
+          <img src={folderIcon} className={styles.btnImg} />
           <input
-            className={styles.searchInput}
-            value={search}
-            onChange={e => setSearch(e.target.value)}
-            placeholder="Search repertoires..."/>
+            ref={newFolderRef}
+            value={newFolderName}
+            onChange={e => setNewFolderName(e.target.value)}
+            placeholder="Folder name..."
+            onKeyDown={e => {
+              if (e.key === "Enter") createFolder();
+              if (e.key === "Escape") setCreatingFolder(false);}}
+            onBlur={createFolder}/>
         </div>
       </div>
-
-
-      {/* New folder inline input */}
-      {creatingFolder && (
-        <div className={styles.newFolderContainer}>
-          <div className={styles.newFolderInput}>
-            <img src={folderIcon} className={styles.btnImg} />
-            <input
-              ref={newFolderRef}
-              value={newFolderName}
-              onChange={e => setNewFolderName(e.target.value)}
-              placeholder="Folder name..."
-              onKeyDown={e => {
-                if (e.key === "Enter") createFolder();
-                if (e.key === "Escape") setCreatingFolder(false);}}
-              onBlur={createFolder}/>
-          </div>
-        </div>
-      )}
+    )}
 
 
 
-      {/* Folder list */}
-      <div className={styles.folderList}>
-        {filtered.length === 0 ? (
-          <div className={styles.emptyMessage}>No repertoires found.</div>
-        ) : (
-          filtered.map(folder => (
-            <FolderSelection
-              key={folder.id}
-              folder={folder}
-              repertoires={folder.filteredRepertoires}
-              onToggle={toggleFolder}
-              onRenameFolder={renameFolder}
-              onRenameRepertoire={renameRepertoire}
-              onSelectRepertoire={selectRepertoire}
-              onDeleteFolder={deleteFolder}/>)))}
-      </div>
-    </main>
+    {/* Folder list */}
+    <div className={styles.folderList}>
+      {filtered.length === 0 ? (
+        <div className={styles.emptyMessage}>No repertoires found.</div>
+      ) : (
+        filtered.map(folder => (
+          <FolderSelection
+            key={folder.id}
+            folder={folder}
+            repertoires={folder.filteredRepertoires}
+            onToggle={toggleFolder}
+            onRenameFolder={renameFolder}
+            onRenameRepertoire={renameRepertoire}
+            onSelectRepertoire={selectRepertoire}
+            onDeleteFolder={deleteFolder}/>)))}
+    </div>
+  </main>
 
 
 
-    {showImportModal && pendingImportData && (
-      <ImportModal
-        data={pendingImportData}
-        onClose={() => setShowImportModal(false)}
-        reloadData={reloadData}/>)}
-  </div>
+  {showImportModal && pendingImportData && (
+    <ImportModal
+      data={pendingImportData}
+      onClose={() => setShowImportModal(false)}
+      reloadData={reloadData}/>)}
+  </>
 );
 };export default EditRepertoires;

@@ -3,7 +3,6 @@
 import React, { useState, useCallback, useEffect, useRef, useMemo } from 'react';
 import { Chessboard } from 'react-chessboard';
 import { Chess, Square } from 'chess.js';
-import type { Page } from '../types/Page';
 import type { GameTree } from '../types/gameTree';
 import {
   createTree,
@@ -22,7 +21,6 @@ import {
 } from '../chess/analysisTree';
 import { MoveList } from '../components/board/MoveList';
 import styles from './BoardView.module.css';
-import Sidebar from '../components/SidebarModule';
 import leftArrow from '../assets/icons/033-left arrow.png';
 import rightArrow from '../assets/icons/034-right arrow.png';
 import farRightArrow from '../assets/icons/029-forward.png';
@@ -33,11 +31,6 @@ import flipIcon from '../assets/icons/019-refresh.png';
 import resetIcon from '../assets/icons/031-remove.png';
 import copyIcon from '../assets/icons/011-copy.png';
 import iconStyles from "../components/buttons/iconRules.module.css";
-
-interface BoardViewProps {
-    page: Page;
-    setPage: (page: Page) => void;
-}
 
 // The board, move list and PGN all read the same GameTree. Tree logic, PGN/FEN import and
 // export live in chess/analysisTree.ts; this component only handles input and layout.
@@ -64,7 +57,7 @@ function download(fileName: string, text: string) {
   URL.revokeObjectURL(url);
 }
 
-const BoardView = ({ setPage }: BoardViewProps) => {
+const BoardView = () => {
 
   // The full game tree. All state lives here.
   const [tree, setTree] = useState<GameTree>(() => createTree());
@@ -349,154 +342,149 @@ const BoardView = ({ setPage }: BoardViewProps) => {
     : null;
 
 return (
-  <div className="app-layout">
-    <Sidebar setPage={setPage} />
+  <main className={styles.boardViewMain}>
+    <div className={styles.boardContainer}>
+      <Chessboard
+        position={currentFen}
+        boardOrientation={orientation}
+        onPieceDrop={onPieceDrop}
+        onSquareClick={onSquareClick}
+        onSquareRightClick={onSquareRightClick}
+        onPromotionCheck={onPromotionCheck}
+        onPromotionPieceSelect={onPromotionPieceSelect}
+        showPromotionDialog={pendingPromotion !== null}
+        promotionToSquare={pendingPromotion?.to ?? null}
+        customSquareStyles={customSquareStyles}
+        boardWidth={560}/>
+    </div>
 
-    {/* ----------------------------- BOARD ----------------------------- */}
-    <main className={styles.boardViewMain}>
-      <div className={styles.boardContainer}>
-        <Chessboard
-          position={currentFen}
-          boardOrientation={orientation}
-          onPieceDrop={onPieceDrop}
-          onSquareClick={onSquareClick}
-          onSquareRightClick={onSquareRightClick}
-          onPromotionCheck={onPromotionCheck}
-          onPromotionPieceSelect={onPromotionPieceSelect}
-          showPromotionDialog={pendingPromotion !== null}
-          promotionToSquare={pendingPromotion?.to ?? null}
-          customSquareStyles={customSquareStyles}
-          boardWidth={560}/>
+  {/* ----------------------------- PANEL ----------------------------- */}
+    <div className={styles.boardPanel}>
+      {/* whose move / game result, and the players of an imported game */}
+      <div className={styles.statusBar}>
+        <span className={status.over ? styles.statusOver : undefined}>{status.text}</span>
+        {players && <span className={styles.players}>{players}</span>}
       </div>
 
-    {/* ----------------------------- PANEL ----------------------------- */}
-      <div className={styles.boardPanel}>
-        {/* whose move / game result, and the players of an imported game */}
-        <div className={styles.statusBar}>
-          <span className={status.over ? styles.statusOver : undefined}>{status.text}</span>
-          {players && <span className={styles.players}>{players}</span>}
-        </div>
-
-        {/* Scrollable move list — grows/shrinks, own scrollbar */}
-        <div className={styles.moveListScroll} ref={moveListRef}>
-          <MoveList tree={tree} activeId={activeNodeId} onSelect={goToPath} />
-        </div>
-
-        {/* Navigation buttons — fixed, not part of the scroll */}
-        <div className={styles.moveNav}>
-          <button className={styles.navArrow} onClick={goToStart} disabled={!canGoBack} title="Start (↑)">
-            <img src={farLeftArrow} className={iconStyles.icon} />
-          </button>
-          <button className={styles.navArrow} onClick={goBack} disabled={!canGoBack} title="Back (←)">
-            <img src={leftArrow} className={iconStyles.icon} />
-          </button>
-          <button className={styles.navArrow} onClick={goForward} disabled={!canGoForward} title="Forward (→)">
-            <img src={rightArrow} className={iconStyles.icon} />
-          </button>
-          <button className={styles.navArrow} onClick={goToEnd} disabled={!canGoForward} title="End of line (↓)">
-            <img src={farRightArrow} className={iconStyles.icon} />
-          </button>
-        </div>
-
-        {/* Import / Export / Flip / Reset — fixed, not part of the scroll */}
-        <div className={styles.boardPanelActions}>
-          <button className={styles.btnSecondary} onClick={() => fileInputRef.current?.click()} title="Open a .pgn file (or a FEN / saved board)">
-            <img src={importIcon} className={iconStyles.icon} /> Import
-          </button>
-          <input ref={fileInputRef} type="file" accept=".pgn,.txt,.fen,.json" style={{ display: 'none' }} onChange={importFile} />
-
-          <button className={styles.btnSecondary} onClick={() => download(pgnFileName(tree), pgnText)} title="Download the game as a .pgn file">
-            <img src={exportIcon} className={iconStyles.icon} /> Export
-          </button>
-
-          <button className={styles.btnSecondary} onClick={() => setOrientation(o => (o === 'white' ? 'black' : 'white'))} title="Flip board (F)">
-            <img src={flipIcon} className={iconStyles.icon} /> Flip
-          </button>
-
-          <button className={styles.btnReset} onClick={resetBoard}>
-            <img src={resetIcon} className={iconStyles.icon} /> Reset
-          </button>
-        </div>
-
-        {/* FEN / PGN toggle */}
-        <div className={styles.toggleWrapper}>
-          <button
-            className={`${styles.fenToggleBtn} ${viewMode === 'fen' ? styles.toggleActive : ''}`}
-            onClick={() => { setViewMode('fen'); setMessage(null); }}>
-            FEN
-          </button>
-          <button
-            className={`${styles.pgnToggleBtn} ${viewMode === 'pgn' ? styles.toggleActive : ''}`}
-            onClick={() => { setViewMode('pgn'); setMessage(null); }}>
-            PGN
-          </button>
-        </div>
-
-        {/* FEN / PGN box — always pinned at the bottom. Shows the live value; typing creates a draft you load */}
-        <div className={styles.dataPanel}>
-          {viewMode === 'fen' && (
-            <>
-              <div className={styles.fenDisplay}>
-                <textarea
-                  className={styles.fenDisplayInput}
-                  value={fenDraft ?? currentFen}
-                  onChange={e => { setFenDraft(e.target.value); setMessage(null); }}
-                  onKeyDown={e => {
-                    if (e.key === 'Enter') { e.preventDefault(); applyFen(); }
-                    if (e.key === 'Escape') { setFenDraft(null); setMessage(null); }
-                  }}
-                  placeholder="Paste a FEN and press Enter"
-                  spellCheck={false}/>
-              </div>
-
-              <div className={styles.panelButtons}>
-                {fenDraft !== null ? (
-                  <>
-                    <button className={`${styles.btnSecondary} ${styles.btnPrimarySmall}`} onClick={applyFen}>Load FEN</button>
-                    <button className={styles.btnSecondary} onClick={() => { setFenDraft(null); setMessage(null); }}>Cancel</button>
-                  </>
-                ) : (
-                  <button className={styles.btnSecondary} onClick={() => copy(currentFen, 'FEN')}>
-                    <img src={copyIcon} className={iconStyles.icon} /> Copy FEN
-                  </button>
-                )}
-              </div>
-            </>
-          )}
-
-          {viewMode === 'pgn' && (
-            <>
-              <div className={styles.pgnDisplay}>
-                <textarea
-                  className={styles.pgnDisplayText}
-                  value={pgnDraft ?? pgnText}
-                  onChange={e => { setPgnDraft(e.target.value); setMessage(null); }}
-                  onKeyDown={e => { if (e.key === 'Escape') { setPgnDraft(null); setMessage(null); } }}
-                  placeholder="Paste a PGN, then Load PGN"
-                  spellCheck={false}/>
-              </div>
-
-              <div className={styles.panelButtons}>
-                {pgnDraft !== null ? (
-                  <>
-                    <button className={`${styles.btnSecondary} ${styles.btnPrimarySmall}`} onClick={applyPgn}>Load PGN</button>
-                    <button className={styles.btnSecondary} onClick={() => { setPgnDraft(null); setMessage(null); }}>Cancel</button>
-                  </>
-                ) : (
-                  <button className={styles.btnSecondary} onClick={() => copy(pgnText, 'PGN')}>
-                    <img src={copyIcon} className={iconStyles.icon} /> Copy PGN
-                  </button>
-                )}
-              </div>
-            </>
-          )}
-
-          {message && (
-            <p className={message.kind === 'error' ? styles.panelError : styles.panelInfo}>{message.text}</p>
-          )}
-        </div>
+      {/* Scrollable move list — grows/shrinks, own scrollbar */}
+      <div className={styles.moveListScroll} ref={moveListRef}>
+        <MoveList tree={tree} activeId={activeNodeId} onSelect={goToPath} />
       </div>
-    </main>
-  </div>
+
+      {/* Navigation buttons — fixed, not part of the scroll */}
+      <div className={styles.moveNav}>
+        <button className={styles.navArrow} onClick={goToStart} disabled={!canGoBack} title="Start (↑)">
+          <img src={farLeftArrow} className={iconStyles.icon} />
+        </button>
+        <button className={styles.navArrow} onClick={goBack} disabled={!canGoBack} title="Back (←)">
+          <img src={leftArrow} className={iconStyles.icon} />
+        </button>
+        <button className={styles.navArrow} onClick={goForward} disabled={!canGoForward} title="Forward (→)">
+          <img src={rightArrow} className={iconStyles.icon} />
+        </button>
+        <button className={styles.navArrow} onClick={goToEnd} disabled={!canGoForward} title="End of line (↓)">
+          <img src={farRightArrow} className={iconStyles.icon} />
+        </button>
+      </div>
+
+      {/* Import / Export / Flip / Reset — fixed, not part of the scroll */}
+      <div className={styles.boardPanelActions}>
+        <button className={styles.btnSecondary} onClick={() => fileInputRef.current?.click()} title="Open a .pgn file (or a FEN / saved board)">
+          <img src={importIcon} className={iconStyles.icon} /> Import
+        </button>
+        <input ref={fileInputRef} type="file" accept=".pgn,.txt,.fen,.json" style={{ display: 'none' }} onChange={importFile} />
+
+        <button className={styles.btnSecondary} onClick={() => download(pgnFileName(tree), pgnText)} title="Download the game as a .pgn file">
+          <img src={exportIcon} className={iconStyles.icon} /> Export
+        </button>
+
+        <button className={styles.btnSecondary} onClick={() => setOrientation(o => (o === 'white' ? 'black' : 'white'))} title="Flip board (F)">
+          <img src={flipIcon} className={iconStyles.icon} /> Flip
+        </button>
+
+        <button className={styles.btnReset} onClick={resetBoard}>
+          <img src={resetIcon} className={iconStyles.icon} /> Reset
+        </button>
+      </div>
+
+      {/* FEN / PGN toggle */}
+      <div className={styles.toggleWrapper}>
+        <button
+          className={`${styles.fenToggleBtn} ${viewMode === 'fen' ? styles.toggleActive : ''}`}
+          onClick={() => { setViewMode('fen'); setMessage(null); }}>
+          FEN
+        </button>
+        <button
+          className={`${styles.pgnToggleBtn} ${viewMode === 'pgn' ? styles.toggleActive : ''}`}
+          onClick={() => { setViewMode('pgn'); setMessage(null); }}>
+          PGN
+        </button>
+      </div>
+
+      {/* FEN / PGN box — always pinned at the bottom. Shows the live value; typing creates a draft you load */}
+      <div className={styles.dataPanel}>
+        {viewMode === 'fen' && (
+          <>
+            <div className={styles.fenDisplay}>
+              <textarea
+                className={styles.fenDisplayInput}
+                value={fenDraft ?? currentFen}
+                onChange={e => { setFenDraft(e.target.value); setMessage(null); }}
+                onKeyDown={e => {
+                  if (e.key === 'Enter') { e.preventDefault(); applyFen(); }
+                  if (e.key === 'Escape') { setFenDraft(null); setMessage(null); }
+                }}
+                placeholder="Paste a FEN and press Enter"
+                spellCheck={false}/>
+            </div>
+
+            <div className={styles.panelButtons}>
+              {fenDraft !== null ? (
+                <>
+                  <button className={`${styles.btnSecondary} ${styles.btnPrimarySmall}`} onClick={applyFen}>Load FEN</button>
+                  <button className={styles.btnSecondary} onClick={() => { setFenDraft(null); setMessage(null); }}>Cancel</button>
+                </>
+              ) : (
+                <button className={styles.btnSecondary} onClick={() => copy(currentFen, 'FEN')}>
+                  <img src={copyIcon} className={iconStyles.icon} /> Copy FEN
+                </button>
+              )}
+            </div>
+          </>
+        )}
+
+        {viewMode === 'pgn' && (
+          <>
+            <div className={styles.pgnDisplay}>
+              <textarea
+                className={styles.pgnDisplayText}
+                value={pgnDraft ?? pgnText}
+                onChange={e => { setPgnDraft(e.target.value); setMessage(null); }}
+                onKeyDown={e => { if (e.key === 'Escape') { setPgnDraft(null); setMessage(null); } }}
+                placeholder="Paste a PGN, then Load PGN"
+                spellCheck={false}/>
+            </div>
+
+            <div className={styles.panelButtons}>
+              {pgnDraft !== null ? (
+                <>
+                  <button className={`${styles.btnSecondary} ${styles.btnPrimarySmall}`} onClick={applyPgn}>Load PGN</button>
+                  <button className={styles.btnSecondary} onClick={() => { setPgnDraft(null); setMessage(null); }}>Cancel</button>
+                </>
+              ) : (
+                <button className={styles.btnSecondary} onClick={() => copy(pgnText, 'PGN')}>
+                  <img src={copyIcon} className={iconStyles.icon} /> Copy PGN
+                </button>
+              )}
+            </div>
+          </>
+        )}
+
+        {message && (
+          <p className={message.kind === 'error' ? styles.panelError : styles.panelInfo}>{message.text}</p>
+        )}
+      </div>
+    </div>
+  </main>
   );}
 export default BoardView

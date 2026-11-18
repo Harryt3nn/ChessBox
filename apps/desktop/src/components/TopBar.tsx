@@ -1,0 +1,57 @@
+/*apps/desktop/src/components/TopBar.tsx*/
+
+import type { Page } from '../types/Page';
+import styles from './TopBar.module.css';
+import knightIcon from '../assets/icons/044-knight.png';
+import gearGlyph from '../assets/icons/012-gear.png';
+import { Icon } from './Icon';
+
+// slim navigation bar shown above every page; Home is the hub, so this only carries the main sections
+
+interface TopBarProps {
+  page: Page;
+  setPage: (page: Page) => void;
+}
+
+const SECTIONS: { page: Page; label: string }[] = [
+  { page: 'board', label: 'Analysis Board' },
+  { page: 'repertoires', label: 'Repertoires' },
+  { page: 'tools', label: 'Toolkit' },
+  { page: 'analytics', label: 'Analytics' },
+];
+
+// tools live inside the Toolkit, so their pages highlight it
+const SECTION_OF: Partial<Record<Page, Page>> = { novelty: 'tools' };
+
+export function TopBar({ page, setPage }: TopBarProps) {
+  const active = SECTION_OF[page] ?? page;
+
+  return (
+    <header className={styles.bar}>
+      <button className={styles.brand} onClick={() => setPage('home')} title="Home">
+        <img src={knightIcon} className={styles.brandIcon} />
+        ChessBox
+      </button>
+
+      <nav className={styles.nav}>
+        {SECTIONS.map(s => (
+          <button
+            key={s.page}
+            className={`${styles.link} ${active === s.page ? styles.linkActive : ''}`}
+            onClick={() => setPage(s.page)}
+          >
+            {s.label}
+          </button>
+        ))}
+      </nav>
+
+      <button
+        className={`${styles.iconButton} ${active === 'settings' ? styles.linkActive : ''}`}
+        onClick={() => setPage('settings')}
+        title="Settings"
+      >
+        <Icon src={gearGlyph} size={20} />
+      </button>
+    </header>
+  );
+}

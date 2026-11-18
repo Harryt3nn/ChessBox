@@ -1,0 +1,197 @@
+/*apps/desktop/src/pages/Home.module.css*/
+
+.hero {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 24px;
+  flex-wrap: wrap;
+}
+
+.greeting {
+  color: var(--color-amber);
+  font-size: 28px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+
+.tagline {
+  margin-top: 6px;
+  color: var(--color-text-tertiary);
+  font-size: 14px;
+}
+
+.hero-actions {
+  display: flex;
+  gap: 10px;
+}
+
+/* bento grid: the board tile spans two rows, list tiles span two columns */
+.grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-auto-rows: minmax(150px, auto);
+  gap: 16px;
+}
+
+.tile {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 20px;
+  background: var(--color-surface-1);
+  border: 1px solid var(--color-border-strong);
+  clip-path: polygon(12px 0, 100% 0, 100% calc(100% - 12px), calc(100% - 12px) 100%, 0 100%, 0 12px);
+  color: inherit;
+  font-family: inherit;
+  text-align: left;
+  cursor: pointer;
+  min-width: 0;
+  transition: background 0.15s, border-color 0.15s;
+}
+
+.tile:hover {
+  background: var(--color-surface-2);
+  border-color: var(--color-amber);
+}
+
+.tile-feature {
+  grid-column: span 2;
+  grid-row: span 2;
+  justify-content: flex-end;
+  padding: 28px;
+}
+
+.tile-wide {
+  grid-column: span 2;
+}
+
+.tile-head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+}
+
+.tile-icon {
+  width: 30px;
+  height: 30px;
+}
+
+.feature-icon {
+  width: 96px;
+  height: 96px;
+  margin-bottom: auto;
+}
+
+.tile-title {
+  color: var(--color-text-primary);
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+
+.tile-feature .tile-title {
+  font-size: 22px;
+}
+
+.tile-text {
+  color: var(--color-text-tertiary);
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.count {
+  margin-left: auto;
+  color: var(--color-text-faint);
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.list {
+  list-style: none;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 6px 16px;
+  width: 100%;
+}
+
+.list-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--color-text-secondary);
+  font-size: 13px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.side-white,
+.side-black {
+  width: 10px;
+  height: 10px;
+  flex-shrink: 0;
+  border: 1px solid var(--color-border-strong);
+  transform: rotate(45deg);
+}
+
+.side-white {
+  background: var(--color-piece-light);
+}
+
+.side-black {
+  background: var(--color-ink);
+}
+
+.tool-row {
+  display: flex;
+  gap: 12px;
+  width: 100%;
+}
+
+.tool {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 14px;
+  background: var(--color-surface-2);
+  border: 1px solid var(--color-border);
+  color: var(--color-text-secondary);
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.tool:hover {
+  border-color: var(--color-amber);
+  color: var(--color-amber);
+}
+
+.tool-soon {
+  cursor: default;
+  opacity: 0.7;
+}
+
+.tool-soon:hover {
+  border-color: var(--color-border);
+  color: var(--color-text-secondary);
+}
+
+.tool-icon {
+  width: 24px;
+  height: 24px;
+}
+
+.account {
+  color: var(--color-text-tertiary);
+  font-size: 12px;
+}
+
+.account strong {
+  color: var(--color-text-secondary);
+}

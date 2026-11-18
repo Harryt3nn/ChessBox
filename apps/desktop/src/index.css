@@ -63,13 +63,15 @@ body {
 
 .app-layout {
   display: flex;
+  flex-direction: column;
   height: 100vh;
   user-select: none;
 }
 
+/* each page fills what's left under the top bar and scrolls on its own */
 .main-content {
   flex: 1;
   min-width: 0;
-  height: 100vh;
+  min-height: 0;
   overflow-y: auto;
 }
