@@ -21,6 +21,7 @@ interface ChesscomGame {
   end_time: number;
   uuid: string;
   time_class: string;
+  rules: string;
 }
 
 interface ChesscomGamesResponse {
@@ -79,6 +80,8 @@ export async function importChesscom(username: string): Promise<ChesscomImportRe
         // the uuid becomes a file name, so it must be a plain id
         if (!isSafeId(game.uuid) || typeof game.pgn !== "string" || !game.pgn || game.pgn.length > MAX_PGN_BYTES) continue;
         if (!ALLOWED_TIME_CLASSES.has(game.time_class)) continue;
+        // variants (chess960, crazyhouse, ...) share time classes with normal games but can't match a repertoire
+        if (game.rules !== "chess") continue;
 
         const filePath = path.join(userDir, `${game.uuid}.pgn`);
 
