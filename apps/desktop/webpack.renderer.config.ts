@@ -6,6 +6,8 @@ import { rules } from './webpack.rules';
 import { plugins } from './webpack.plugins';
 
 const rendererRules = [
+  // `import x from 'file?url'` copies the file into the build and gives its URL (used for the Stockfish worker + wasm)
+  { resourceQuery: /url/, type: 'asset/resource' },
   ...rules,
   {
     test: /\.css$/,

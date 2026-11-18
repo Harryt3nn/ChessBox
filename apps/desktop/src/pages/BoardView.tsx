@@ -22,6 +22,10 @@ import {
 } from '../chess/analysisTree';
 import { MoveList } from '../components/board/MoveList';
 import { Graveyard } from '../components/board/Graveyard';
+import { EvalBar } from '../components/board/EvalBar';
+import { EngineLines } from '../components/board/EngineLines';
+import { useEngine } from '../engine/useEngine';
+import { evalBarPercent, shortScore, whiteScore } from '../engine/uci';
 import { capturedPieces, materialBalance } from '../chess/material';
 import styles from './BoardView.module.css';
 import leftArrow from '../assets/icons/033-left arrow.png';
@@ -95,6 +99,15 @@ const BoardView = () => {
   const status = useMemo(() => positionStatus(currentFen), [currentFen]);
   const captured = useMemo(() => capturedPieces(tree.root.fen, movesAlongPath(tree.root, tree.currentPath)), [tree]);
   const balance = useMemo(() => materialBalance(currentFen), [currentFen]);
+
+  const [engineOn, setEngineOn] = useState(true);
+  const engineLines = useEngine(currentFen, engineOn && !status.over);
+  // a finished game shows its result; otherwise the engine's best line, from White's side
+  const bestScore = engineLines[0] ? whiteScore(engineLines[0].score, currentFen) : null;
+  const evalPercent = status.over
+    ? { '1-0': 100, '0-1': 0, '1/2-1/2': 50, '*': 50 }[status.result]
+    : bestScore ? evalBarPercent(bestScore) : 50;
+  const evalLabel = status.over ? status.result.replace('1/2', '½') : bestScore ? shortScore(bestScore) : '';
 
   const clearSelection = () => {
     setSelectedSquare(null);
@@ -353,6 +366,8 @@ return (
       {orientation === 'white'
         ? <Graveyard pieces={captured.byBlack} pieceColor="w" lead={-balance} />
         : <Graveyard pieces={captured.byWhite} pieceColor="b" lead={balance} />}
+      <div className={styles.boardRow}>
+      {engineOn && <EvalBar whitePercent={evalPercent} label={evalLabel} flipped={orientation === 'black'} height={560} />}
       <Chessboard
         position={currentFen}
         boardOrientation={orientation}
@@ -365,6 +380,7 @@ return (
         promotionToSquare={pendingPromotion?.to ?? null}
         customSquareStyles={customSquareStyles}
         boardWidth={560}/>
+      </div>
       {orientation === 'white'
         ? <Graveyard pieces={captured.byWhite} pieceColor="b" lead={balance} />
         : <Graveyard pieces={captured.byBlack} pieceColor="w" lead={-balance} />}
@@ -377,6 +393,8 @@ return (
         <span className={status.over ? styles.statusOver : undefined}>{status.text}</span>
         {players && <span className={styles.players}>{players}</span>}
       </div>
+
+      <EngineLines fen={currentFen} lines={engineLines} enabled={engineOn} onToggle={() => setEngineOn(on => !on)} />
 
       {/* Scrollable move list — grows/shrinks, own scrollbar */}
       <div className={styles.moveListScroll} ref={moveListRef}>

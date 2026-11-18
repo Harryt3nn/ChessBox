@@ -1,0 +1,90 @@
+/*apps/desktop/src/components/board/EngineLines.module.css*/
+
+.panel {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 10px 12px;
+  background: var(--color-surface-1);
+  border: 1px solid var(--color-border);
+  flex-shrink: 0;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.toggle {
+  position: relative;
+  width: 34px;
+  height: 18px;
+  background: var(--color-surface-3);
+  border: 1px solid var(--color-border-strong);
+  border-radius: 9px;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.toggle-on {
+  background: var(--color-sage);
+}
+
+.knob {
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: var(--color-text-primary);
+  transition: left 0.15s;
+}
+
+.toggle-on .knob {
+  left: 18px;
+}
+
+.name {
+  color: var(--color-text-primary);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.depth {
+  margin-left: auto;
+  color: var(--color-text-faint);
+  font-size: 11px;
+  letter-spacing: 0.04em;
+}
+
+.line {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  font-size: 13px;
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+.score {
+  min-width: 52px;
+  padding: 1px 6px;
+  background: var(--color-piece-light);
+  color: var(--color-ink);
+  font-weight: 700;
+  font-size: 12px;
+  text-align: center;
+}
+
+.score-black {
+  background: var(--color-ink);
+  color: var(--color-piece-light);
+}
+
+.moves {
+  color: var(--color-text-secondary);
+  overflow: hidden;
+  text-overflow: ellipsis;
+}

@@ -11,8 +11,13 @@
 }
 
 .boardContainer {
-  width: 560px;
   flex-shrink: 0;
+}
+
+/* eval bar + board */
+.boardRow {
+  display: flex;
+  gap: 8px;
 }
 
 .boardPanel {
