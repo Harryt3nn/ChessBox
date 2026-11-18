@@ -146,7 +146,7 @@ The record of design choices, the features added and dropped, and the reasons. R
 - **Evidence:** lite: depth 20 after 1.e4 e5 2.Nf3 within ~9 s in the dev app (observed, not timed). Full: TBD (T16). Loaded via webpack `?url` assets: the worker gets `script.js#<wasm url>`.
 - **One-liner:** A small engine for instant feedback, a big one for verdicts.
 
-### D15 · novelty finder · The user picks the repertoire; it is a Toolkit tool: Status: Planned · Updated: 2026-11-18 19:20
+### D15 · novelty finder · The user picks the repertoire; it is a Toolkit tool: Status: Built · Updated: 2026-11-19 00:30
 - **Decision:** Harry: before running (one game or in bulk), the user chooses which repertoire to check against. No auto-matching. Novelty Finder lives in the Toolkit, like WeakPoints.
 - **Why:** the user knows what they were playing; no fuzzy best-fit logic.
 - **Alternatives rejected:** auto-picking the deepest-matching repertoire (from D11).
@@ -155,7 +155,7 @@ The record of design choices, the features added and dropped, and the reasons. R
 - **Evidence:** n/a.
 - **One-liner:** You choose the repertoire; the finder checks your games against it.
 
-### D16 · storage · Novelty results stored locally: Status: Planned · Updated: 2026-11-18 19:20
+### D16 · storage · Novelty results stored locally: Status: Built · Updated: 2026-11-19 00:30
 - **Decision:** Harry: local filesystem, next to the existing data at `%APPDATA%/ChessBox/ChessBox-data/` (on his machine `C:\Users\harry\AppData\Roaming\ChessBox\ChessBox-data\`), in a new `novelty/` folder. Exact format shown to Harry before it is written (T15).
 - **Why:** repertoires and games are already local; works offline; no server work for the MVP.
 - **Alternatives rejected:** Postgres on the Pi now (D11's sketch).
@@ -164,7 +164,7 @@ The record of design choices, the features added and dropped, and the reasons. R
 - **Evidence:** n/a.
 - **One-liner:** Results live next to your games.
 
-### D17 · data model · Exactly one prepared reply on your move: Status: Planned · Updated: 2026-11-18 19:20
+### D17 · data model · Exactly one prepared reply on your move: Status: Built · Updated: 2026-11-19 00:30
 - **Decision:** Harry: one prepared reply to every position where it's the user's move (D11's single-response constraint). The editor blocks a second; imports flag violations to resolve. "Acceptable alternatives" (other theory or good moves that shouldn't count as a deviation) are a stage-2 idea.
 - **Why:** a deviation is then unambiguous, and drills have one right answer.
 - **Alternatives rejected:** allowing several replies now.
@@ -173,7 +173,7 @@ The record of design choices, the features added and dropped, and the reasons. R
 - **Evidence:** n/a.
 - **One-liner:** One right answer per position, for now.
 
-### D18 · storage · Novelty results: one JSON file per repertoire: Status: Planned · Updated: 2026-11-18 23:30
+### D18 · storage · Novelty results: one JSON file per repertoire: Status: Built · Updated: 2026-11-19 00:30
 - **Decision:** Harry picked `ChessBox-data/novelty/<repertoireId>.json` holding `games` (per-game result keyed `<site>:<gameId>`, with the moves to the surprise as `line`), `findings` (keyed `nodeId|move|kind`, with count, lastSeen, status new/dismissed/added, optional engine eval) and `nodeHits` (how often each repertoire node was reached).
 - **Why:** one read + one write per run; per-game results are the source, findings and hits are recomputed from them (D11), so re-runs never double-count; status and eval carry over.
 - **Alternatives rejected:** one small file per finding in `deviations/` and `novelties/` folders (thousands of files, more writes).

@@ -3,9 +3,9 @@
 Work **▶ Now** top to bottom. Tags: `[🟠 your call: …]` = a design decision for the builder (CLAUDE.md §1) · `[⏸ waits on: …]` = blocked.
 
 ## 📊 Latest (the only home of volatile facts)
-- **Updated:** 2026-11-18 21:30
-- **`main` at:** cb7e11c (pushed) · **open branches:** none · **Electron:** 42.11.18
-- **Tests:** 96 passing (10 files) · **Engine:** lite reaches depth 20 in a few seconds after 1.e4 e5 2.Nf3 (seen in the app, not timed) · **npm audit:** 47, all build / dev tooling
+- **Updated:** 2026-11-19 00:30
+- **`main` at:** fd04a4a (pushed) · **open branches:** none · **Electron:** 42.11.18
+- **Tests:** 141 passing (17 files) · **Novelty run:** "Check all games" on White Aggressive Italian = 4,396 games in 22 s in the dev app (2,627 deviations, 1,757 novelties, 12 in prep) · **Walk alone:** ~3 ms / game · **npm audit:** 47, build / dev tooling only
 
 ## ▶ Now (ranked): stage-1 MVP from `system.md` (2026-11-18)
 **M1 · Layout**
@@ -19,13 +19,13 @@ Work **▶ Now** top to bottom. Tags: `[🟠 your call: …]` = a design decisio
 - [x] **T12 · Eval bar + engine lines** · Done when: the board shows an eval bar (cp / mate, from White's side), the best line(s) and an engine toggle; changing position stops the old search.
 
 **M3 · Repertoire ↔ board**
-- [ ] **T13 · Open a repertoire in the analysis board** · Done when: a pure graph → tree conversion (transpositions shown, no infinite loops) is tested, and "Open in board" works from Repertoires (read-only).
-- [ ] **T14 · Edit a repertoire from the board** · Done when: moves added on the board can be saved back as nodes, respecting the single-response rule (D17).
+- [x] **T13 · Open a repertoire in the analysis board** · Done when: a pure graph → tree conversion (transpositions shown, no infinite loops) is tested, and "Open in board" works from Repertoires (read-only).
+- [x] **T14 · Edit a repertoire from the board** · Done when: moves added on the board can be saved back as nodes, respecting the single-response rule (D17).
 
 **M4 · Novelty finder (toolkit tool)**
-- [ ] **T4 · Single-response constraint (D17)** · Done when: the editor blocks a second reply on your move, and an import flags violating nodes for you to resolve.
-- [ ] **T3 · The walk** · Done when: tests show a game walked against the chosen repertoire (D15) returns its matches, the first deviation (`prep-miss`) or novelty (`opponent-gap` / past a leaf), and follows transpositions.
-- [ ] **T15 · Single + bulk runs, results saved locally (D16)** · Done when: picking a repertoire and one game or all imported games writes results under `ChessBox-data/novelty/` (format shown to Harry first: a 🟠 schema decision).
+- [x] **T4 · Single-response constraint (D17)** · Done when: the editor blocks a second reply on your move, and an import flags violating nodes for you to resolve.
+- [x] **T3 · The walk** · Done when: tests show a game walked against the chosen repertoire (D15) returns its matches, the first deviation (`prep-miss`) or novelty (`opponent-gap` / past a leaf), and follows transpositions.
+- [x] **T15 · Single + bulk runs, results saved locally (D16)** · Done when: picking a repertoire and one game or all imported games writes results under `ChessBox-data/novelty/` (format shown to Harry first: a 🟠 schema decision).
 - [ ] **T16 · Stockfish verdict + add to repertoire + open in board** · Done when: each novelty / deviation gets a full-engine eval and can be added as a node or opened in the analysis board.
 
 **M5 · Repertoire builder**
@@ -76,6 +76,11 @@ Work **▶ Now** top to bottom. Tags: `[🟠 your call: …]` = a design decisio
 ## ── Archived (superseded, do NOT action) ──
 
 ## ✅ Done log (newest first)
+- 2026-11-19 00:30 · T15 novelty runs: pick a repertoire, check latest / all games, results in `novelty/<id>.json` (D18), deviation + novelty tables; verified on real data in the app · `main@fd04a4a` · 8 tests
+- 2026-11-19 00:00 · T4 import gate for one reply on your move (D17): conflicts listed in a restyled import window, other branches dropped · `main@3f78ffd` · 5 tests (window not seen on screen: needs the native file picker)
+- 2026-11-18 23:45 · T3 novelty walk (deviation / opponent-move / end-of-line, transpositions followed); smoke-run on 8,340 real games · `main@2b3f9de` · 10 tests
+- 2026-11-18 23:15 · T14 save board moves back to the open repertoire (new nodes, transposition links, one-reply rule); verified on real data then restored from backup · `main@28aa6de` · 13 tests
+- 2026-11-18 22:30 · T13 open a repertoire in the board (graph → tree, transpositions as leaf links, board flips to its side) · `main@415d324` · 9 tests
 - 2026-11-18 21:30 · T11 + T12 Stockfish 18 lite in a Web Worker (UCI wrapper, tested with a fake worker), eval bar, 2 engine lines, toggle; engine files verified inside the packaged app · `main@cb7e11c` · 19 tests
 - 2026-11-18 20:55 · T10 board edge-case tests; found + fixed: positions where the side not to move is in check were accepted · `main@ca0e9ae` · 21 tests
 - 2026-11-18 20:40 · T9 captured-pieces graveyard + material lead, flips with the board · `main@20c5f61` · 10 tests
