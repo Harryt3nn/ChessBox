@@ -3,6 +3,7 @@
 import type { StorageProvider } from "./StorageProvider";
 import type { Folder } from "../types/Folder";
 import type { Repertoire } from "../types/Repertoire";
+import type { Node } from "../types/Node";
 export class FileSystemStorageProvider implements StorageProvider {
   
   async loadFolders(): Promise<Folder[]> {
@@ -19,5 +20,9 @@ export class FileSystemStorageProvider implements StorageProvider {
 
   async saveRepertoire(rep: Repertoire): Promise<void> {
     await window.storage.saveRepertoire(rep);
+  }
+
+  async loadNodes(): Promise<Record<string, Node>> {
+    return await window.storage.loadNodes();
   }
 }

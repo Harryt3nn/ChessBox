@@ -3,6 +3,7 @@
 import { contextBridge, ipcRenderer, } from "electron";
 import type { Folder } from "./types/Folder";
 import type { Repertoire } from "./types/Repertoire";
+import type { Node } from "./types/Node";
 import { ImportRepertoiresPayload } from "./types/ImportPayload";
 
 // the only place where the renderer can communicate with main processes
@@ -22,6 +23,9 @@ contextBridge.exposeInMainWorld("storage", {
 
   saveRepertoire: (rep: Repertoire): Promise<void> =>
     ipcRenderer.invoke("storage:saveRepertoire", rep),
+
+  loadNodes: (): Promise<Record<string, Node>> =>
+    ipcRenderer.invoke("storage:loadNodes"),
 
   openFileDialog: (options: Electron.OpenDialogOptions): Promise<string[]> =>
     ipcRenderer.invoke("storage:openFileDialog", options),

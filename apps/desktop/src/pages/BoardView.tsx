@@ -4,6 +4,9 @@ import React, { useState, useCallback, useEffect, useRef, useMemo } from 'react'
 import { Chessboard } from 'react-chessboard';
 import { Chess, Square } from 'chess.js';
 import type { GameTree } from '../types/gameTree';
+import type { Repertoire } from '../types/Repertoire';
+import { repertoireToTree } from '../chess/repertoireTree';
+import { FileSystemStorageProvider } from '../Storage/FileSystemStorageProvider';
 import {
   createTree,
   getNodeAtPath,
@@ -64,7 +67,13 @@ function download(fileName: string, text: string) {
   URL.revokeObjectURL(url);
 }
 
-const BoardView = () => {
+interface BoardViewProps {
+  // a repertoire to show instead of a free analysis; changes aren't saved back yet (T14)
+  repertoire: Repertoire | null;
+  onCloseRepertoire: () => void;
+}
+
+const BoardView = ({ repertoire, onCloseRepertoire }: BoardViewProps) => {
 
   // The full game tree. All state lives here.
   const [tree, setTree] = useState<GameTree>(() => createTree());
@@ -126,6 +135,26 @@ const BoardView = () => {
 
   const confirmDiscard = () =>
     tree.root.children.length === 0 || window.confirm('Replace the current analysis? Its moves will be lost.');
+
+  // opening a repertoire replaces the board with its moves, seen from the repertoire's side
+  const storage = useMemo(() => new FileSystemStorageProvider(), []);
+  useEffect(() => {
+    if (!repertoire) return;
+    storage.loadNodes().then(nodes => {
+      try {
+        const { tree: next, skipped } = repertoireToTree(repertoire.rootNodeId, nodes, { Event: repertoire.name });
+        loadTree(next, skipped ? `${skipped} move${skipped === 1 ? '' : 's'} in this repertoire couldn't be played and ${skipped === 1 ? 'was' : 'were'} left out.` : undefined);
+        setOrientation(repertoire.side);
+      } catch (err) {
+        setMessage({ kind: 'error', text: err instanceof Error ? err.message : "That repertoire couldn't be opened." });
+      }
+    });
+  }, [repertoire, storage]);
+
+  const closeRepertoire = () => {
+    onCloseRepertoire();
+    loadTree(createTree());
+  };
 
   // -------------------------------------------------------------------------
   // NAVIGATION
@@ -389,6 +418,15 @@ return (
   {/* ----------------------------- PANEL ----------------------------- */}
     <div className={styles.boardPanel}>
       {/* whose move / game result, and the players of an imported game */}
+      {repertoire && (
+        <div className={styles.repertoireBanner}>
+          <span>
+            <strong>{repertoire.name}</strong> · plays {repertoire.side} · read-only for now, changes aren't saved
+          </span>
+          <button className={styles.btnSecondary} onClick={closeRepertoire}>Close</button>
+        </div>
+      )}
+
       <div className={styles.statusBar}>
         <span className={status.over ? styles.statusOver : undefined}>{status.text}</span>
         {players && <span className={styles.players}>{players}</span>}

@@ -12,6 +12,7 @@ import {
   saveFolders,
   loadRepertoires,
   saveRepertoires,
+  loadNodes,
   saveAuthToken,
   loadAuthToken,
   clearAuthToken
@@ -35,6 +36,8 @@ ipcMain.handle("storage:loadFolders", () => loadFolders());
 ipcMain.handle("storage:saveFolders", (_event, folders: unknown) => saveFolders(sanitiseFolders(folders)));
 
 ipcMain.handle("storage:loadRepertoires", () => loadRepertoires());
+
+ipcMain.handle("storage:loadNodes", () => loadNodes());
 
 ipcMain.handle("storage:saveRepertoire", (_event, rep: unknown) => {
   const clean = sanitiseRepertoire(rep);

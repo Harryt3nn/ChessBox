@@ -24,7 +24,7 @@ interface FolderSelectionProps {
   onToggle: (id: string) => void;
   onRenameFolder: (id: string, name: string) => void;
   onRenameRepertoire: (id: string, name: string) => void;
-  onSelectRepertoire: (id: string) => void;
+  onOpenRepertoire: (rep: Repertoire) => void;
   onDeleteFolder: (id: string) => void;
 }
 
@@ -32,7 +32,7 @@ interface FolderSelectionProps {
 const MAX_FOLDER_NAME = 32;
 
 const FolderSelection: React.FC<FolderSelectionProps> = ({folder, repertoires, onToggle, onRenameFolder, 
-  onRenameRepertoire, onSelectRepertoire, onDeleteFolder
+  onRenameRepertoire, onOpenRepertoire, onDeleteFolder
 }) => { const [editingFolder, setEditingFolder] = useState(false);
   const [folderName, setFolderName] = useState(folder.name); 
   const folderInputRef = useRef<HTMLInputElement>(null);
@@ -127,7 +127,7 @@ const FolderSelection: React.FC<FolderSelectionProps> = ({folder, repertoires, o
                 key={rep.id}
                 rep={rep}
                 onRename={onRenameRepertoire}
-                onSelect={onSelectRepertoire}
+                onOpen={onOpenRepertoire}
               />
             ))
           )}

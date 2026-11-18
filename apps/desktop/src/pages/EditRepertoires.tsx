@@ -24,7 +24,11 @@ function generateId(): string {
   return crypto.randomUUID();
 }
 
-const EditRepertoires = () => {
+interface EditRepertoiresProps {
+  onOpenRepertoire: (rep: Repertoire) => void;
+}
+
+const EditRepertoires = ({ onOpenRepertoire }: EditRepertoiresProps) => {
   const [folders, setFolders] = useState<Folder[]>([]);
   const [repertoires, setRepertoires] = useState<Repertoire[]>([]);
   const [search, setSearch] = useState("");
@@ -135,10 +139,6 @@ const createFolder = async () => {
   setCreatingFolder(false);
 };
 
-const selectRepertoire = (repId: string) => { // later: open viewer/editor
-  console.log("Selected repertoire:", repId); 
-};
-
 const deleteFolder = async (folderId: string) => {
   const updatedFolders = folders.filter(f => f.id !== folderId);
   const updatedRepertoires = repertoires.map(rep =>
@@ -232,7 +232,7 @@ return (
             onToggle={toggleFolder}
             onRenameFolder={renameFolder}
             onRenameRepertoire={renameRepertoire}
-            onSelectRepertoire={selectRepertoire}
+            onOpenRepertoire={onOpenRepertoire}
             onDeleteFolder={deleteFolder}/>)))}
     </div>
   </main>

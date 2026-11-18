@@ -3,6 +3,7 @@
 
 import type { Folder } from "./Folder";
 import type { Repertoire } from "./Repertoire";
+import type { Node } from "./Node";
 import type { ImportResult } from "./ImportResults";
 import type { ImportRepertoiresPayload } from "./ImportPayload";
 
@@ -15,6 +16,7 @@ declare global {
       saveFolders(folders: Folder[]): Promise<void>;
       loadRepertoires(): Promise<Repertoire[]>;
       saveRepertoire(rep: Repertoire): Promise<void>;
+      loadNodes(): Promise<Record<string, Node>>;
       openFileDialog(options: Electron.OpenDialogOptions): Promise<string[]>;
       readFile(filePath: string): Promise<string>;
       importRepertoires(payload: ImportRepertoiresPayload): Promise<{ success: boolean }>;

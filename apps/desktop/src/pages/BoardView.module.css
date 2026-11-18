@@ -288,7 +288,7 @@
   line-height: 1.8;
   flex: 1;
   overflow-y: auto;
-  min-height: 0;
+  min-height: 140px;
 }
 
 .moveListScroll::-webkit-scrollbar {
@@ -309,11 +309,12 @@
 
 /* Always-visible FEN/PGN box, pinned at the bottom of the panel */
 .dataPanel {
-  flex-shrink: 0;
+  /* gives way first when the panel is crowded (repertoire banner + engine), the move list matters more */
+  flex: 0 1 220px;
+  min-height: 110px;
   display: flex;
   flex-direction: column;
   gap: 8px;
-  height: 220px;
 }
 
 .fenDisplay,
@@ -333,5 +334,30 @@
 .boardPanelActions {
   display: flex;
   gap: 8px;
+  flex-shrink: 0;
+}
+/* shown while a repertoire is open in the board */
+.repertoireBanner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 8px 12px;
+  background: rgba(var(--color-amber-rgb), 0.12);
+  border: 1px solid rgba(var(--color-amber-rgb), 0.5);
+  color: var(--color-text-secondary);
+  font-size: 13px;
+  flex-shrink: 0;
+}
+
+.repertoireBanner strong {
+  color: var(--color-amber);
+}
+
+/* fixed rows in the side panel never shrink; only the move list and the FEN/PGN box flex */
+.statusBar,
+.moveNav,
+.boardPanelActions,
+.toggleWrapper {
   flex-shrink: 0;
 }

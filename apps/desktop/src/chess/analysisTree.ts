@@ -121,6 +121,15 @@ export function plyInfo(rootFen: string, ply: number): { moveNumber: number; isW
   return { moveNumber: startNumber + Math.floor(index / 2), isWhite: index % 2 === 0 };
 }
 
+/** "1. e4 e5 2. Nf3", or "2... Nc6 3. Bb5" when the line starts with Black */
+export function numberedLine(rootFen: string, sans: string[], startPly = 1): string {
+  return sans.map((san, i) => {
+    const { moveNumber, isWhite } = plyInfo(rootFen, startPly + i);
+    if (isWhite) return `${moveNumber}. ${san}`;
+    return i === 0 ? `${moveNumber}... ${san}` : san;
+  }).join(' ');
+}
+
 const NAG_SYMBOLS: Record<string, string> = {
   $1: '!', $2: '?', $3: '!!', $4: '??', $5: '!?', $6: '?!',
 };
