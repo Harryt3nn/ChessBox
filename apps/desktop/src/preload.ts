@@ -5,7 +5,7 @@ import type { Folder } from "./types/Folder";
 import type { Repertoire } from "./types/Repertoire";
 import type { Node } from "./types/Node";
 import type { NoveltyFile } from "./novelty/results";
-import type { RunSummary } from "./Storage/NoveltyRunner";
+import type { FindingUpdate, RunSummary } from "./Storage/NoveltyRunner";
 import { ImportRepertoiresPayload } from "./types/ImportPayload";
 
 // the only place where the renderer can communicate with main processes
@@ -62,6 +62,9 @@ contextBridge.exposeInMainWorld("api", {
 
   loadNovelty: (repertoireId: string): Promise<NoveltyFile | null> =>
     ipcRenderer.invoke("novelty:load", repertoireId),
+
+  updateFinding: (repertoireId: string, key: string, update: FindingUpdate): Promise<void> =>
+    ipcRenderer.invoke("novelty:update", repertoireId, key, update),
 
   // returns a function that stops listening
   onNoveltyProgress: (listener: (done: number, total: number) => void): (() => void) => {

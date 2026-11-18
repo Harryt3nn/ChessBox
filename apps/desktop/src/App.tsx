@@ -14,6 +14,7 @@ import { TopBar } from './components/TopBar';
 import { restoreAuthToken } from './trpc';
 import type { Page } from './types/Page';
 import type { Repertoire } from './types/Repertoire';
+import type { BoardFocus } from './pages/BoardView';
 import type { inferRouterOutputs } from '@trpc/server';
 import type { AppRouter } from '@chessbox/shared/router';
 
@@ -27,9 +28,12 @@ const App = () => {
   const [currentUser, setCurrentUser] = useState<User | null>(null);
   // the repertoire the analysis board is showing, if any
   const [boardRepertoire, setBoardRepertoire] = useState<Repertoire | null>(null);
+  // a position to jump to once the repertoire is on the board (a novelty-finder result)
+  const [boardFocus, setBoardFocus] = useState<BoardFocus | null>(null);
 
-  function openInBoard(rep: Repertoire) {
+  function openInBoard(rep: Repertoire, focus?: BoardFocus) {
     setBoardRepertoire(rep);
+    setBoardFocus(focus ?? null);
     setPage('board');
   }
 
@@ -55,8 +59,8 @@ const App = () => {
     if (page === 'repertoires') return <EditRepertoires onOpenRepertoire={openInBoard} />;
     if (page === 'tools') return <TrainingToolkit page={page} setPage={setPage} />;
     if (page === 'settings') return <Settings page={page} onLogout={handleLogout} isAuthed={isAuthed} />;
-    if (page === 'board') return <BoardView repertoire={boardRepertoire} onCloseRepertoire={() => setBoardRepertoire(null)} />;
-    if (page === 'novelty') return <NoveltyFinder page={page} currentUser={currentUser} />;
+    if (page === 'board') return <BoardView repertoire={boardRepertoire} focus={boardFocus} onCloseRepertoire={() => { setBoardRepertoire(null); setBoardFocus(null); }} />;
+    if (page === 'novelty') return <NoveltyFinder page={page} currentUser={currentUser} onOpenInBoard={openInBoard} />;
 
     return <Home setPage={setPage} currentUser={currentUser} />;
   }

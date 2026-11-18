@@ -125,3 +125,43 @@
   font-family: inherit;
   font-size: 13px;
 }
+
+/* per-finding actions: open in board, engine verdict, dismiss */
+.rowActions {
+  white-space: nowrap;
+}
+
+.rowBtn {
+  margin-right: 6px;
+  padding: 3px 8px;
+  background: none;
+  border: 1px solid var(--color-border);
+  color: var(--color-text-tertiary);
+  font-family: inherit;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+
+.rowBtn:hover:not(:disabled) {
+  color: var(--color-amber);
+  border-color: var(--color-amber);
+}
+
+.rowBtn:disabled {
+  opacity: 0.5;
+  cursor: wait;
+}
+
+.verdict {
+  margin-right: 6px;
+  color: var(--color-text-primary);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.dismissed td {
+  opacity: 0.45;
+}

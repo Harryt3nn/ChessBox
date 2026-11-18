@@ -11,7 +11,7 @@ const dataDir = await vi.hoisted(async () => {
 
 vi.mock('electron', () => ({ app: { getPath: () => dataDir }, safeStorage: {} }));
 
-import { loadNovelty, runNovelty } from './NoveltyRunner';
+import { loadNovelty, runNovelty, updateFinding } from './NoveltyRunner';
 import { saveNodes, saveRepertoires } from './MainStorage';
 
 const DATA = path.join(dataDir, 'ChessBox-data');
@@ -71,6 +71,21 @@ describe('runNovelty', () => {
     const progress = vi.fn();
     await runNovelty('rep', 'all', progress);
     expect(progress).toHaveBeenLastCalledWith(2, 2);
+  });
+
+  it('saves a finding\'s status and engine verdict, and they survive a re-run', async () => {
+    await runNovelty('rep', 'all');
+    await updateFinding('rep', 'e5|Bc4|deviation', { status: 'dismissed', eval: { score: '-0.40', depth: 20, best: 'Nf3' } });
+    await runNovelty('rep', 'all');
+    expect((await loadNovelty('rep'))?.findings['e5|Bc4|deviation']).toMatchObject({ status: 'dismissed', eval: { score: '-0.40', depth: 20, best: 'Nf3' } });
+  });
+
+  it('ignores bad finding updates', async () => {
+    await runNovelty('rep', 'all');
+    await expect(updateFinding('rep', 'nope|x|deviation', { status: 'dismissed' })).rejects.toThrow();
+    await updateFinding('rep', 'e5|Bc4|deviation', { status: 'deleted', eval: { score: 5 } } as never);
+    expect((await loadNovelty('rep'))?.findings['e5|Bc4|deviation']).toMatchObject({ status: 'new' });
+    expect((await loadNovelty('rep'))?.findings['e5|Bc4|deviation'].eval).toBeUndefined();
   });
 
   it('refuses an unsafe or unknown repertoire id', async () => {

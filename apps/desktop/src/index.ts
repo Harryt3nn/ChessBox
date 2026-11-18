@@ -7,7 +7,7 @@ import { IMPORT_LIMITS, sanitiseFolders, sanitiseRepertoire } from "./importsAnd
 import { importRepertoires } from "./Storage/ImportService";
 import { importChesscom } from "./Storage/ChesscomImporter";
 import { importLichess } from "./Storage/LichessImporter";
-import { loadNovelty, runNovelty } from "./Storage/NoveltyRunner";
+import { loadNovelty, runNovelty, updateFinding, type FindingUpdate } from "./Storage/NoveltyRunner";
 import {
   loadFolders,
   saveFolders,
@@ -122,6 +122,11 @@ ipcMain.handle("novelty:run", (event, repertoireId: unknown, mode: unknown) => {
 ipcMain.handle("novelty:load", (_event, repertoireId: unknown) => {
   if (typeof repertoireId !== "string") throw new Error("Invalid repertoire id");
   return loadNovelty(repertoireId);
+});
+
+ipcMain.handle("novelty:update", (_event, repertoireId: unknown, key: unknown, update: unknown) => {
+  if (typeof repertoireId !== "string" || typeof key !== "string" || !update || typeof update !== "object") throw new Error("Invalid finding update");
+  return updateFinding(repertoireId, key, update as FindingUpdate);
 });
 
 ipcMain.handle("storage:saveAuthToken", (_event, token: string) => saveAuthToken(token));

@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { BoardImportError, createTree, existingPath, exportPgn, importAny, importPgn, mainLineFrom, movesAlongPath, playMove, plyInfo } from './analysisTree';
+import { BoardImportError, createTree, existingPath, pathToNode, playSan, exportPgn, importAny, importPgn, mainLineFrom, movesAlongPath, playMove, plyInfo } from './analysisTree';
 import type { GameTree } from '../types/gameTree';
 
 const moves = (tree: GameTree) => mainLineFrom(tree.root, []).length;
@@ -40,6 +40,26 @@ describe('existingPath', () => {
     const e5 = e4.children[0];
     expect(existingPath(tree.root, [e4.id, e5.id])).toEqual([e4.id, e5.id]);
     expect(existingPath(tree.root, [e4.id, 'gone', e5.id])).toEqual([e4.id]);
+  });
+});
+
+describe('playSan', () => {
+  it('plays a SAN move from the current position, or returns null if illegal', () => {
+    const next = playSan(createTree(), 'Nf3');
+    expect(next?.root.children[0].move).toBe('Nf3');
+    expect(next?.currentPath).toEqual([next?.root.children[0].id]);
+    expect(playSan(createTree(), 'Ke2')).toBeNull();
+  });
+});
+
+describe('pathToNode', () => {
+  it('finds the path to a node anywhere in the tree, or null', () => {
+    const { tree } = importPgn('1. e4 e5 (1... c5 2. Nf3) 2. Nf3 *');
+    const e4 = tree.root.children[0];
+    const nf3InSicilian = e4.children[1].children[0];
+    expect(pathToNode(tree.root, nf3InSicilian.id)).toEqual([e4.id, e4.children[1].id, nf3InSicilian.id]);
+    expect(pathToNode(tree.root, 'missing')).toBeNull();
+    expect(pathToNode(tree.root, tree.root.id)).toEqual([]);
   });
 });
 

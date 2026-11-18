@@ -42,6 +42,21 @@ export function getNodeAtPath(root: MoveNode, path: string[]): MoveNode {
   return node;
 }
 
+/** the path from the root to the node with `id` (anywhere in the tree), or null if it isn't there */
+export function pathToNode(root: MoveNode, id: string): string[] | null {
+  if (root.id === id) return [];
+  const stack: [MoveNode, string[]][] = [[root, []]];
+  for (let item = stack.pop(); item; item = stack.pop()) {
+    const [node, path] = item;
+    for (const child of node.children) {
+      const childPath = [...path, child.id];
+      if (child.id === id) return childPath;
+      stack.push([child, childPath]);
+    }
+  }
+  return null;
+}
+
 /** the longest start of `path` whose ids still exist, e.g. after the tree was rebuilt */
 export function existingPath(root: MoveNode, path: string[]): string[] {
   const out: string[] = [];
@@ -110,6 +125,17 @@ export function playMove(tree: GameTree, move: { from: string; to: string; promo
     root: withChild(tree.root, tree.currentPath, node),
     currentPath: [...tree.currentPath, node.id],
   };
+}
+
+/** playMove for a move written in SAN (e.g. from a saved finding); null if it isn't legal here */
+export function playSan(tree: GameTree, san: string): GameTree | null {
+  const current = getNodeAtPath(tree.root, tree.currentPath);
+  try {
+    const { from, to, promotion } = new Chess(current.fen).move(san);
+    return playMove(tree, { from, to, promotion });
+  } catch {
+    return null;
+  }
 }
 
 /** true if moving `from` → `to` in `fen` is a legal pawn promotion */

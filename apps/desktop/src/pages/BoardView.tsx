@@ -14,6 +14,8 @@ import {
   getNodeAtPath,
   mainLineFrom,
   existingPath,
+  pathToNode,
+  playSan,
   movesAlongPath,
   playMove,
   isPromotionMove,
@@ -70,13 +72,19 @@ function download(fileName: string, text: string) {
   URL.revokeObjectURL(url);
 }
 
+export interface BoardFocus {
+  nodeId: string; // the repertoire position to show
+  move: string; // a move to play from there (a novelty or deviation), left unsaved
+}
+
 interface BoardViewProps {
-  // a repertoire to show instead of a free analysis; changes aren't saved back yet (T14)
+  // a repertoire to show instead of a free analysis; moves added on the board can be saved into it
   repertoire: Repertoire | null;
+  focus: BoardFocus | null;
   onCloseRepertoire: () => void;
 }
 
-const BoardView = ({ repertoire, onCloseRepertoire }: BoardViewProps) => {
+const BoardView = ({ repertoire, focus, onCloseRepertoire }: BoardViewProps) => {
 
   // The full game tree. All state lives here.
   const [tree, setTree] = useState<GameTree>(() => createTree());
@@ -147,7 +155,10 @@ const BoardView = ({ repertoire, onCloseRepertoire }: BoardViewProps) => {
     if (!repertoire) return;
     storage.loadNodes().then(nodes => {
       try {
-        const { tree: next, skipped } = repertoireToTree(repertoire.rootNodeId, nodes, { Event: repertoire.name });
+        const { tree: built, skipped } = repertoireToTree(repertoire.rootNodeId, nodes, { Event: repertoire.name });
+        const focusPath = focus ? pathToNode(built.root, focus.nodeId) : null;
+        const atFocus = focusPath ? { ...built, currentPath: focusPath } : built;
+        const next = focus && focusPath ? playSan(atFocus, focus.move) ?? atFocus : built;
         loadTree(next, skipped ? `${skipped} move${skipped === 1 ? '' : 's'} in this repertoire couldn't be played and ${skipped === 1 ? 'was' : 'were'} left out.` : undefined);
         setOrientation(repertoire.side);
         setRepertoireNodes(nodes);
@@ -155,7 +166,7 @@ const BoardView = ({ repertoire, onCloseRepertoire }: BoardViewProps) => {
         setMessage({ kind: 'error', text: err instanceof Error ? err.message : "That repertoire couldn't be opened." });
       }
     });
-  }, [repertoire, storage]);
+  }, [repertoire, focus, storage]);
 
   // moves played on the board that the repertoire doesn't have yet
   const pendingEdits = useMemo(

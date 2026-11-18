@@ -131,3 +131,22 @@ export async function runNovelty(
   await fs.promises.writeFile(target, JSON.stringify(file), "utf8");
   return summary;
 }
+
+export interface FindingUpdate {
+  status?: "new" | "dismissed";
+  eval?: { score: string; depth: number; best: string };
+}
+
+/** sets a finding's status and/or engine verdict; the update comes from the renderer, so only valid fields are kept */
+export async function updateFinding(repertoireId: string, key: string, update: FindingUpdate): Promise<void> {
+  const file = await loadNovelty(repertoireId);
+  const finding = file && Object.prototype.hasOwnProperty.call(file.findings, key) ? file.findings[key] : null;
+  if (!file || !finding) throw new Error("That finding doesn't exist any more.");
+
+  if (update.status === "new" || update.status === "dismissed") finding.status = update.status;
+  const e = update.eval;
+  if (e && typeof e.score === "string" && e.score.length <= 12 && Number.isFinite(e.depth) && typeof e.best === "string" && e.best.length <= 12) {
+    finding.eval = { score: e.score, depth: e.depth, best: e.best };
+  }
+  await fs.promises.writeFile(noveltyPath(repertoireId), JSON.stringify(file), "utf8");
+}
