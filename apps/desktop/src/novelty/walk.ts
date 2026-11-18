@@ -63,7 +63,8 @@ export function walkGame(startFen: string, moves: string[], rootId: string, node
       ...(node.transpositionEdges ?? []).map(e => ({ id: e.targetId, move: e.move })),
     ].flatMap(o => {
       const target = lookup(nodes, o.id);
-      const result = o.move && target ? tryMove(game, o.move) : null;
+      if (!o.move || !target) return [];
+      const result = tryMove(game, o.move);
       return result ? [{ target, ...result }] : [];
     });
 
