@@ -20,11 +20,11 @@ A bare § means this file. `tasks.md` holds the ranked work; `decisions.md` hold
 - D15: The user picks the repertoire before every novelty-finder run; Novelty Finder and WeakPoints are Toolkit tools.
 - D16: Novelty-finder results are stored locally under `%APPDATA%/ChessBox/ChessBox-data/novelty/`.
 - D17: Exactly one prepared reply per position on the user's move (D11's single-response constraint); multi-reply alternatives are stage 2.
+- D18: Novelty results = one JSON per repertoire in `novelty/` (games → derived findings + node hits).
 - D13: A saved session is cleared only when the server answers `UNAUTHORIZED` or `NOT_FOUND` (deleted account); unreachable / erroring server → stay signed in, toast, local features keep working.
 
 **Pending / Unconfirmed** (*not decided*; each with the condition that decides it):
 - Deadline: none stated in `system.md`. *Decide if a date matters.*
-- Novelty-finder result file format (T15). *Shown to Harry before it is written.*
 - JWT expiry: ARCHITECTURE.md says 3 days, the old TODO says 7. *Decide when someone checks the server code.*
 
 **Active gates** (date · what must work · what we fall back to if it doesn't):

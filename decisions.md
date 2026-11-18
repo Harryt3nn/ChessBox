@@ -172,3 +172,12 @@ The record of design choices, the features added and dropped, and the reasons. R
 - **Revisit if:** stage 2 adds alternatives.
 - **Evidence:** n/a.
 - **One-liner:** One right answer per position, for now.
+
+### D18 · storage · Novelty results: one JSON file per repertoire: Status: Planned · Updated: 2026-11-18 23:30
+- **Decision:** Harry picked `ChessBox-data/novelty/<repertoireId>.json` holding `games` (per-game result keyed `<site>:<gameId>`, with the moves to the surprise as `line`), `findings` (keyed `nodeId|move|kind`, with count, lastSeen, status new/dismissed/added, optional engine eval) and `nodeHits` (how often each repertoire node was reached).
+- **Why:** one read + one write per run; per-game results are the source, findings and hits are recomputed from them (D11), so re-runs never double-count; status and eval carry over.
+- **Alternatives rejected:** one small file per finding in `deviations/` and `novelties/` folders (thousands of files, more writes).
+- **Trade-off / risk:** the file grows with games (~4k per account today); fine as JSON at this size.
+- **Revisit if:** results move to a server (stage 2).
+- **Evidence:** walk on real data: 8,340 Chess.com games, ~3 ms per game (measured in a throwaway vitest run, 2026-11-18).
+- **One-liner:** Each repertoire keeps its own record of how your games went against it.
