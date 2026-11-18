@@ -1,120 +1,118 @@
 /*apps/desktop/src/components/ImportModal.tsx*/
 
-import React, { useState } from "react";
+import { useMemo, useState } from "react";
 import type { PreparedImportData } from "../importsAndExports/prepareForImport";
+import type { Repertoire } from "../types/Repertoire";
+import { findReplyConflicts, keepReplies } from "../importsAndExports/replyConflicts";
 import toast from "react-hot-toast";
+import styles from "./ImportModal.module.css";
 
-// UI component for importing chess graph JSON via 'prepareForImport' pipeline
-// reads imported file, allows for import selection by the user
-// selected imports are added to the tree
-// returns raw html
+// pick which repertoires of a chessgraph file to import. Where a picked repertoire has more than one
+// reply on its own move, the user keeps one (D17); the other branches aren't imported.
 
-export function ImportModal({data, onClose, reloadData}: 
-  {
+interface ImportModalProps {
   data: PreparedImportData;
   onClose: () => void;
   reloadData: () => Promise<void>;
-}) {
+}
+
+export function ImportModal({ data, onClose, reloadData }: ImportModalProps) {
   const [selected, setSelected] = useState<string[]>([]);
+  const [choices, setChoices] = useState<Record<string, string>>({});
   const [loading, setLoading] = useState(false);
 
-  const toggle = (id: string) => {
-    setSelected(prev =>
-      prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id]
-    );
-  };
+  const chosenReps = data.repertoires.filter(r => selected.includes(r.id));
+  // recomputed when the selection changes; chosenReps is derived from it
+  const conflicts = useMemo(() => findReplyConflicts(chosenReps, data.nodes), [data.nodes, selected]);
+
+  const toggle = (id: string) => setSelected(prev => (prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id]));
 
   const handleImport = async () => {
-  setLoading(true);
+    setLoading(true);
+    // a position the user didn't touch keeps its first reply, the main line
+    const kept = Object.fromEntries(conflicts.map(c => [c.nodeId, choices[c.nodeId] ?? c.replies[0].id]));
+    try {
+      await window.storage.importRepertoires({
+        folders: data.folders,
+        repertoires: chosenReps,
+        nodes: keepReplies(data.nodes, chosenReps, kept),
+      });
+      await reloadData();
+      toast.success("Imported repertoires successfully");
+      onClose();
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Import failed");
+    } finally {
+      setLoading(false);
+    }
+  };
 
-  try {
-    await window.storage.importRepertoires({
-      folders: data.folders,
-      repertoires: data.repertoires.filter(r => selected.includes(r.id)),
-      nodes: data.nodes
-    });
-    await reloadData();
-    toast.success("Imported repertoires successfully");
-    onClose();
-  } catch (err) {
-    toast.error(err instanceof Error ? err.message : "Import failed");
-  } finally {
-    setLoading(false);
-  }
-};
+  const groups: { name: string; reps: Repertoire[] }[] = [
+    ...data.folders.map(f => ({ name: f.name, reps: data.repertoires.filter(r => r.folderId === f.id) })),
+    { name: "No folder", reps: data.repertoires.filter(r => r.folderId === null) },
+  ].filter(g => g.reps.length > 0);
 
-// render: overlay for import
   return (
-    <div className="modal-backdrop">
-      <div className="modal-window">
-
-        <h2>Import from Chess Graph</h2>
-        <p>Select repertoires to import. Folders + nodes will be saved automatically.
-
-        </p>
+    <div className={styles.backdrop}>
+      <div className={styles.window}>
+        <h2 className={styles.title}>Import from chessgraph</h2>
+        <p className={styles.hint}>Choose the repertoires to import. Their folders come with them.</p>
 
         {/* anything the sanitiser dropped or repaired while reading the file */}
         {data.warnings.length > 0 && (
-          <ul className="import-warnings">
+          <ul className={styles.warnings}>
             {data.warnings.map(w => <li key={w}>{w}</li>)}
           </ul>
         )}
 
-        <div className="folder-view">
-          {data.folders.map(folder => {
-            const reps = data.repertoires.filter(r => r.folderId === folder.id);
-            if (reps.length === 0) return null;
-
-            return (
-              <div key={folder.id} className="folder-block">
-                <div className="folder-title">{folder.name}</div>
-
-                {reps.map(rep => (
-                  <label key={rep.id} className="rep-item">
-                    <input
-                      type="checkbox"
-                      checked={selected.includes(rep.id)}
-                      onChange={() => toggle(rep.id)}
-                    />
-                    {rep.name} ({rep.side})
-                  </label>
-                ))}
-              </div>
-            );
-          })}
-
-          {/* Repertoires with no folder */}
-          {data.repertoires.filter(r => r.folderId === null).length > 0 && (
-            <div className="folder-block">
-              <div className="folder-title">(No Folder)</div>
-
-              {data.repertoires
-                .filter(r => r.folderId === null)
-                .map(rep => (
-                  <label key={rep.id} className="rep-item">
-                    <input
-                      type="checkbox"
-                      checked={selected.includes(rep.id)}
-                      onChange={() => toggle(rep.id)}
-                    />
-                    {rep.name} ({rep.side})
-                  </label>
-                ))}
+        <div className={styles.list}>
+          {groups.map(group => (
+            <div key={group.name} className={styles.group}>
+              <div className={styles.groupName}>{group.name}</div>
+              {group.reps.map(rep => (
+                <label key={rep.id} className={styles.rep}>
+                  <input type="checkbox" checked={selected.includes(rep.id)} onChange={() => toggle(rep.id)} />
+                  {rep.name}
+                  <span className={styles.side}>{rep.side}</span>
+                </label>
+              ))}
             </div>
-          )}
+          ))}
         </div>
 
-        <div className="modal-actions">
-          <button onClick={onClose}>Cancel</button>
-          <button
-            className="btn-primary"
-            disabled={selected.length === 0 || loading}
-            onClick={handleImport}
-          >
-            {loading ? "Importing..." : "Import Selected"}
+        {conflicts.length > 0 && (
+          <div className={styles.conflicts}>
+            <div className={styles.groupName}>One reply per position</div>
+            <p className={styles.hint}>
+              These positions have more than one reply on your own move. Keep one; the other lines won't be imported.
+            </p>
+            {conflicts.map(c => (
+              <div key={`${c.repertoireId}:${c.nodeId}`} className={styles.conflict}>
+                <span className={styles.conflictLine}>{c.repertoireName} · {c.line}</span>
+                <div className={styles.replies}>
+                  {c.replies.map(r => (
+                    <label key={r.id} className={styles.reply}>
+                      <input
+                        type="radio"
+                        name={c.nodeId}
+                        checked={(choices[c.nodeId] ?? c.replies[0].id) === r.id}
+                        onChange={() => setChoices(prev => ({ ...prev, [c.nodeId]: r.id }))}
+                      />
+                      {r.move}
+                    </label>
+                  ))}
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+
+        <div className={styles.actions}>
+          <button className={styles.btnOutline} onClick={onClose}>Cancel</button>
+          <button className={styles.btnPrimary} disabled={selected.length === 0 || loading} onClick={handleImport}>
+            {loading ? "Importing…" : "Import selected"}
           </button>
         </div>
-
       </div>
     </div>
   );
