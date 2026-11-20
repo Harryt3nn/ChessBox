@@ -70,7 +70,7 @@ const App = () => {
       return <RepertoireBuilder key={builderRepertoire.id} repertoire={builderRepertoire} onOpenInBoard={openInBoard} onBack={() => setPage('repertoires')} />;
     }
     if (page === 'tools') return <TrainingToolkit page={page} setPage={setPage} />;
-    if (page === 'settings') return <Settings page={page} onLogout={handleLogout} isAuthed={isAuthed} />;
+    if (page === 'settings') return <Settings onLogout={handleLogout} onUserChange={setCurrentUser} />;
     if (page === 'board') return <BoardView repertoire={boardRepertoire} focus={boardFocus} onCloseRepertoire={() => { setBoardRepertoire(null); setBoardFocus(null); }} />;
     if (page === 'novelty') return <NoveltyFinder page={page} currentUser={currentUser} onOpenInBoard={openInBoard} />;
 
