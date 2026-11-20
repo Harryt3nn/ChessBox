@@ -336,7 +336,7 @@ The record of design choices, the features added and dropped, and the reasons. R
 - **Evidence:** n/a.
 - **One-liner:** Bad data is set aside, never lost, and never blocks training.
 
-### D36 · training · WeakPoints has three modes: Focused, Mistakes only, Random: Status: Planned · Updated: 2026-11-20 22:40
+### D36 · training · WeakPoints has three modes: Focused, Mistakes only, Random: Status: Built · Updated: 2026-11-21 00:10
 - **Decision:** Harry: **Focused** = the full D33 pool (deviations + rare + strong, FSRS); **Mistakes only** = deviation cards only (same FSRS schedule); **Random** = random sequences from the repertoire, mainly for when there's no game data.
 - **Why:** Harry wanted both "targeted at what I'm weak at" and the broader refresh, as separate choices, plus something that works without novelty data.
 - **Alternatives rejected:** picking only one of Focused-as-D33 or deviations-only.
@@ -345,7 +345,7 @@ The record of design choices, the features added and dropped, and the reasons. R
 - **Evidence:** n/a.
 - **One-liner:** Drill everything, only your mistakes, or random lines.
 
-### D37 · training · Random mode saves nothing and runs in the renderer: Status: Planned · Updated: 2026-11-20 22:40
+### D37 · training · Random mode saves nothing and runs in the renderer: Status: Built · Updated: 2026-11-21 00:10
 - **Decision:** Harry: Random drills are practice only: no FSRS, no file writes. Built in the window from the repertoire it already loads, so no new IPC.
 - **Why:** a practice path with no side effects can't fill the schedule with arbitrary positions, and D33 stays intact.
 - **Alternatives rejected:** a random mistake becomes a Focused card (needs a new IPC call and card source, changes D33); log attempts without scheduling (a second history with no use yet).
@@ -354,7 +354,7 @@ The record of design choices, the features added and dropped, and the reasons. R
 - **Evidence:** n/a.
 - **One-liner:** Random is free practice; it never touches your schedule.
 
-### D38 · analysis · Deviations are checked by Stockfish automatically; the Evaluate button goes: Status: Planned · Updated: 2026-11-20 23:00
+### D38 · analysis · Deviations are checked by Stockfish automatically; the Evaluate button goes: Status: Built · Updated: 2026-11-21 00:10
 - **Decision:** Harry (took Claude's rec): after a novelty run, and when the page opens, the Novelty Finder checks every deviation without a prepared-move score in the background (full Stockfish, depth 18, the page's worker), showing progress; each verdict is saved as it lands, so leaving the page and coming back resumes. The Evaluate / Re-check buttons are removed.
 - **Why:** Harry found the button redundant next to Board; D23 (earlier decision, so it wins) needs a verdict on each deviation.
 - **Alternatives rejected:** keep the button, relabelled (only works if pressed); remove it and drop D23 (overrides an earlier decision).
@@ -363,7 +363,7 @@ The record of design choices, the features added and dropped, and the reasons. R
 - **Evidence:** TBD (measure the first pass on the Italian).
 - **One-liner:** Stockfish checks your deviations by itself.
 
-### D39 · training · Deviations on your first 2 moves aren't drilled (TUNE): Status: Planned · Updated: 2026-11-20 23:00
+### D39 · training · Deviations on your first 2 moves aren't drilled (TUNE): Status: Built · Updated: 2026-11-21 00:10
 - **Decision:** Harry (took Claude's rec): WeakPoints skips deviations on your first 2 moves (you were playing a different opening). The Novelty Finder still lists them. Existing cards for those positions stay in the file (D35) but aren't queued.
 - **Why:** Harry got "wrong first move" drills from games where he played another opening.
 - **Alternatives rejected:** a new "different opening" outcome in the walk and novelty file (changes D11 / D18, re-run needed).
@@ -372,7 +372,7 @@ The record of design choices, the features added and dropped, and the reasons. R
 - **Evidence:** n/a.
 - **One-liner:** Playing another opening isn't a mistake to drill.
 
-### D40 · training · Drills can be limited to one branch of the repertoire: Status: Planned · Updated: 2026-11-20 23:00
+### D40 · training · Drills can be limited to one branch of the repertoire: Status: Built · Updated: 2026-11-21 00:10
 - **Decision:** Harry (took Claude's rec): a picker lists the repertoire's main branches (the first point where the opponent has several replies, e.g. "1.e4 e6"), plus Everything. A position belongs to a branch when the branch node is on its parent chain (a transposed position follows its main parent, like D34). Applies to all three modes. `weakpoints:queue` gains `mode` and an optional `branchNodeId` (D32 extended).
 - **Why:** Harry wants e.g. French-only drills in the White Aggressive Italian; an opening is a subtree.
 - **Alternatives rejected:** named openings from a bundled ECO table (new data dependency; can be layered on later); user tags (everything must be tagged first).
@@ -381,7 +381,7 @@ The record of design choices, the features added and dropped, and the reasons. R
 - **Evidence:** n/a.
 - **One-liner:** Drill just the French, or everything.
 
-### D41 · training · Random drills play forward from a random point: Status: Planned · Updated: 2026-11-20 23:00
+### D41 · training · Random drills play forward from a random point: Status: Built · Updated: 2026-11-21 00:10
 - **Decision:** Harry (took Claude's rec): pick a random your-move position (in the chosen branch), you play your next N moves (1–10, default 5, set on the page), the opponent's replies are picked at random from the repertoire's branches; ends early at the end of a line. Every move you play is scored for the session only (D37).
 - **Why:** "random sequences partway through the rep, about 5 moves", length set by the user.
 - **Alternatives rejected:** backward to a random position (only the last move tested; deep lines over-picked).

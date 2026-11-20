@@ -3,9 +3,9 @@
 Work **▶ Now** top to bottom. Tags: `[🟠 your call: …]` = a design decision for the builder (CLAUDE.md §1) · `[⏸ waits on: …]` = blocked.
 
 ## 📊 Latest (the only home of volatile facts)
-- **Updated:** 2026-11-20 22:00
-- **`main` at:** bfa85b4 (pushed) · **server `main`:** 1717269 (pushed, deployed to the Pi) · **open branches:** `weakpoints-drills` (pushed, not merged: waits on Harry trying a drill session) · **Electron:** 42.11.18
-- **Tests:** desktop 196 passing (22 files) · server 17 passing (1 file, ~26 s) · **Builder:** 888-node Italian renders in ~1.2 s · **Verdict:** full Stockfish (single-threaded) depth 18 in ~4 s per finding · **Novelty run:** "Check all games" on White Aggressive Italian = 4,396 games in 22 s in the dev app (2,627 deviations, 1,757 novelties, 12 in prep) · **Walk alone:** ~3 ms / game · **WeakPoints sync + queue:** Italian ~130 ms, 106 cards on first sync (D30, D33) · **npm audit:** 47, build / dev tooling only
+- **Updated:** 2026-11-21 00:10
+- **`main` at:** bfa85b4 (pushed) · **server `main`:** 1717269 (pushed, deployed to the Pi) · **open branches:** `weakpoints-drills` (`db9be75`, pushed, not merged: T21 + T24–T28 built, waits on Harry trying them in the app) · **Electron:** 42.11.18
+- **Tests:** desktop 209 passing (23 files) · server 17 passing (1 file, ~26 s) · **Builder:** 888-node Italian renders in ~1.2 s · **Verdict:** full Stockfish (single-threaded) depth 18 in ~4 s per finding · **Novelty run:** "Check all games" on White Aggressive Italian = 4,396 games in 22 s in the dev app (2,627 deviations, 1,757 novelties, 12 in prep) · **Walk alone:** ~3 ms / game · **WeakPoints sync + queue:** Italian ~130 ms, 106 cards on first sync (D30, D33) · **npm audit:** 47, build / dev tooling only
 
 ## ▶ Now (ranked): stage-1 MVP from `system.md` (2026-11-18)
 **M1 · Layout**

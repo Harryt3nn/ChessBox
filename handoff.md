@@ -13,6 +13,13 @@ For the next session. One entry per handoff, at most ~15 lines.
 
 ---
 
+## 2026-11-21 00:10 · WeakPoints modes, branch filter, auto verdicts, board ↔ graph
+- **Done:** on `weakpoints-drills` (`db9be75`, pushed): Harry's feedback (layout, Home badge, auto-advance, explicit repertoire pick) + D36–D41 built: Focused / Mistakes only / Random, opening branch filter, early deviations skipped, automatic deviation verdicts (Evaluate button gone), game dates + times, Graph buttons, builder ↔ board at the selected node. 209 tests green.
+- **In progress:** not merged; Harry to try it in the dev app.
+- **Next step:** Harry checks WeakPoints (all 3 modes, an opening filter), Novelty Finder (background check progress, game lists, Graph), board "Show in graph". Then merge, tick T21 + T24–T28, measure D38's first pass on the Italian.
+- **Gotchas:** novelties no longer get new verdicts (D38 is deviations only). Random lives in `src/weakpoints/lines.ts` (no ts-fsrs in the renderer). Rule: on a conflict Harry's earlier decision wins.
+- **Commands to run:** `./ctx.sh sync` · `cd apps/desktop && npm test` · `npm start`
+
 ## 2026-11-20 21:45 · T21 WeakPoints built on a branch
 - **Done:** D30–D35 decided (Harry took all recs) and built on `weakpoints-drills` (`2b805d7`, pushed): `src/weakpoints/cards.ts` (pool, lead-in, FSRS), `src/Storage/WeakPoints.ts` (file + IPC), `pages/WeakPoints.tsx`, verdict gains `playedCp` / `preparedCp` + a Re-check button. 196 tests green.
 - **In progress:** not merged. Needs Harry to run a drill session in the dev app.
