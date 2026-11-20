@@ -47,6 +47,24 @@
   background: var(--color-void);
 }
 
+/* React Flow's own chrome (zoom buttons, grid, edge labels) in the app palette, not its white defaults */
+.canvas :global(.react-flow) {
+  --xy-background-color: var(--color-void);
+  --xy-background-pattern-color: var(--color-surface-3);
+  --xy-controls-button-background-color: var(--color-surface-2);
+  --xy-controls-button-background-color-hover: var(--color-surface-3);
+  --xy-controls-button-color: var(--color-text-secondary);
+  --xy-controls-button-color-hover: var(--color-amber);
+  --xy-controls-button-border-color: var(--color-border);
+  --xy-controls-box-shadow: none;
+  --xy-edge-label-background-color: var(--color-void);
+  --xy-edge-label-color: var(--color-amber);
+}
+
+.canvas :global(.react-flow__controls) {
+  border: 1px solid var(--color-border);
+}
+
 .empty {
   padding: 40px;
   color: var(--color-text-tertiary);
@@ -79,6 +97,38 @@
   height: 6px;
   background: var(--color-amber);
   transform: rotate(45deg);
+}
+
+.toggle {
+  position: absolute;
+  bottom: -9px;
+  left: 50%;
+  transform: translateX(-50%);
+  min-width: 18px;
+  height: 16px;
+  padding: 0 4px;
+  background: var(--color-surface-1);
+  border: 1px solid var(--color-border-strong);
+  color: var(--color-text-tertiary);
+  font-family: inherit;
+  font-size: 10px;
+  font-weight: 700;
+  line-height: 14px;
+  cursor: pointer;
+  z-index: 1;
+}
+
+.toggle:hover {
+  color: var(--color-amber);
+  border-color: var(--color-amber);
+}
+
+/* folded: shows how many positions are hidden, in the accent so it isn't missed */
+.toggle-folded,
+.toggle-folded:hover {
+  background: var(--color-amber);
+  border-color: var(--color-amber);
+  color: var(--color-ink);
 }
 
 .handle {
@@ -154,7 +204,12 @@
   cursor: pointer;
 }
 
-.btn:hover {
+.btn:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
+.btn:hover:not(:disabled) {
   color: var(--color-amber);
   border-color: var(--color-amber);
 }

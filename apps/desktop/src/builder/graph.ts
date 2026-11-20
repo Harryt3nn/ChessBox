@@ -17,7 +17,8 @@ export const NODE_HEIGHT = 44;
 export interface BuilderNode {
   id: string;
   position: { x: number; y: number };
-  data: { label: string; comment?: string; fen: string };
+  // children = positions directly after this one; hidden = how many positions its collapse hides
+  data: { label: string; comment?: string; fen: string; children: number; hidden?: number };
 }
 
 export interface BuilderEdge {
@@ -41,8 +42,8 @@ function play(fen: string, san: string): string | null {
   }
 }
 
-/** every node the root reaches (each once), with its position and its ply from the root */
-function reachable(rootId: string, nodes: Record<string, Node>) {
+/** every node the root reaches (each once) without passing through a collapsed one, with its position and ply */
+function reachable(rootId: string, nodes: Record<string, Node>, collapsed: ReadonlySet<string> = new Set()) {
   const root = lookup(nodes, rootId);
   if (!root) throw new Error('This repertoire has no starting position.');
   const rootFen = root.fen ?? DEFAULT_POSITION;
@@ -51,6 +52,7 @@ function reachable(rootId: string, nodes: Record<string, Node>) {
 
   for (let id = stack.pop(); id !== undefined; id = stack.pop()) {
     const { node, fen, ply } = found.get(id) as { node: Node; fen: string; ply: number };
+    if (collapsed.has(id)) continue;
     for (const childId of childrenOf(node)) {
       const child = lookup(nodes, childId);
       const childFen = child?.move ? play(fen, child.move) : null;
@@ -62,8 +64,25 @@ function reachable(rootId: string, nodes: Record<string, Node>) {
   return { found, rootFen };
 }
 
-export function layoutRepertoire(rootId: string, nodes: Record<string, Node>): { nodes: BuilderNode[]; edges: BuilderEdge[] } {
-  const { found, rootFen } = reachable(rootId, nodes);
+/** how many positions under `id` are hidden: reachable in full, but not shown (another path may still show some) */
+function hiddenUnder(id: string, nodes: Record<string, Node>, shown: ReadonlyMap<string, unknown>): number {
+  const seen = new Set<string>();
+  const stack = childrenOf(nodes[id]);
+  for (let next = stack.pop(); next !== undefined; next = stack.pop()) {
+    const node = lookup(nodes, next);
+    if (!node || seen.has(next) || shown.has(next)) continue;
+    seen.add(next);
+    stack.push(...childrenOf(node));
+  }
+  return seen.size;
+}
+
+export function layoutRepertoire(
+  rootId: string,
+  nodes: Record<string, Node>,
+  collapsed: ReadonlySet<string> = new Set(),
+): { nodes: BuilderNode[]; edges: BuilderEdge[] } {
+  const { found, rootFen } = reachable(rootId, nodes, collapsed);
   const edges: BuilderEdge[] = [];
 
   for (const [id, { node }] of found) {
@@ -87,10 +106,17 @@ export function layoutRepertoire(rootId: string, nodes: Record<string, Node>): {
     const { x, y } = g.node(id);
     const { moveNumber, isWhite } = plyInfo(rootFen, ply);
     const label = ply === 0 ? 'Start' : `${moveNumber}${isWhite ? '.' : '...'} ${node.move}`;
+    const children = childrenOf(node).filter(c => lookup(nodes, c)).length;
     return {
       id,
       position: { x: x - NODE_WIDTH / 2, y: y - NODE_HEIGHT / 2 },
-      data: { label, fen, ...(node.comment ? { comment: node.comment } : {}) },
+      data: {
+        label,
+        fen,
+        children,
+        ...(node.comment ? { comment: node.comment } : {}),
+        ...(collapsed.has(id) && children ? { hidden: hiddenUnder(id, nodes, found) } : {}),
+      },
     };
   });
 

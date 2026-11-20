@@ -9,8 +9,8 @@ import type { Node } from '../types/Node';
 import type { Repertoire } from '../types/Repertoire';
 import { FileSystemStorageProvider } from '../Storage/FileSystemStorageProvider';
 import { deleteBranch, layoutRepertoire, NODE_HEIGHT, NODE_WIDTH, type BuilderNode } from '../builder/graph';
-import { repertoireToTree } from '../chess/repertoireTree';
-import { pathToNode, playMove } from '../chess/analysisTree';
+import { childrenOf, repertoireToTree } from '../chess/repertoireTree';
+import { isPromotionMove, pathToNode, playMove } from '../chess/analysisTree';
 import { collectRepertoireEdits, normalised } from '../chess/repertoireEdits';
 import styles from './RepertoireBuilder.module.css';
 
@@ -23,14 +23,26 @@ interface RepertoireBuilderProps {
   onBack: () => void;
 }
 
-// one box per position: its move, and a dot when it has a comment
-function PositionNode({ data, selected }: NodeProps) {
-  const d = data as BuilderNode['data'];
+type PositionData = BuilderNode['data'] & { onToggle: (id: string) => void };
+
+// one box per position: its move, a dot when it has a comment, and a toggle to fold the moves after it
+function PositionNode({ id, data, selected }: NodeProps) {
+  const d = data as PositionData;
+  const folded = d.hidden !== undefined;
   return (
     <div className={`${styles.node} ${selected ? styles.nodeSelected : ''}`} style={{ width: NODE_WIDTH, height: NODE_HEIGHT }}>
       <Handle type="target" position={Position.Top} className={styles.handle} />
       {d.label}
       {d.comment && <span className={styles.commentDot} title={d.comment} />}
+      {d.children > 0 && (
+        <button
+          className={`nodrag nopan ${styles.toggle} ${folded ? styles.toggleFolded : ''}`}
+          title={folded ? 'Show the moves after this' : 'Hide the moves after this'}
+          onClick={e => { e.stopPropagation(); d.onToggle(id); }}
+        >
+          {folded ? `+${d.hidden}` : '−'}
+        </button>
+      )}
       <Handle type="source" position={Position.Bottom} className={styles.handle} />
     </div>
   );
@@ -46,6 +58,16 @@ const RepertoireBuilder = ({ repertoire, onOpenInBoard, onBack }: RepertoireBuil
   const [message, setMessage] = useState<string | null>(null);
   // click-to-move on the mini board, like the analysis board: first click picks the piece
   const [from, setFrom] = useState<Square | null>(null);
+  // a click-move that needs its promotion piece picked first
+  const [pendingPromotion, setPendingPromotion] = useState<{ from: Square; to: Square } | null>(null);
+  // folded positions: view state only, so big repertoires stay readable; not saved
+  const [collapsed, setCollapsed] = useState<ReadonlySet<string>>(new Set());
+
+  const toggle = useCallback((id: string) => setCollapsed(prev => {
+    const next = new Set(prev);
+    if (!next.delete(id)) next.add(id);
+    return next;
+  }), []);
 
   const reload = useCallback(async () => setNodes(await storage.loadNodes()), [storage]);
   useEffect(() => { void reload(); }, [reload]);
@@ -53,21 +75,22 @@ const RepertoireBuilder = ({ repertoire, onOpenInBoard, onBack }: RepertoireBuil
   const graph = useMemo(() => {
     if (!nodes) return null;
     try {
-      return layoutRepertoire(repertoire.rootNodeId, nodes);
+      return layoutRepertoire(repertoire.rootNodeId, nodes, collapsed);
     } catch {
       return null;
     }
-  }, [nodes, repertoire.rootNodeId]);
+  }, [nodes, repertoire.rootNodeId, collapsed]);
 
   const selected = graph?.nodes.find(n => n.id === selectedId) ?? graph?.nodes[0];
   useEffect(() => {
     setComment(nodes?.[selected?.id ?? '']?.comment ?? '');
     setFrom(null);
+    setPendingPromotion(null);
   }, [selected?.id, nodes]);
 
   const flowNodes = useMemo(
-    () => (graph?.nodes ?? []).map(n => ({ ...n, type: 'position', selected: n.id === selected?.id })),
-    [graph, selected?.id],
+    () => (graph?.nodes ?? []).map(n => ({ ...n, type: 'position', selected: n.id === selected?.id, data: { ...n.data, onToggle: toggle } })),
+    [graph, selected?.id, toggle],
   );
   const flowEdges = useMemo(
     () => (graph?.edges ?? []).map(e => ({ ...e, className: e.data.transposition ? styles.transposition : styles.edge })),
@@ -75,11 +98,11 @@ const RepertoireBuilder = ({ repertoire, onOpenInBoard, onBack }: RepertoireBuil
   );
 
   // a piece dropped on the mini board adds that move from the selected position
-  async function addMove(from: Square, to: Square): Promise<boolean> {
+  async function addMove(from: Square, to: Square, promotion?: string): Promise<boolean> {
     if (!nodes || !selected) return false;
     const { tree } = repertoireToTree(repertoire.rootNodeId, nodes);
     const path = pathToNode(tree.root, selected.id);
-    const next = path && playMove({ ...tree, currentPath: path }, { from, to, promotion: 'q' });
+    const next = path && playMove({ ...tree, currentPath: path }, { from, to, promotion });
     if (!next) return false;
 
     const edits = collectRepertoireEdits(next, repertoire, nodes);
@@ -92,10 +115,30 @@ const RepertoireBuilder = ({ repertoire, onOpenInBoard, onBack }: RepertoireBuil
       return false;
     }
     await storage.saveNodes(edits.patch);
+    // the new move goes under the selected position: unfold it, or the move lands out of sight
+    setCollapsed(prev => {
+      const next = new Set(prev);
+      next.delete(selected.id);
+      return next;
+    });
     await reload();
     setSelectedId(next.currentPath[next.currentPath.length - 1]);
     setMessage(edits.transpositions ? 'Linked as a transposition to the position the repertoire already has.' : null);
     return true;
+  }
+
+  // called with the chosen piece (e.g. "wN"), or with nothing if the picker was closed
+  function onPromotionPieceSelect(piece?: string, dropFrom?: Square, dropTo?: Square): boolean {
+    const move = dropFrom && dropTo ? { from: dropFrom, to: dropTo } : pendingPromotion;
+    setPendingPromotion(null);
+    if (piece && move) void addMove(move.from, move.to, piece[1].toLowerCase());
+    return false;
+  }
+
+  // fold every first move, leaving Start and the replies to it
+  function collapseAll() {
+    const root = nodes?.[repertoire.rootNodeId];
+    if (root) setCollapsed(new Set(childrenOf(root)));
   }
 
   async function saveComment() {
@@ -130,6 +173,8 @@ const RepertoireBuilder = ({ repertoire, onOpenInBoard, onBack }: RepertoireBuil
         <h1 className={styles.title}>{repertoire.name}</h1>
         <span className={styles.meta}>plays {repertoire.side} · {graph?.nodes.length ?? 0} positions</span>
         <div className={styles.headerActions}>
+          <button className={styles.btn} onClick={collapseAll}>Collapse all</button>
+          <button className={styles.btn} onClick={() => setCollapsed(new Set())} disabled={!collapsed.size}>Expand all</button>
           <button className={styles.btn} onClick={() => onOpenInBoard(repertoire)}>Open in board</button>
           <button className={`${styles.btn} ${styles.danger}`} onClick={removeRepertoire}>Delete repertoire</button>
         </div>
@@ -165,9 +210,15 @@ const RepertoireBuilder = ({ repertoire, onOpenInBoard, onBack }: RepertoireBuil
               boardOrientation={repertoire.side}
               boardWidth={272}
               onPieceDrop={(source, target) => { void addMove(source as Square, target as Square); return false; }}
+              onPromotionCheck={(source, target) => isPromotionMove(selected.data.fen, source, target)}
+              onPromotionPieceSelect={onPromotionPieceSelect}
+              showPromotionDialog={pendingPromotion !== null}
+              promotionToSquare={pendingPromotion?.to ?? null}
               onSquareClick={square => {
-                if (from && from !== square) void addMove(from, square as Square);
-                setFrom(from ? null : (square as Square));
+                const to = square as Square;
+                if (from && from !== to && isPromotionMove(selected.data.fen, from, to)) setPendingPromotion({ from, to });
+                else if (from && from !== to) void addMove(from, to);
+                setFrom(from ? null : to);
               }}
               customSquareStyles={from ? { [from]: { backgroundColor: 'var(--highlight-selected)' } } : {}}
             />

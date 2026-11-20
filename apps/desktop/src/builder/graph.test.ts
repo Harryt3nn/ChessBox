@@ -42,6 +42,27 @@ describe('layoutRepertoire', () => {
     const { nodes: flow } = layoutRepertoire('root', odd);
     expect(flow.map(f => f.id).sort()).toEqual(['Nf3', 'c5', 'e4', 'e5', 'root']);
   });
+
+  it('hides everything under a collapsed position and says how many it hides', () => {
+    const { nodes: flow, edges } = layoutRepertoire('root', nodes, new Set(['e4']));
+    expect(flow.map(f => f.id).sort()).toEqual(['e4', 'root']);
+    expect(flow.find(f => f.id === 'e4')?.data).toMatchObject({ children: 2, hidden: 3 });
+    expect(edges.map(e => e.id)).toEqual(['root->e4']);
+  });
+
+  it('keeps a transposition target that is still reachable, and drops links into hidden positions', () => {
+    const { nodes: flow, edges } = layoutRepertoire('root', nodes, new Set(['e5']));
+    expect(flow.map(f => f.id).sort()).toEqual(['c5', 'e4', 'e5', 'root']);
+    expect(flow.find(f => f.id === 'e5')?.data.hidden).toBe(1);
+    expect(edges.some(e => e.data.transposition)).toBe(false);
+  });
+
+  it('ignores a collapsed leaf or an unknown id', () => {
+    const { nodes: flow } = layoutRepertoire('root', nodes, new Set(['Nf3', 'nope']));
+    expect(flow).toHaveLength(5);
+    expect(flow.find(f => f.id === 'Nf3')?.data).toEqual(expect.objectContaining({ children: 0 }));
+    expect(flow.find(f => f.id === 'Nf3')?.data.hidden).toBeUndefined();
+  });
 });
 
 describe('deleteBranch', () => {
