@@ -201,13 +201,13 @@ The record of design choices, the features added and dropped, and the reasons. R
 - **Evidence:** the 888-node White Aggressive Italian renders in ~1.2 s in the dev app (observed 1,184 / 1,281 ms). Versions pinned to stable releases: `@xyflow/react` 12.12.0 (not the 2-day-old 13.0 major), `@dagrejs/dagre` 3.1.3 (the maintained, typed `dagre`).
 - **One-liner:** A React canvas for graphs plus an automatic layout.
 
-### D21 · training · WeakPoints scheduled with FSRS (ts-fsrs 5.4.2): Status: Built · Updated: 2026-11-20 21:45
+### D21 · training · WeakPoints scheduled with FSRS (ts-fsrs 5.4.2): Status: Verified · Updated: 2026-11-21 00:40
 - **Decision:** Harry picked FSRS via `ts-fsrs` 5.4.2 (MIT, no dependencies, Node ≥ 20), default parameters, desired retention 90%. A card = one prepared reply on your move, drilled as a short sequence (starting 2–3 moves earlier, opponent moves auto-played), auto-graded: wrong move → Again, right first time → Good.
 - **Why:** FSRS beat SM-2 on 99.6% of ~10k benchmarked Anki collections and is Anki's built-in alternative (research Pass 1).
 - **Alternatives rejected:** SM-2 by hand (less accurate, can't be tuned); `ts-fsrs` 6.0 (3 weeks old, Node ≥ 24, adds a dependency).
 - **Trade-off / risk:** a new dependency; no source measures FSRS on chess-move cards.
 - **Revisit if:** enough review history builds up to fit parameters (separate optimiser package).
-- **Evidence:** research.md Pass 1.
+- **Evidence:** research.md Pass 1. In-app (2026-11-21): Harry drilled both repertoires in the dev app (15 graded reviews saved by 2026-11-20 20:02 UTC).
 - **One-liner:** The drills come back just before you'd forget them.
 
 ### D22 · storage · WeakPoints schedules in weakpoints/<repertoireId>.json: Status: Built · Updated: 2026-11-20 21:45
@@ -282,13 +282,13 @@ The record of design choices, the features added and dropped, and the reasons. R
 - **Evidence:** 17 tests in ~26 s (Argon2id hashing dominates).
 - **One-liner:** Both repos test with Vitest.
 
-### D30 · storage · weakpoints/<id>.json = FSRS state + full review log: Status: Built · Updated: 2026-11-20 21:45
+### D30 · storage · weakpoints/<id>.json = FSRS state + full review log: Status: Verified · Updated: 2026-11-21 00:40
 - **Decision:** Harry (took Claude's rec): `{ version: 1, repertoireId, updatedAt, cards: { "<nodeId>": { source, fsrs, log: [{ at, rating, played }] } } }`, keyed by the node where it's your move (same `nodeId` as a deviation `Finding`).
 - **Why:** fitting FSRS parameters later (D21 "Revisit if") needs full review history; `version` lets a future format spot old files.
 - **Alternatives rejected:** state only (history lost for good); state + last 20 reviews (the optimiser needs full histories).
 - **Trade-off / risk:** the file grows ~40 bytes per review (estimate, not measured).
 - **Revisit if:** the file gets big enough to slow loading.
-- **Evidence:** TBD (measure file size after a month of drills). Sync + queue on the 1,082-node data: Italian ~130 ms, 1.e4 12–21 ms warm (each node replayed once; was 385–603 ms replaying every line from the root), measured in Vitest on `weakpoints-drills`.
+- **Evidence:** TBD (measure file size after a month of drills). Sync + queue on the 1,082-node data: Italian ~130 ms, 1.e4 12–21 ms warm (each node replayed once; was 385–603 ms replaying every line from the root), measured in Vitest on `weakpoints-drills`. In-app (2026-11-21): review log in the real file holds rating + played move, e.g. [[3,"e4"],[3,"Nf3"],[3,"d4"],[1,"Bc4"]] on the 1.e4 Repertoire.
 - **One-liner:** Every drill you do is kept, not just the next due date.
 
 ### D31 · storage · Verdicts store numeric scores from your side: Status: Built · Updated: 2026-11-20 21:45
@@ -300,13 +300,13 @@ The record of design choices, the features added and dropped, and the reasons. R
 - **Evidence:** n/a.
 - **One-liner:** Scores are saved as numbers so they can be compared.
 
-### D32 · contract · WeakPoints scheduling runs in main; renderer only reports right / wrong: Status: Built · Updated: 2026-11-20 22:00
+### D32 · contract · WeakPoints scheduling runs in main; renderer only reports right / wrong: Status: Verified · Updated: 2026-11-21 00:40
 - **Decision:** Harry (took Claude's rec): `weakpoints:queue(repId)` returns due + new cards with their lead-in lines; `weakpoints:grade(repId, nodeId, correct: boolean, played: SAN)`. **Amended 2026-11-20 22:00:** `played` added (validated `[A-Za-z0-9=+#-]{2,10}`) because D30's log keeps the move; Harry's rule: on a conflict the earlier decision wins. Main builds the pool, runs `ts-fsrs` on its own clock, saves.
 - **Why:** a boolean is trivial to re-sanitise (D8); the nodes and novelty file already live in main (D4).
 - **Alternatives rejected:** renderer runs FSRS and sends whole cards (main must validate ~10 untrusted fields; ts-fsrs in the renderer bundle).
 - **Trade-off / risk:** one IPC round trip per grade.
 - **Revisit if:** another tool needs to schedule cards from the renderer.
-- **Evidence:** n/a.
+- **Evidence:** n/a. In-app (2026-11-21): every grade in the real files came through `weakpoints:grade` with a validated SAN.
 - **One-liner:** The window says "right" or "wrong"; the main process decides when you see it again.
 
 ### D33 · training · What becomes a WeakPoints card (TUNE): Status: Built · Updated: 2026-11-20 21:45
@@ -354,13 +354,13 @@ The record of design choices, the features added and dropped, and the reasons. R
 - **Evidence:** n/a.
 - **One-liner:** Random is free practice; it never touches your schedule.
 
-### D38 · analysis · Deviations are checked by Stockfish automatically; the Evaluate button goes: Status: Built · Updated: 2026-11-21 00:10
+### D38 · analysis · Deviations are checked by Stockfish automatically; the Evaluate button goes: Status: Verified · Updated: 2026-11-21 00:40
 - **Decision:** Harry (took Claude's rec): after a novelty run, and when the page opens, the Novelty Finder checks every deviation without a prepared-move score in the background (full Stockfish, depth 18, the page's worker), showing progress; each verdict is saved as it lands, so leaving the page and coming back resumes. The Evaluate / Re-check buttons are removed.
 - **Why:** Harry found the button redundant next to Board; D23 (earlier decision, so it wins) needs a verdict on each deviation.
 - **Alternatives rejected:** keep the button, relabelled (only works if pressed); remove it and drop D23 (overrides an earlier decision).
 - **Trade-off / risk:** first pass ~6 s per deviation (estimate from the measured ~4 s for two searches), ~10 min for the Italian's 96; novelties no longer get new verdicts (existing ones still show).
 - **Revisit if:** the background check makes the page sluggish.
-- **Evidence:** TBD (measure the first pass on the Italian).
+- **Evidence:** TBD (measure the first pass on the Italian). In-app (2026-11-21): in the dev app the background check finished 33 of 33 deviations on the 1.e4 Repertoire; timing not measured, Italian (147) not run yet.
 - **One-liner:** Stockfish checks your deviations by itself.
 
 ### D39 · training · Deviations on your first 2 moves aren't drilled (TUNE): Status: Built · Updated: 2026-11-21 00:10

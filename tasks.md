@@ -3,8 +3,8 @@
 Work **▶ Now** top to bottom. Tags: `[🟠 your call: …]` = a design decision for the builder (CLAUDE.md §1) · `[⏸ waits on: …]` = blocked.
 
 ## 📊 Latest (the only home of volatile facts)
-- **Updated:** 2026-11-21 00:10
-- **`main` at:** bfa85b4 (pushed) · **server `main`:** 1717269 (pushed, deployed to the Pi) · **open branches:** `weakpoints-drills` (`db9be75`, pushed, not merged: T21 + T24–T28 built, waits on Harry trying them in the app) · **Electron:** 42.11.18
+- **Updated:** 2026-11-21 00:40
+- **`main` at:** cf9f9ee (pushed) · **server `main`:** 1717269 (pushed, deployed to the Pi) · **open branches:** none · **Electron:** 42.11.18
 - **Tests:** desktop 209 passing (23 files) · server 17 passing (1 file, ~26 s) · **Builder:** 888-node Italian renders in ~1.2 s · **Verdict:** full Stockfish (single-threaded) depth 18 in ~4 s per finding · **Novelty run:** "Check all games" on White Aggressive Italian = 4,396 games in 22 s in the dev app (2,627 deviations, 1,757 novelties, 12 in prep) · **Walk alone:** ~3 ms / game · **WeakPoints sync + queue:** Italian ~130 ms, 106 cards on first sync (D30, D33) · **npm audit:** 47, build / dev tooling only
 
 ## ▶ Now (ranked): stage-1 MVP from `system.md` (2026-11-18)
@@ -40,14 +40,14 @@ Work **▶ Now** top to bottom. Tags: `[🟠 your call: …]` = a design decisio
 
 **M7 · WeakPoints trainer (toolkit tool)**
 - [x] **T20 · Research pass: spaced repetition (Anki SM-2 / FSRS) + Aimchess** · Done when: `research.md` Pass 1 is graded and a recommendation is ready for Harry.
-- [ ] **T21 · WeakPoints drills (D21–D23)** · Done when: cards from deviations (minus ones within 0.3 pawns), rarely hit and strong lines are drilled as short sequences on a board without analysis, auto-graded and scheduled by FSRS, saved to `weakpoints/<id>.json`; verdict gains the prepared-move score; deleting a repertoire removes its weakpoints file.
+- [x] **T21 · WeakPoints drills (D21–D23)** · Done when: cards from deviations (minus ones within 0.3 pawns), rarely hit and strong lines are drilled as short sequences on a board without analysis, auto-graded and scheduled by FSRS, saved to `weakpoints/<id>.json`; verdict gains the prepared-move score; deleting a repertoire removes its weakpoints file.
 
-- [ ] **T24 · WeakPoints modes (D36, D37)** · Done when: the page offers Focused, Mistakes only and Random; Random works with no novelty data and saves nothing; tested.
+- [x] **T24 · WeakPoints modes (D36, D37)** · Done when: the page offers Focused, Mistakes only and Random; Random works with no novelty data and saves nothing; tested.
 
-- [ ] **T25 · Board ↔ graph everywhere** · Done when: every position with a Board button also has Graph (opens the builder on that node, unfolded and centred), the builder's "Open in board" opens the selected node, and the board can jump to the graph.
-- [ ] **T26 · Branch filter for drills (D40)** · Done when: a branch picker (plus Everything) limits all three modes; tested.
-- [ ] **T27 · Skip early deviations (D39)** · Done when: deviations on your first 2 moves aren't queued; tested.
-- [ ] **T28 · Automatic deviation verdicts (D38)** · Done when: the Novelty Finder checks unchecked deviations in the background with progress, saves each, resumes; the Evaluate button is gone. Also shows game dates and times (UI).
+- [x] **T25 · Board ↔ graph everywhere** · Done when: every position with a Board button also has Graph (opens the builder on that node, unfolded and centred), the builder's "Open in board" opens the selected node, and the board can jump to the graph.
+- [x] **T26 · Branch filter for drills (D40)** · Done when: a branch picker (plus Everything) limits all three modes; tested.
+- [x] **T27 · Skip early deviations (D39)** · Done when: deviations on your first 2 moves aren't queued; tested.
+- [x] **T28 · Automatic deviation verdicts (D38)** · Done when: the Novelty Finder checks unchecked deviations in the background with progress, saves each, resumes; the Evaluate button is gone. Also shows game dates and times (UI).
 
 **Loose ends**
 - [x] **T6 · Check B8 in the app** (Escape in "New Folder" may still create one).
@@ -87,6 +87,7 @@ Work **▶ Now** top to bottom. Tags: `[🟠 your call: …]` = a design decisio
 ## ── Archived (superseded, do NOT action) ──
 
 ## ✅ Done log (newest first)
+- 2026-11-21 00:40 · T21 + T24–T28 WeakPoints and Novelty Finder: FSRS drills (D21–D35), three modes Focused / Mistakes only / Random (D36, D37), opening branch filter (D40), early deviations skipped (D39), random forward drills (D41), automatic deviation verdicts with no Evaluate button (D38), game dates + times and game lists, deviations / novelties in one tabbed panel, board ↔ graph everywhere · `main@cf9f9ee` · 209 desktop tests · checked by Harry in the dev app: drills graded and saved (15 reviews across both repertoires, played moves logged), background check finished 33 of 33 deviations on the 1.e4 Repertoire; Italian's 147 not yet run
 - 2026-11-20 20:30 · T18 one settings page (account, linked sites inline, change username / password, Retry when the Pi is unreachable; replaces the profile card) · `main@bfa85b4` · 6 tests · verified by Harry in the app on a new `dev` account: linked Chess.com + Lichess, changed username and password, signed back in
 - 2026-11-20 20:30 · T19 server: change password / username (D28), login + register limits (D26), Vitest on the server (D29) · server `1717269`, deployed; checked from the desktop: health `{"ok":true}`, `user.changePassword` routed (401 signed out), foreign Origin gets no CORS allow header; Harry's live test as T18 · 17 server tests
 - 2026-11-20 18:30 · T23 builder polish: fold / unfold branches (+N = positions hidden; collapse all folds where the lines first split, expand all; view state only, not saved), promotion picker on the mini board, React Flow controls + grid in the app theme; verified in the app on the 1.e4 repertoire (52 positions, collapse all shows 7, counts 1 + 22 + 22); promotion picker not clicked through (no promotion position in the data), type-checked against the same props as the board · `main@b34dc17` · 3 tests

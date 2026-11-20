@@ -13,6 +13,13 @@ For the next session. One entry per handoff, at most ~15 lines.
 
 ---
 
+## 2026-11-21 00:40 · M7 merged: WeakPoints + Novelty Finder polish on main
+- **Done:** `weakpoints-drills` merged to `main@cf9f9ee` (pushed, branch deleted). T21 + T24–T28 ticked. D21, D30, D32, D38 Verified in the app; the rest Built. 209 tests.
+- **In progress:** nothing; no open branches.
+- **Next step:** open the Novelty Finder on the White Aggressive Italian and let the 147 deviation checks finish (~15 min, estimate); time it for D38's evidence. Then ▶ Now is empty for stage 1: offer the Parked list.
+- **Gotchas:** Harry's rule: on a conflict his earlier decision wins. Random drills live in `src/weakpoints/lines.ts` (no ts-fsrs in the renderer).
+- **Commands to run:** `./ctx.sh sync` · `cd apps/desktop && npm test` · `npm start`
+
 ## 2026-11-21 00:10 · WeakPoints modes, branch filter, auto verdicts, board ↔ graph
 - **Done:** on `weakpoints-drills` (`db9be75`, pushed): Harry's feedback (layout, Home badge, auto-advance, explicit repertoire pick) + D36–D41 built: Focused / Mistakes only / Random, opening branch filter, early deviations skipped, automatic deviation verdicts (Evaluate button gone), game dates + times, Graph buttons, builder ↔ board at the selected node. 209 tests green.
 - **In progress:** not merged; Harry to try it in the dev app.
