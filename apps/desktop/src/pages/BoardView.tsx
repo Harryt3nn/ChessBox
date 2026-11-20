@@ -74,17 +74,18 @@ function download(fileName: string, text: string) {
 
 export interface BoardFocus {
   nodeId: string; // the repertoire position to show
-  move: string; // a move to play from there (a novelty or deviation), left unsaved
+  move?: string; // a move to play from there (a novelty or deviation), left unsaved
 }
 
 interface BoardViewProps {
   // a repertoire to show instead of a free analysis; moves added on the board can be saved into it
   repertoire: Repertoire | null;
   focus: BoardFocus | null;
+  onOpenInGraph: (repertoire: Repertoire, nodeId: string) => void;
   onCloseRepertoire: () => void;
 }
 
-const BoardView = ({ repertoire, focus, onCloseRepertoire }: BoardViewProps) => {
+const BoardView = ({ repertoire, focus, onOpenInGraph, onCloseRepertoire }: BoardViewProps) => {
 
   // The full game tree. All state lives here.
   const [tree, setTree] = useState<GameTree>(() => createTree());
@@ -158,7 +159,7 @@ const BoardView = ({ repertoire, focus, onCloseRepertoire }: BoardViewProps) => 
         const { tree: built, skipped } = repertoireToTree(repertoire.rootNodeId, nodes, { Event: repertoire.name });
         const focusPath = focus ? pathToNode(built.root, focus.nodeId) : null;
         const atFocus = focusPath ? { ...built, currentPath: focusPath } : built;
-        const next = focus && focusPath ? playSan(atFocus, focus.move) ?? atFocus : built;
+        const next = focus?.move && focusPath ? playSan(atFocus, focus.move) ?? atFocus : atFocus;
         loadTree(next, skipped ? `${skipped} move${skipped === 1 ? '' : 's'} in this repertoire couldn't be played and ${skipped === 1 ? 'was' : 'were'} left out.` : undefined);
         setOrientation(repertoire.side);
         setRepertoireNodes(nodes);
@@ -484,6 +485,15 @@ return (
               title="Add the moves you played here to the repertoire"
             >
               Save to repertoire
+            </button>
+            <button
+              className={styles.btnSecondary}
+              onClick={() => onOpenInGraph(repertoire, activeNodeId ?? repertoire.rootNodeId)}
+              // a move played here but not saved isn't in the graph yet
+              disabled={!repertoireNodes || (activeNodeId !== null && !Object.prototype.hasOwnProperty.call(repertoireNodes, activeNodeId))}
+              title="Show this position in the repertoire graph"
+            >
+              Show in graph
             </button>
             <button className={styles.btnSecondary} onClick={closeRepertoire}>Close</button>
           </div>

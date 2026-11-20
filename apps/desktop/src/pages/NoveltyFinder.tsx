@@ -1,6 +1,6 @@
 /* apps/desktop/src/pages/NoveltyFinder.tsx */
 
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { Fragment, useEffect, useMemo, useRef, useState } from 'react';
 import { DEFAULT_POSITION } from 'chess.js';
 import { PageHeader } from '../components/PageHeader';
 import { Icon } from '../components/Icon';
@@ -8,7 +8,7 @@ import styles from './NoveltyFinder.module.css';
 import shared from './PageShared.module.css';
 import type { Page } from '../types/Page';
 import type { Repertoire } from '../types/Repertoire';
-import type { Finding, NoveltyFile } from '../novelty/results';
+import type { Finding, GameRecord, NoveltyFile } from '../novelty/results';
 import { FileSystemStorageProvider } from '../Storage/FileSystemStorageProvider';
 import { numberedLine } from '../chess/analysisTree';
 import type { BoardFocus } from './BoardView';
@@ -26,13 +26,16 @@ interface NoveltyFinderProps {
   page: Page;
   currentUser: any; // or your inferred User type
   onOpenInBoard: (repertoire: Repertoire, focus: BoardFocus) => void;
+  onOpenInGraph: (repertoire: Repertoire, nodeId: string) => void;
 }
 
 // rows shown per table; the rest are counted in the header
 const SHOWN = 50;
 
 const describeLine = (line: string[]) => (line.length ? numberedLine(DEFAULT_POSITION, line) : 'Start position');
-const formatDate = (ms: number) => (ms ? new Date(ms).toLocaleDateString() : '—');
+const formatDateTime = (ms: number) => (ms ? new Date(ms).toLocaleString(undefined, { dateStyle: 'medium', timeStyle: 'short' }) : '—');
+// games listed under an opened row
+const GAMES_SHOWN = 20;
 // dismissed findings sink to the bottom; otherwise the most frequent first
 const byCount = (a: Finding, b: Finding) =>
   Number(a.status === 'dismissed') - Number(b.status === 'dismissed') || b.count - a.count || b.lastSeen - a.lastSeen;
@@ -40,7 +43,7 @@ const keyOf = (f: Finding) => `${f.nodeId}|${f.move}|${f.kind}`;
 // (TUNE) full Stockfish, single-threaded: a few seconds per position
 const VERDICT_DEPTH = 18;
 
-const NoveltyFinder = ({ currentUser, onOpenInBoard }: NoveltyFinderProps) => {
+const NoveltyFinder = ({ currentUser, onOpenInBoard, onOpenInGraph }: NoveltyFinderProps) => {
   const storage = useMemo(() => new FileSystemStorageProvider(), []);
   const [repertoires, setRepertoires] = useState<Repertoire[]>([]);
   const [repertoireId, setRepertoireId] = useState('');
@@ -92,45 +95,85 @@ const NoveltyFinder = ({ currentUser, onOpenInBoard }: NoveltyFinderProps) => {
     }
   }
 
-  // the full engine is loaded on the first Evaluate and closed with the page
+  // the full engine is loaded when the first deviation needs checking, and closed with the page
   const engine = useRef<Engine | null>(null);
-  useEffect(() => () => engine.current?.quit(), []);
-  const [evaluating, setEvaluating] = useState<string | null>(null);
   const repertoire = repertoires.find(r => r.id === repertoireId);
 
   const refresh = async () => setResults(await window.api.loadNovelty(repertoireId));
 
   // the verdict: the engine's score after the move played, its own best move in the position before,
   // and for a deviation the score after your prepared move, so WeakPoints can skip near-equal ones (D23, D31)
-  async function evaluate(f: Finding) {
+  async function verdict(repId: string, side: 'white' | 'black', f: Finding): Promise<boolean> {
     const positions = findingPositions(f.line, f.move);
-    const prepared = f.kind === 'deviation' && f.expected ? findingPositions(f.line, f.expected) : null;
-    if (!positions || !repertoire) return setSummary("That position couldn't be replayed.");
-    setEvaluating(keyOf(f));
+    const prepared = f.expected ? findingPositions(f.line, f.expected) : null;
+    if (!positions || !prepared) return false;
+    const stockfish = (engine.current ??= new Engine(createFullWorker()));
+    const topLine = async (fen: string) => {
+      let lines: EngineLine[] = [];
+      await stockfish.analyse(fen, { depth: VERDICT_DEPTH }, l => { lines = l; });
+      return lines[0];
+    };
+    const bestUci = await stockfish.analyse(positions.before, { depth: VERDICT_DEPTH }, () => undefined);
+    const after = await topLine(positions.after);
+    const afterPrepared = await topLine(prepared.after);
+    await window.api.updateFinding(repId, keyOf(f), {
+      eval: {
+        score: after ? formatScore(whiteScore(after.score, positions.after)) : '?',
+        depth: after?.depth ?? 0,
+        best: bestUci ? uciToSan(positions.before, [bestUci])[0] ?? '?' : '—',
+        ...(after ? { playedCp: sideCentipawns(after.score, positions.after, side) } : {}),
+        ...(afterPrepared ? { preparedCp: sideCentipawns(afterPrepared.score, prepared.after, side) } : {}),
+      },
+    });
+    return true;
+  }
+
+  // D38: deviations without a prepared-move score are checked one at a time in the background, most
+  // frequent first. Each verdict is saved as it lands, so leaving and coming back carries on where it
+  // stopped. One loop at a time; it follows whichever repertoire is shown and pauses during a run.
+  const [checking, setChecking] = useState<{ done: number; total: number } | null>(null);
+  const shownRepertoire = useRef<Repertoire | undefined>(undefined);
+  shownRepertoire.current = repertoire;
+  const walking = useRef(false);
+  walking.current = !!running;
+  const checkLoop = useRef(false);
+  const unreplayable = useRef(new Set<string>());
+
+  async function checkDeviations() {
+    if (checkLoop.current) return;
+    checkLoop.current = true;
+    let done = 0;
     try {
-      const stockfish = (engine.current ??= new Engine(createFullWorker()));
-      const topLine = async (fen: string) => {
-        let lines: EngineLine[] = [];
-        await stockfish.analyse(fen, { depth: VERDICT_DEPTH }, l => { lines = l; });
-        return lines[0];
-      };
-      const bestUci = await stockfish.analyse(positions.before, { depth: VERDICT_DEPTH }, () => undefined);
-      const after = await topLine(positions.after);
-      const afterPrepared = prepared && await topLine(prepared.after);
-      await window.api.updateFinding(repertoireId, keyOf(f), {
-        eval: {
-          score: after ? formatScore(whiteScore(after.score, positions.after)) : '?',
-          depth: after?.depth ?? 0,
-          best: bestUci ? uciToSan(positions.before, [bestUci])[0] ?? '?' : '—',
-          ...(after ? { playedCp: sideCentipawns(after.score, positions.after, repertoire.side) } : {}),
-          ...(afterPrepared && prepared ? { preparedCp: sideCentipawns(afterPrepared.score, prepared.after, repertoire.side) } : {}),
-        },
-      });
-      await refresh();
+      for (;;) {
+        const rep = shownRepertoire.current;
+        if (!rep || walking.current) break;
+        const file = await window.api.loadNovelty(rep.id);
+        const todo = Object.values(file?.findings ?? {})
+          .filter(f => f.kind === 'deviation' && f.eval?.preparedCp === undefined && !unreplayable.current.has(`${rep.id}|${keyOf(f)}`))
+          .sort(byCount);
+        if (todo.length === 0) break;
+        setChecking({ done, total: done + todo.length });
+        if (!(await verdict(rep.id, rep.side, todo[0]))) unreplayable.current.add(`${rep.id}|${keyOf(todo[0])}`);
+        done++;
+        if (shownRepertoire.current?.id === rep.id) setResults(await window.api.loadNovelty(rep.id));
+      }
+    } catch (err) {
+      // the engine was closed with the page, or a save failed: stop, and try again next time
+      console.error('Stopped checking deviations:', err);
     } finally {
-      setEvaluating(null);
+      checkLoop.current = false;
+      setChecking(null);
     }
   }
+
+  useEffect(() => {
+    if (results && !running) checkDeviations();
+  }, [results?.updatedAt, repertoireId, running]);
+
+  useEffect(() => () => {
+    shownRepertoire.current = undefined;
+    engine.current?.quit();
+  }, []);
 
   async function toggleDismissed(f: Finding) {
     await window.api.updateFinding(repertoireId, keyOf(f), { status: f.status === 'dismissed' ? 'new' : 'dismissed' });
@@ -140,11 +183,40 @@ const NoveltyFinder = ({ currentUser, onOpenInBoard }: NoveltyFinderProps) => {
   const actions = (f: Finding) => (
     <td className={styles.rowActions}>
       <button className={styles.rowBtn} onClick={() => repertoire && onOpenInBoard(repertoire, { nodeId: f.nodeId, move: f.move })} title="Show this position in the analysis board">Board</button>
+      <button className={styles.rowBtn} onClick={() => repertoire && onOpenInGraph(repertoire, f.nodeId)} title="Show where this happens in the repertoire graph">Graph</button>
       {f.eval && <span className={styles.verdict} title={`Stockfish depth ${f.eval.depth}: score after ${f.move}, and its own best move`}>{f.eval.score} · best {f.eval.best}</span>}
-      {/* a verdict from before D31 has no prepared-move score, so WeakPoints can't tell if the deviation was fine */}
-      {(!f.eval || (f.kind === 'deviation' && f.eval.preparedCp === undefined)) && <button className={styles.rowBtn} onClick={() => evaluate(f)} disabled={!!evaluating}>{evaluating === keyOf(f) ? 'Evaluating…' : f.eval ? 'Re-check' : 'Evaluate'}</button>}
       <button className={styles.rowBtn} onClick={() => toggleDismissed(f)}>{f.status === 'dismissed' ? 'Restore' : 'Dismiss'}</button>
     </td>
+  );
+
+  // the games behind a finding, newest first, shown under its row
+  const [openRow, setOpenRow] = useState<string | null>(null);
+  const timesCell = (f: Finding) => (
+    <td>
+      <button className={styles.linkBtn} onClick={() => setOpenRow(r => (r === keyOf(f) ? null : keyOf(f)))} title="Show the games">
+        {f.count} {openRow === keyOf(f) ? '▾' : '▸'}
+      </button>
+    </td>
+  );
+  const gamesRow = (f: Finding) => openRow === keyOf(f) && (
+    <tr className={styles.gamesRow}>
+      <td colSpan={6}>
+        <ul className={styles.gameList}>
+          {f.games
+            .map(key => ({ key, game: results?.games[key] }))
+            .filter((g): g is { key: string; game: GameRecord } => !!g.game)
+            .sort((a, b) => b.game.playedAt - a.game.playedAt)
+            .slice(0, GAMES_SHOWN)
+            .map(({ key, game }) => (
+              <li key={key}>
+                <span className={styles.gameWhen}>{formatDateTime(game.playedAt)}</span>
+                {game.white} vs {game.black} · {game.result} · {key.startsWith('lichess:') ? 'Lichess' : 'Chess.com'}
+              </li>
+            ))}
+          {f.games.length > GAMES_SHOWN && <li className={styles.importHint}>and {f.games.length - GAMES_SHOWN} older</li>}
+        </ul>
+      </td>
+    </tr>
   );
 
   const findings = Object.values(results?.findings ?? {});
@@ -287,6 +359,7 @@ const NoveltyFinder = ({ currentUser, onOpenInBoard }: NoveltyFinderProps) => {
           <section className={shared.panel}>
             <div className={shared.panelHeader}>
               <h2 className={shared.sectionTitle}>Deviations</h2>
+              {checking && <span className={styles.importHint}>Stockfish checking {checking.done + 1} of {checking.total}…</span>}
               {deviations.length > SHOWN && <span className={styles.importHint}>top {SHOWN} of {deviations.length}</span>}
             </div>
 
@@ -295,10 +368,13 @@ const NoveltyFinder = ({ currentUser, onOpenInBoard }: NoveltyFinderProps) => {
                 <thead><tr><th>After</th><th>You played</th><th>Prepared</th><th>Times</th><th>Last</th><th /></tr></thead>
                 <tbody>
                   {deviations.slice(0, SHOWN).map(f => (
-                    <tr key={keyOf(f)} className={f.status === 'dismissed' ? styles.dismissed : undefined}>
-                      <td>{describeLine(f.line)}</td><td>{f.move}</td><td>{f.expected}</td><td>{f.count}</td><td>{formatDate(f.lastSeen)}</td>
-                      {actions(f)}
-                    </tr>
+                    <Fragment key={keyOf(f)}>
+                      <tr className={f.status === 'dismissed' ? styles.dismissed : undefined}>
+                        <td>{describeLine(f.line)}</td><td>{f.move}</td><td>{f.expected}</td>{timesCell(f)}<td>{formatDateTime(f.lastSeen)}</td>
+                        {actions(f)}
+                      </tr>
+                      {gamesRow(f)}
+                    </Fragment>
                   ))}
                 </tbody>
               </table>
@@ -326,12 +402,15 @@ const NoveltyFinder = ({ currentUser, onOpenInBoard }: NoveltyFinderProps) => {
                 <thead><tr><th>After</th><th>Move</th><th>Why new</th><th>Times</th><th>Last</th><th /></tr></thead>
                 <tbody>
                   {novelties.slice(0, SHOWN).map(f => (
-                    <tr key={keyOf(f)} className={f.status === 'dismissed' ? styles.dismissed : undefined}>
-                      <td>{describeLine(f.line)}</td><td>{f.move}</td>
-                      <td>{f.reason === 'opponent-move' ? "opponent's move" : 'line ended'}</td>
-                      <td>{f.count}</td><td>{formatDate(f.lastSeen)}</td>
-                      {actions(f)}
-                    </tr>
+                    <Fragment key={keyOf(f)}>
+                      <tr className={f.status === 'dismissed' ? styles.dismissed : undefined}>
+                        <td>{describeLine(f.line)}</td><td>{f.move}</td>
+                        <td>{f.reason === 'opponent-move' ? "opponent's move" : 'line ended'}</td>
+                        {timesCell(f)}<td>{formatDateTime(f.lastSeen)}</td>
+                        {actions(f)}
+                      </tr>
+                      {gamesRow(f)}
+                    </Fragment>
                   ))}
                 </tbody>
               </table>

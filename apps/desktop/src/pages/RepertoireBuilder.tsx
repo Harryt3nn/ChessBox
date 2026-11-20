@@ -13,13 +13,15 @@ import { childrenOf, repertoireToTree } from '../chess/repertoireTree';
 import { isPromotionMove, pathToNode, playMove } from '../chess/analysisTree';
 import { collectRepertoireEdits, normalised } from '../chess/repertoireEdits';
 import styles from './RepertoireBuilder.module.css';
+import type { BoardFocus } from './BoardView';
 
 // the visual repertoire builder (M5, D20): the graph top-down, a mini board to add moves from the
 // selected position (same rules as the analysis board: one reply on your move, transpositions linked)
 
 interface RepertoireBuilderProps {
   repertoire: Repertoire;
-  onOpenInBoard: (repertoire: Repertoire) => void;
+  focusNodeId: string | null; // the position to select and centre on when it opens
+  onOpenInBoard: (repertoire: Repertoire, focus: BoardFocus) => void;
   onBack: () => void;
 }
 
@@ -50,10 +52,10 @@ function PositionNode({ id, data, selected }: NodeProps) {
 
 const nodeTypes = { position: PositionNode };
 
-const RepertoireBuilder = ({ repertoire, onOpenInBoard, onBack }: RepertoireBuilderProps) => {
+const RepertoireBuilder = ({ repertoire, focusNodeId, onOpenInBoard, onBack }: RepertoireBuilderProps) => {
   const storage = useMemo(() => new FileSystemStorageProvider(), []);
   const [nodes, setNodes] = useState<Record<string, Node> | null>(null);
-  const [selectedId, setSelectedId] = useState(repertoire.rootNodeId);
+  const [selectedId, setSelectedId] = useState(focusNodeId ?? repertoire.rootNodeId);
   const [comment, setComment] = useState('');
   const [message, setMessage] = useState<string | null>(null);
   // click-to-move on the mini board, like the analysis board: first click picks the piece
@@ -193,7 +195,7 @@ const RepertoireBuilder = ({ repertoire, onOpenInBoard, onBack }: RepertoireBuil
         <div className={styles.headerActions}>
           <button className={styles.btn} onClick={collapseAll}>Collapse all</button>
           <button className={styles.btn} onClick={expandAll} disabled={!collapsed.size}>Expand all</button>
-          <button className={styles.btn} onClick={() => onOpenInBoard(repertoire)}>Open in board</button>
+          <button className={styles.btn} onClick={() => onOpenInBoard(repertoire, { nodeId: selected?.id ?? repertoire.rootNodeId })} title="Open the selected position in the analysis board">Open in board</button>
           <button className={`${styles.btn} ${styles.danger}`} onClick={removeRepertoire}>Delete repertoire</button>
         </div>
       </header>
@@ -210,6 +212,8 @@ const RepertoireBuilder = ({ repertoire, onOpenInBoard, onBack }: RepertoireBuil
               nodesDraggable={false}
               nodesConnectable={false}
               fitView
+              // opened on a position: centre on it, but only the first time (collapse / expand all re-fits the whole tree)
+              fitViewOptions={viewKey === 0 && focusNodeId ? { nodes: [{ id: focusNodeId }], maxZoom: 1 } : undefined}
               minZoom={0.05}
               proOptions={{ hideAttribution: true }}
             >

@@ -35,9 +35,12 @@ const App = () => {
 
   // the repertoire open in the visual builder
   const [builderRepertoire, setBuilderRepertoire] = useState<Repertoire | null>(null);
+  // a position to select and centre on when the builder opens (board ↔ graph)
+  const [builderFocus, setBuilderFocus] = useState<string | null>(null);
 
-  function openBuilder(rep: Repertoire) {
+  function openBuilder(rep: Repertoire, nodeId?: string) {
     setBuilderRepertoire(rep);
+    setBuilderFocus(nodeId ?? null);
     setPage('builder');
   }
 
@@ -68,13 +71,13 @@ const App = () => {
     if (page === 'analytics') return <Analytics />;
     if (page === 'repertoires') return <EditRepertoires onOpenRepertoire={openInBoard} onBuildRepertoire={openBuilder} />;
     if (page === 'builder' && builderRepertoire) {
-      return <RepertoireBuilder key={builderRepertoire.id} repertoire={builderRepertoire} onOpenInBoard={openInBoard} onBack={() => setPage('repertoires')} />;
+      return <RepertoireBuilder key={`${builderRepertoire.id}:${builderFocus}`} repertoire={builderRepertoire} focusNodeId={builderFocus} onOpenInBoard={openInBoard} onBack={() => setPage('repertoires')} />;
     }
     if (page === 'tools') return <TrainingToolkit page={page} setPage={setPage} />;
     if (page === 'settings') return <Settings onLogout={handleLogout} onUserChange={setCurrentUser} />;
-    if (page === 'board') return <BoardView repertoire={boardRepertoire} focus={boardFocus} onCloseRepertoire={() => { setBoardRepertoire(null); setBoardFocus(null); }} />;
+    if (page === 'board') return <BoardView repertoire={boardRepertoire} focus={boardFocus} onOpenInGraph={openBuilder} onCloseRepertoire={() => { setBoardRepertoire(null); setBoardFocus(null); }} />;
     if (page === 'weakpoints') return <WeakPoints setPage={setPage} />;
-    if (page === 'novelty') return <NoveltyFinder page={page} currentUser={currentUser} onOpenInBoard={openInBoard} />;
+    if (page === 'novelty') return <NoveltyFinder page={page} currentUser={currentUser} onOpenInBoard={openInBoard} onOpenInGraph={openBuilder} />;
 
     return <Home setPage={setPage} currentUser={currentUser} />;
   }
