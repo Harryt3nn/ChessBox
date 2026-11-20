@@ -32,6 +32,12 @@ A bare § means this file. `tasks.md` holds the ranked work; `decisions.md` hold
 - D27: A password change doesn't sign out other devices **for now** (revisit: see Pending).
 - D28: Change password / username both re-ask the current password; contract in `decisions.md`.
 - D29: Server tests run on Vitest too (`npm test` in `vendor/chessbox-server/apps/api`).
+- D30: `weakpoints/<id>.json` = `{version, cards: {nodeId: {source, fsrs, log}}}`, full review log kept.
+- D31: Verdicts store `playedCp` / `preparedCp` from your side (mate = ±100 pawns); old ones count as no verdict.
+- D32: WeakPoints scheduling runs in main; IPC = `weakpoints:queue` + `weakpoints:grade(nodeId, correct)`.
+- D33: Cards = deviations (non-dismissed, outside 0.3) + rare (hit 1–2) + strong (hit ≥ 5, never deviated); 10 new / day (TUNE).
+- D34: A drill starts 2 of your moves back (TUNE); only the target move is graded.
+- D35: Unreadable weakpoints file → backed up, fresh start, toast; deleted node → card dropped; changed reply → card reset.
 - D13: A saved session is cleared only when the server answers `UNAUTHORIZED` or `NOT_FOUND` (deleted account); unreachable / erroring server → stay signed in, toast, local features keep working.
 
 **Pending / Unconfirmed** (*not decided*; each with the condition that decides it):

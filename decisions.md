@@ -281,3 +281,57 @@ The record of design choices, the features added and dropped, and the reasons. R
 - **Revisit if:** the image size on the Pi matters (`npm ci --omit=dev` would need tsx and prisma moved to dependencies).
 - **Evidence:** 17 tests in ~26 s (Argon2id hashing dominates).
 - **One-liner:** Both repos test with Vitest.
+
+### D30 · storage · weakpoints/<id>.json = FSRS state + full review log: Status: Planned · Updated: 2026-11-20 21:00
+- **Decision:** Harry (took Claude's rec): `{ version: 1, repertoireId, updatedAt, cards: { "<nodeId>": { source, fsrs, log: [{ at, rating, played }] } } }`, keyed by the node where it's your move (same `nodeId` as a deviation `Finding`).
+- **Why:** fitting FSRS parameters later (D21 "Revisit if") needs full review history; `version` lets a future format spot old files.
+- **Alternatives rejected:** state only (history lost for good); state + last 20 reviews (the optimiser needs full histories).
+- **Trade-off / risk:** the file grows ~40 bytes per review (estimate, not measured).
+- **Revisit if:** the file gets big enough to slow loading.
+- **Evidence:** TBD (measure file size after a month of drills).
+- **One-liner:** Every drill you do is kept, not just the next due date.
+
+### D31 · storage · Verdicts store numeric scores from your side: Status: Planned · Updated: 2026-11-20 21:00
+- **Decision:** Harry (took Claude's rec): `Finding.eval` gains `playedCp` and `preparedCp`, centipawns from the repertoire side; a mate counts as ±100 pawns. The display string stays. Old verdicts without `preparedCp` count as "no verdict" (drilled, D23) until re-evaluated.
+- **Why:** store data, not presentation; D23's comparison becomes one subtraction.
+- **Alternatives rejected:** parse the `"+0.35"` / `"#3"` strings.
+- **Trade-off / risk:** the 12 existing verdicts need Evaluate again to be filtered.
+- **Revisit if:** n/a.
+- **Evidence:** n/a.
+- **One-liner:** Scores are saved as numbers so they can be compared.
+
+### D32 · contract · WeakPoints scheduling runs in main; renderer only reports right / wrong: Status: Planned · Updated: 2026-11-20 21:00
+- **Decision:** Harry (took Claude's rec): `weakpoints:queue(repId)` returns due + new cards with their lead-in lines; `weakpoints:grade(repId, nodeId, correct: boolean)`. Main builds the pool, runs `ts-fsrs` on its own clock, saves.
+- **Why:** a boolean is trivial to re-sanitise (D8); the nodes and novelty file already live in main (D4).
+- **Alternatives rejected:** renderer runs FSRS and sends whole cards (main must validate ~10 untrusted fields; ts-fsrs in the renderer bundle).
+- **Trade-off / risk:** one IPC round trip per grade.
+- **Revisit if:** another tool needs to schedule cards from the renderer.
+- **Evidence:** n/a.
+- **One-liner:** The window says "right" or "wrong"; the main process decides when you see it again.
+
+### D33 · training · What becomes a WeakPoints card (TUNE): Status: Planned · Updated: 2026-11-20 21:00
+- **Decision:** Harry (took Claude's rec): only positions your games reached. Deviations: non-dismissed, outside 0.3 (D23), due now. Rare: your-move positions hit 1–2 times. Strong: hit ≥ 5, never deviated. Rare + strong enter at 10 new per day, rare first. Dismissed deviations are skipped.
+- **Why:** `system.md` builds WeakPoints from the novelty-finder data.
+- **Alternatives rejected:** count never-reached (0-hit) positions as rare (months-long new queue on the 888-node Italian); every your-move node is a card (Chessable model, drifts from "weak points").
+- **Trade-off / risk:** lines you never reach are never drilled.
+- **Revisit if:** the queue runs dry, or the numbers feel off.
+- **Evidence:** TBD (card counts per source on the Italian).
+- **One-liner:** Your mistakes, your rarely seen lines, and now and then your strong ones.
+
+### D34 · training · Only the target move of a drill is graded: Status: Planned · Updated: 2026-11-20 21:00
+- **Decision:** Harry (took Claude's rec): a drill starts 2 of your moves before the target (TUNE); a wrong lead-in move shows the right one and carries on ungraded; only the target card gets Again / Good.
+- **Why:** FSRS assumes one review per card when it's due; grading lead-ins would review cards early and stop strong ones stretching out.
+- **Alternatives rejected:** grade every your-move in the sequence that is a card.
+- **Trade-off / risk:** lead-in mistakes go unrecorded.
+- **Revisit if:** lead-in moves keep slipping.
+- **Evidence:** n/a.
+- **One-liner:** One drill, one grade.
+
+### D35 · failure modes · WeakPoints file and repertoire changes: Status: Planned · Updated: 2026-11-20 21:00
+- **Decision:** Harry (took Claude's rec): an unreadable file is renamed `<id>.corrupt-<time>.json`, a fresh one starts, toast. A card whose node is deleted is dropped; a card whose prepared reply changed resets to New (log kept). No novelty file → "Run the Novelty Finder on this repertoire first" with a button there.
+- **Why:** fail safe without deleting anything; old history must not grade you against a move you no longer play.
+- **Alternatives rejected:** block WeakPoints until the file is fixed by hand; keep orphaned / changed cards and skip them.
+- **Trade-off / risk:** a corrupt file resets the schedule (the backup keeps it).
+- **Revisit if:** n/a.
+- **Evidence:** n/a.
+- **One-liner:** Bad data is set aside, never lost, and never blocks training.
