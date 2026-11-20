@@ -227,3 +227,21 @@ The record of design choices, the features added and dropped, and the reasons. R
 - **Revisit if:** the threshold skips moves Harry wants drilled, or vice versa.
 - **Evidence:** TBD (how many of the 154 Italian deviations fall inside 0.3).
 - **One-liner:** Only real mistakes become drills.
+
+### D24 · auth · Sessions last 3 days: Status: Built · Updated: 2026-11-20 19:00
+- **Decision:** Harry: JWT expiry is the standard 3 days. 7 was only ever temporary.
+- **Why:** shorter-lived tokens limit the damage of a leaked token, and the server has no revocation (README, Security).
+- **Alternatives rejected:** 7 days (temporary value, now retired).
+- **Trade-off / risk:** you sign in again every 3 days.
+- **Revisit if:** sign-in every 3 days gets annoying enough to justify refresh tokens.
+- **Evidence:** `apps/api/src/routers/auth.ts:10` signs with `expiresIn: '3d'` (server `48a45b3`).
+- **One-liner:** A login token lasts 3 days.
+
+### D25 · security · Server hardening (Harry's edits, committed 2026-11-20): Status: Built · Updated: 2026-11-20 19:00
+- **Decision:** Harry: env vars checked at startup; CORS allow-list (`localhost:3000`, `null`); rate limits 300/min per IP and 10 account links per 15 min per user (in memory); 64 KB body, 10 calls per batch; `user.me` selects safe fields only; production errors hide internals; Postgres not published; container runs as `node` and runs `prisma migrate deploy` on start; chess usernames limited to `[A-Za-z0-9_-]`, 8 s upstream timeout.
+- **Why:** the API was open to any origin, leaked `passwordHash` through `user.me`, and published Postgres on the Pi.
+- **Alternatives rejected:** none recorded.
+- **Trade-off / risk:** rate limits reset on restart and won't work across several instances (one Pi, so fine).
+- **Revisit if:** the API is exposed beyond Tailscale (needs HTTPS) or runs as more than one instance.
+- **Evidence:** server type-checks clean; TBD (deployed and checked from the desktop over Tailscale).
+- **One-liner:** The server only trusts the app, limits abuse and never sends secrets.

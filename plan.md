@@ -26,11 +26,12 @@ A bare § means this file. `tasks.md` holds the ranked work; `decisions.md` hold
 - D21: WeakPoints = FSRS (ts-fsrs 5.4.2), card = your prepared reply drilled as a short sequence.
 - D22: WeakPoints schedules in `weakpoints/<repertoireId>.json`.
 - D23: Deviations within 0.3 pawns (TUNE) of the prepared move aren't drilled.
+- D24: Login tokens (JWT) last 3 days.
+- D25: Server hardening: CORS allow-list, rate limits, safe `user.me`, Postgres not published.
 - D13: A saved session is cleared only when the server answers `UNAUTHORIZED` or `NOT_FOUND` (deleted account); unreachable / erroring server → stay signed in, toast, local features keep working.
 
 **Pending / Unconfirmed** (*not decided*; each with the condition that decides it):
 - Deadline: none stated in `system.md`. *Decide if a date matters.*
-- JWT expiry: ARCHITECTURE.md says 3 days, the old TODO says 7. *Decide when someone checks the server code.*
 
 **Active gates** (date · what must work · what we fall back to if it doesn't):
 - {{none yet: set from Harry's feature md}}
