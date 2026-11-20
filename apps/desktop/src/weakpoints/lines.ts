@@ -27,7 +27,7 @@ export interface Drill {
 export const has = (record: Record<string, unknown>, id: string) => Object.prototype.hasOwnProperty.call(record, id);
 
 /** the repertoire's moves from a node, in the walk's order: children first, then transposition links */
-export function options(nodes: Record<string, Node>, node: Node): { id: string; move: string }[] {
+export function movesFrom(nodes: Record<string, Node>, node: Node): { id: string; move: string }[] {
   return [
     ...childrenOf(node).map(id => ({ id, move: has(nodes, id) ? nodes[id].move : null })),
     ...(node.transpositionEdges ?? []).map(e => ({ id: e.targetId, move: e.move })),
@@ -78,7 +78,7 @@ export function lineReader(rep: Repertoire, nodes: Record<string, Node>): LineRe
     if (!line) return null;
     const board = new Chess(line.fen);
     if (board.turn() !== rep.side[0]) return null;
-    const reply = options(nodes, nodes[nodeId])[0];
+    const reply = movesFrom(nodes, nodes[nodeId])[0];
     if (!reply) return null;
     try {
       return { startFen, moves: line.moves, answer: board.move(reply.move).san };
@@ -114,7 +114,7 @@ export function branches(rep: Repertoire, nodes: Record<string, Node>): { nodeId
   let node = has(nodes, rep.rootNodeId) ? nodes[rep.rootNodeId] : undefined;
   while (node && !seen.has(node.id)) {
     seen.add(node.id);
-    const next = options(nodes, node);
+    const next = movesFrom(nodes, node);
     if (next.length > 1) {
       return next.flatMap(o => {
         const line = reader.lineTo(o.id);
@@ -145,7 +145,7 @@ function reachable(rep: Repertoire, nodes: Record<string, Node>): string[] {
     const id = stack.pop() as string;
     if (seen.has(id)) continue;
     seen.add(id);
-    for (const o of options(nodes, nodes[id])) stack.push(o.id);
+    for (const o of movesFrom(nodes, nodes[id])) stack.push(o.id);
   }
   return [...seen];
 }
@@ -174,7 +174,7 @@ export function randomDrills(
     let node = nodes[startId];
     for (let mine = 0; mine < yourMoves; ) {
       const yourTurn = board.turn() === rep.side[0];
-      const next = options(nodes, node);
+      const next = movesFrom(nodes, node);
       if (!next.length) break;
       const pick = yourTurn ? next[0] : next[Math.floor(random() * next.length)];
       try {
