@@ -44,6 +44,11 @@ Work **▶ Now** top to bottom. Tags: `[🟠 your call: …]` = a design decisio
 
 - [ ] **T24 · WeakPoints modes (D36, D37)** · Done when: the page offers Focused, Mistakes only and Random; Random works with no novelty data and saves nothing; tested.
 
+- [ ] **T25 · Board ↔ graph everywhere** · Done when: every position with a Board button also has Graph (opens the builder on that node, unfolded and centred), the builder's "Open in board" opens the selected node, and the board can jump to the graph.
+- [ ] **T26 · Branch filter for drills (D40)** · Done when: a branch picker (plus Everything) limits all three modes; tested.
+- [ ] **T27 · Skip early deviations (D39)** · Done when: deviations on your first 2 moves aren't queued; tested.
+- [ ] **T28 · Automatic deviation verdicts (D38)** · Done when: the Novelty Finder checks unchecked deviations in the background with progress, saves each, resumes; the Evaluate button is gone. Also shows game dates and times (UI).
+
 **Loose ends**
 - [x] **T6 · Check B8 in the app** (Escape in "New Folder" may still create one).
 

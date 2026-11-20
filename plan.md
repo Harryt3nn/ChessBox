@@ -40,6 +40,10 @@ A bare § means this file. `tasks.md` holds the ranked work; `decisions.md` hold
 - D35: Unreadable weakpoints file → backed up, fresh start, toast; deleted node → card dropped; changed reply → card reset.
 - D36: WeakPoints modes: Focused (D33 pool), Mistakes only (deviations), Random.
 - D37: Random mode saves nothing; built in the renderer, no new IPC.
+- D38: Deviations get Stockfish verdicts automatically in the background; no Evaluate button.
+- D39: WeakPoints skips deviations on your first 2 moves (TUNE).
+- D40: Drills can be limited to one branch ("1.e4 e6") or Everything; queue takes `mode` + `branchNodeId`.
+- D41: Random drills: random your-move position, play your next N (default 5) moves forward.
 - D13: A saved session is cleared only when the server answers `UNAUTHORIZED` or `NOT_FOUND` (deleted account); unreachable / erroring server → stay signed in, toast, local features keep working.
 
 **Pending / Unconfirmed** (*not decided*; each with the condition that decides it):

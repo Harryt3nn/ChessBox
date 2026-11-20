@@ -353,3 +353,39 @@ The record of design choices, the features added and dropped, and the reasons. R
 - **Revisit if:** Harry wants Random mistakes to feed Focused.
 - **Evidence:** n/a.
 - **One-liner:** Random is free practice; it never touches your schedule.
+
+### D38 · analysis · Deviations are checked by Stockfish automatically; the Evaluate button goes: Status: Planned · Updated: 2026-11-20 23:00
+- **Decision:** Harry (took Claude's rec): after a novelty run, and when the page opens, the Novelty Finder checks every deviation without a prepared-move score in the background (full Stockfish, depth 18, the page's worker), showing progress; each verdict is saved as it lands, so leaving the page and coming back resumes. The Evaluate / Re-check buttons are removed.
+- **Why:** Harry found the button redundant next to Board; D23 (earlier decision, so it wins) needs a verdict on each deviation.
+- **Alternatives rejected:** keep the button, relabelled (only works if pressed); remove it and drop D23 (overrides an earlier decision).
+- **Trade-off / risk:** first pass ~6 s per deviation (estimate from the measured ~4 s for two searches), ~10 min for the Italian's 96; novelties no longer get new verdicts (existing ones still show).
+- **Revisit if:** the background check makes the page sluggish.
+- **Evidence:** TBD (measure the first pass on the Italian).
+- **One-liner:** Stockfish checks your deviations by itself.
+
+### D39 · training · Deviations on your first 2 moves aren't drilled (TUNE): Status: Planned · Updated: 2026-11-20 23:00
+- **Decision:** Harry (took Claude's rec): WeakPoints skips deviations on your first 2 moves (you were playing a different opening). The Novelty Finder still lists them. Existing cards for those positions stay in the file (D35) but aren't queued.
+- **Why:** Harry got "wrong first move" drills from games where he played another opening.
+- **Alternatives rejected:** a new "different opening" outcome in the walk and novelty file (changes D11 / D18, re-run needed).
+- **Trade-off / risk:** a real mistake on move 1–2 never gets drilled.
+- **Revisit if:** early mistakes matter, or move 3 deviations are also "other openings".
+- **Evidence:** n/a.
+- **One-liner:** Playing another opening isn't a mistake to drill.
+
+### D40 · training · Drills can be limited to one branch of the repertoire: Status: Planned · Updated: 2026-11-20 23:00
+- **Decision:** Harry (took Claude's rec): a picker lists the repertoire's main branches (the first point where the opponent has several replies, e.g. "1.e4 e6"), plus Everything. A position belongs to a branch when the branch node is on its parent chain (a transposed position follows its main parent, like D34). Applies to all three modes. `weakpoints:queue` gains `mode` and an optional `branchNodeId` (D32 extended).
+- **Why:** Harry wants e.g. French-only drills in the White Aggressive Italian; an opening is a subtree.
+- **Alternatives rejected:** named openings from a bundled ECO table (new data dependency; can be layered on later); user tags (everything must be tagged first).
+- **Trade-off / risk:** branches are labelled by moves, not opening names.
+- **Revisit if:** names are wanted (add the lichess chess-openings table on top).
+- **Evidence:** n/a.
+- **One-liner:** Drill just the French, or everything.
+
+### D41 · training · Random drills play forward from a random point: Status: Planned · Updated: 2026-11-20 23:00
+- **Decision:** Harry (took Claude's rec): pick a random your-move position (in the chosen branch), you play your next N moves (1–10, default 5, set on the page), the opponent's replies are picked at random from the repertoire's branches; ends early at the end of a line. Every move you play is scored for the session only (D37).
+- **Why:** "random sequences partway through the rep, about 5 moves", length set by the user.
+- **Alternatives rejected:** backward to a random position (only the last move tested; deep lines over-picked).
+- **Trade-off / risk:** short lines give drills shorter than N.
+- **Revisit if:** it keeps landing in the same lines.
+- **Evidence:** n/a.
+- **One-liner:** Five moves of your prep from somewhere random.
