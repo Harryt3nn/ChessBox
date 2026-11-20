@@ -1,14 +1,27 @@
 /*apps/desktop/src/pages/WeakPoints.module.css*/
 
-.row {
+/* controls on the left, the board filling the rest, so nothing needs scrolling */
+.layout {
+  display: grid;
+  grid-template-columns: minmax(260px, 320px) 1fr;
+  gap: 24px;
+  align-items: start;
+}
+
+.controls {
   display: flex;
-  align-items: center;
-  gap: 12px;
-  flex-wrap: wrap;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.board-area {
+  min-width: 0;
+  display: flex;
+  justify-content: center;
 }
 
 .select {
-  min-width: 240px;
+  width: 100%;
   padding: 8px 10px;
   background: var(--color-surface-2);
   border: 1px solid var(--color-border-strong);
@@ -17,28 +30,23 @@
   font-size: 13px;
 }
 
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  color: var(--color-text-secondary);
+  font-size: 12px;
+}
+
 .hint {
   color: var(--color-text-tertiary);
   font-size: 13px;
-  margin: 12px 0 0;
+  margin: 0;
 }
 
-/* the drill: a bare board and a narrow column for what's happening, no analysis */
-.drill {
-  display: flex;
-  gap: 32px;
-  align-items: flex-start;
-}
-
-.board {
-  flex: 0 0 auto;
-}
-
-.side {
-  display: flex;
-  flex-direction: column;
-  gap: 14px;
-  min-width: 220px;
+.progress {
+  color: var(--color-text-tertiary);
+  font-size: 12px;
 }
 
 .source {

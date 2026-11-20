@@ -1,23 +1,21 @@
 /*apps/desktop/src/weakpoints/cards.ts*/
 
-import { Chess, DEFAULT_POSITION } from 'chess.js';
 import { createEmptyCard, fsrs, Rating, type Card } from 'ts-fsrs';
 import type { Node } from '../types/Node';
 import type { Repertoire } from '../types/Repertoire';
 import type { NoveltyFile } from '../novelty/results';
-import { childrenOf } from '../chess/repertoireTree';
+import { cardDrill, has, inBranch, isEarly, lineReader, type Drill, type DrillSource } from './lines';
 
-// WeakPoints (D21, D30–D35): which repertoire positions become drill cards, the line that leads into
-// each one, and FSRS scheduling. Pure, so main can run it (D32) and tests can pin the clock.
+// WeakPoints (D21, D30–D36): which repertoire positions become drill cards, and FSRS scheduling.
+// The lines themselves are in lines.ts. Pure, so main can run it (D32) and tests can pin the clock.
 
-// (TUNE) D23, D33, D34
+// (TUNE) D23, D33
 export const EQUAL_WITHIN_CP = 30;
 export const RARE_MAX_HITS = 2;
 export const STRONG_MIN_HITS = 5;
 export const NEW_PER_DAY = 10;
-export const LEAD_IN_MOVES = 2;
 
-export type CardSource = 'deviation' | 'rare' | 'strong';
+export type CardSource = Exclude<DrillSource, 'random'>;
 
 // ts-fsrs's Card with its dates as ms, so the file is plain JSON
 export type StoredFsrs = Omit<Card, 'due' | 'last_review'> & { due: number; last_review?: number };
@@ -37,77 +35,11 @@ export interface WeakPointsFile {
   cards: Record<string, WeakCard>; // keyed by the repertoire node where it's your move
 }
 
-export interface Drill {
-  nodeId: string;
-  source: CardSource;
-  startFen: string;
-  moves: string[]; // SAN from the repertoire's start to the card's position
-  from: number; // moves before this index are set up silently; the drill plays out the rest
-  answer: string;
-  userSide: 'white' | 'black';
-}
-
 // defaults: 90% desired retention, no fuzz (D21)
 const scheduler = fsrs();
 
-const has = (record: Record<string, unknown>, id: string) => Object.prototype.hasOwnProperty.call(record, id);
-
 export const emptyFile = (repertoireId: string, now: number): WeakPointsFile =>
   ({ version: 1, repertoireId, updatedAt: now, cards: {} });
-
-type YourPosition = { startFen: string; moves: string[]; answer: string };
-
-/**
- * reads positions you must answer: the standard-SAN line from the root and your prepared reply, or null
- * if it isn't your move, has no reply, or its parent chain is broken. Each node's line is built from its
- * parent's and kept, so every node is replayed once however many cards share its path.
- */
-function positionReader(rep: Repertoire, nodes: Record<string, Node>): (nodeId: string) => YourPosition | null {
-  const startFen = (has(nodes, rep.rootNodeId) ? nodes[rep.rootNodeId].fen : undefined) ?? DEFAULT_POSITION;
-  const lines = new Map<string, { fen: string; moves: string[] } | null>();
-  const visiting = new Set<string>();
-
-  const lineTo = (id: string | null): { fen: string; moves: string[] } | null => {
-    if (id === null || !has(nodes, id)) return null;
-    if (id === rep.rootNodeId) return { fen: startFen, moves: [] };
-    const cached = lines.get(id);
-    if (cached !== undefined) return cached;
-    if (visiting.has(id)) return null; // a parent loop never reaches the root
-    visiting.add(id);
-    const node = nodes[id];
-    const parent = node.move ? lineTo(node.parentId) : null;
-    let line = null;
-    if (parent && node.move) {
-      const board = new Chess(parent.fen);
-      try {
-        const san = board.move(node.move).san;
-        line = { fen: board.fen(), moves: [...parent.moves, san] };
-      } catch {
-        // an illegal move in the repertoire: nothing below it can be drilled
-      }
-    }
-    lines.set(id, line);
-    return line;
-  };
-
-  return nodeId => {
-    const line = lineTo(nodeId);
-    if (!line) return null;
-    const board = new Chess(line.fen);
-    if (board.turn() !== rep.side[0]) return null;
-
-    // the same order the walk uses: children first, then transposition links
-    const node = nodes[nodeId];
-    const reply = [...childrenOf(node).map(id => (has(nodes, id) ? nodes[id].move : null)), ...(node.transpositionEdges ?? []).map(e => e.move)]
-      .find((m): m is string => !!m);
-    if (!reply) return null;
-    try {
-      return { startFen, moves: line.moves, answer: board.move(reply).san };
-    } catch {
-      return null;
-    }
-  };
-}
 
 /** a deviation the engine rates as about as good as the prepared move, or better, isn't a mistake (D23, D31) */
 function isFine(e: { playedCp?: number; preparedCp?: number } | undefined): boolean {
@@ -120,7 +52,7 @@ interface Candidate { nodeId: string; source: CardSource; answer: string; lastSe
 
 /** the positions that should be cards (D33), deviations first, then rare, then strong */
 export function candidates(rep: Repertoire, nodes: Record<string, Node>, novelty: NoveltyFile): Candidate[] {
-  const position = positionReader(rep, nodes);
+  const { position } = lineReader(rep, nodes);
   const deviated = new Set<string>();
   const deviations = new Map<string, Candidate>();
   for (const f of Object.values(novelty.findings)) {
@@ -128,7 +60,7 @@ export function candidates(rep: Repertoire, nodes: Record<string, Node>, novelty
     deviated.add(f.nodeId);
     if (f.status === 'dismissed' || isFine(f.eval)) continue;
     const pos = position(f.nodeId);
-    if (!pos) continue;
+    if (!pos || isEarly(pos.moves)) continue;
     const prev = deviations.get(f.nodeId);
     if (!prev || f.lastSeen > prev.lastSeen) {
       deviations.set(f.nodeId, { nodeId: f.nodeId, source: 'deviation', answer: pos.answer, lastSeen: f.lastSeen, hits: 0 });
@@ -169,7 +101,7 @@ const sameDay = (a: number, b: number) => new Date(a).toDateString() === new Dat
 
 /** brings the cards in line with the repertoire and the latest novelty run (D33, D35); returns a new file */
 export function syncCards(file: WeakPointsFile, rep: Repertoire, nodes: Record<string, Node>, novelty: NoveltyFile, now: number): WeakPointsFile {
-  const position = positionReader(rep, nodes);
+  const { position } = lineReader(rep, nodes);
   const cards: Record<string, WeakCard> = {};
 
   for (const [nodeId, card] of Object.entries(file.cards)) {
@@ -199,26 +131,25 @@ export function syncCards(file: WeakPointsFile, rep: Repertoire, nodes: Record<s
   return { ...file, updatedAt: now, cards };
 }
 
-/** the cards due now, soonest first, each with the line that leads into it (D34) */
-export function dueDrills(file: WeakPointsFile, rep: Repertoire, nodes: Record<string, Node>, now: number): Drill[] {
-  const position = positionReader(rep, nodes);
+export type FocusMode = 'focused' | 'mistakes';
+
+/**
+ * the cards due now, soonest first, as drills (D34). Mistakes only keeps the deviation cards (D36);
+ * a branch keeps the positions under it (D40); a deviation on your first moves isn't drilled (D39)
+ */
+export function dueDrills(
+  file: WeakPointsFile, rep: Repertoire, nodes: Record<string, Node>, now: number,
+  { mode, branchId }: { mode: FocusMode; branchId: string | null },
+): Drill[] {
+  const { position } = lineReader(rep, nodes);
   return Object.entries(file.cards)
-    .filter(([, c]) => c.fsrs.due <= now)
+    .filter(([nodeId, c]) => c.fsrs.due <= now && (mode === 'focused' || c.source === 'deviation') && inBranch(nodes, nodeId, branchId))
     .sort(([, a], [, b]) => a.fsrs.due - b.fsrs.due)
     .flatMap(([nodeId, card]) => {
       const pos = position(nodeId);
-      return pos ? [{ nodeId, source: card.source, ...pos, from: leadInStart(pos.moves), userSide: rep.side }] : [];
+      if (!pos || (card.source === 'deviation' && isEarly(pos.moves))) return [];
+      return [cardDrill(nodeId, card.source, pos, rep.side)];
     });
-}
-
-/**
- * where the drill starts: LEAD_IN_MOVES of your moves before the card, one ply earlier so the
- * opponent's move is seen being played. The card's position is always your move, so your moves sit
- * at indices with the same parity as moves.length.
- */
-function leadInStart(moves: string[]): number {
-  const firstYours = moves.length - 2 * LEAD_IN_MOVES;
-  return Math.max(0, firstYours - 1);
 }
 
 /** grades the card's target move (D34): wrong → Again, right first time → Good (D21) */

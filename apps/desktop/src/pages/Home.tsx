@@ -99,11 +99,10 @@ const Home = ({ setPage, currentUser }: HomeProps) => {
                 <img src={noveltyIcon} className={styles.toolIcon} />
                 <span>Novelty Finder</span>
               </button>
-              <div className={`${styles.tool} ${styles.toolSoon}`}>
+              <button className={styles.tool} onClick={e => { e.stopPropagation(); setPage('weakpoints'); }}>
                 <img src={weakPointsIcon} className={styles.toolIcon} />
                 <span>WeakPoints</span>
-                <span className={shared.soonBadge}>Soon</span>
-              </div>
+              </button>
             </div>
           </div>
 

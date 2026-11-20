@@ -5,7 +5,8 @@ import path from "path";
 import { DATA_DIR, loadNodes, loadRepertoires } from "./MainStorage";
 import { loadNovelty } from "./NoveltyRunner";
 import { isSafeId } from "../importsAndExports/sanitiseImport";
-import { dueDrills, emptyFile, gradeCard, syncCards, type Drill, type WeakPointsFile } from "../weakpoints/cards";
+import { dueDrills, emptyFile, gradeCard, syncCards, type WeakPointsFile } from "../weakpoints/cards";
+import { has, type Drill } from "../weakpoints/lines";
 
 // WeakPoints in the main process (D32): the renderer asks for the queue and reports right / wrong;
 // scheduling and the file (ChessBox-data/weakpoints/<repertoireId>.json, D22 + D30) stay here
@@ -73,18 +74,21 @@ async function loadRepertoire(repertoireId: string) {
   return rep;
 }
 
-export async function weakpointsQueue(repertoireId: unknown): Promise<WeakPointsQueue> {
+/** the due drills in Focused or Mistakes-only mode (D36), optionally under one branch (D40) */
+export async function weakpointsQueue(repertoireId: unknown, mode: unknown, branchId: unknown): Promise<WeakPointsQueue> {
   const id = checkedId(repertoireId);
+  if ((mode !== "focused" && mode !== "mistakes") || (branchId !== null && typeof branchId !== "string")) throw new Error("Invalid drill request");
   const rep = await loadRepertoire(id);
   const novelty = await loadNovelty(id);
   if (!novelty) return { drills: [], cards: 0, recovered: false, noNovelty: true };
 
   const now = Date.now();
   const nodes = await loadNodes();
+  if (branchId !== null && !has(nodes, branchId)) throw new Error("That part of the repertoire doesn't exist any more.");
   const loaded = await loadFile(id, now);
   const file = syncCards(loaded.file, rep, nodes, novelty, now);
   await saveFile(file);
-  return { drills: dueDrills(file, rep, nodes, now), cards: Object.keys(file.cards).length, recovered: loaded.recovered, noNovelty: false };
+  return { drills: dueDrills(file, rep, nodes, now, { mode, branchId }), cards: Object.keys(file.cards).length, recovered: loaded.recovered, noNovelty: false };
 }
 
 /** grades one card; returns when it's next due (ms) */

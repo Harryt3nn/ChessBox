@@ -128,31 +128,56 @@ describe('syncCards', () => {
 });
 
 describe('dueDrills', () => {
-  it('returns due cards with the line from the start and a lead-in of two of your moves', () => {
+  const everything = { mode: 'focused', branchId: null } as const;
+
+  it('returns due cards as drills: the line from the start, a lead-in of two of your moves, only the last move scored', () => {
     const file = syncCards(emptyFile('r1', NOW), rep, nodes, novelty([deviation('Bc5')]), NOW);
-    const [drill] = dueDrills(file, rep, nodes, NOW);
-    expect(drill).toMatchObject({ nodeId: 'Bc5', answer: 'c3', userSide: 'white', startFen: DEFAULT_POSITION });
-    expect(drill.moves).toEqual(['e4', 'e5', 'Nf3', 'Nc6', 'Bc4', 'Bc5']);
+    const [drill] = dueDrills(file, rep, nodes, NOW, everything);
+    expect(drill).toMatchObject({ nodeId: 'Bc5', source: 'deviation', userSide: 'white', startFen: DEFAULT_POSITION });
+    expect(drill.line).toEqual(['e4', 'e5', 'Nf3', 'Nc6', 'Bc4', 'Bc5', 'c3']);
     // starts on 1...e5 being played, then you play 2.Nf3 and 3.Bc4 before the card's 4.c3
     expect(drill.from).toBe(1);
+    expect(drill.scoredFrom).toBe(6);
   });
 
   it('starts at the beginning when the card is near the root', () => {
     const file = syncCards(emptyFile('r1', NOW), rep, nodes, novelty([], { e5: 1 }), NOW);
-    expect(dueDrills(file, rep, nodes, NOW)[0].from).toBe(0);
+    expect(dueDrills(file, rep, nodes, NOW, everything)[0].from).toBe(0);
   });
 
-  it('leaves out cards that aren\'t due yet', () => {
+  it("leaves out cards that aren't due yet", () => {
     let file = syncCards(emptyFile('r1', NOW), rep, nodes, novelty([deviation('Bc5')]), NOW);
     file = gradeCard(file, 'Bc5', true, 'c3', NOW);
-    expect(dueDrills(file, rep, nodes, NOW + 1000)).toEqual([]);
+    expect(dueDrills(file, rep, nodes, NOW + 1000, everything)).toEqual([]);
   });
 
   it('lead-in works for a black repertoire too', () => {
     const black = { ...rep, side: 'black' as const };
     const file = syncCards(emptyFile('r1', NOW), black, nodes, novelty([deviation('Bc4')]), NOW);
-    const [drill] = dueDrills(file, black, nodes, NOW);
-    expect(drill).toMatchObject({ answer: 'Bc5', from: 0, userSide: 'black' });
+    const [drill] = dueDrills(file, black, nodes, NOW, everything);
+    expect(drill).toMatchObject({ from: 0, scoredFrom: 5, userSide: 'black' });
+    expect(drill.line[drill.line.length - 1]).toBe('Bc5');
+  });
+
+  it('Mistakes only keeps just the deviation cards', () => {
+    const file = syncCards(emptyFile('r1', NOW), rep, nodes, novelty([deviation('Bc5')], { Nc6: 1, c5: 6 }), NOW);
+    expect(dueDrills(file, rep, nodes, NOW, everything).map(d => d.nodeId).sort()).toEqual(['Bc5', 'Nc6', 'c5']);
+    expect(dueDrills(file, rep, nodes, NOW, { mode: 'mistakes', branchId: null }).map(d => d.nodeId)).toEqual(['Bc5']);
+  });
+
+  it('a branch keeps only the positions under it', () => {
+    const file = syncCards(emptyFile('r1', NOW), rep, nodes, novelty([deviation('Bc5')], { c5: 6 }), NOW);
+    expect(dueDrills(file, rep, nodes, NOW, { mode: 'focused', branchId: 'c5' }).map(d => d.nodeId)).toEqual(['c5']);
+    expect(dueDrills(file, rep, nodes, NOW, { mode: 'focused', branchId: 'e5' }).map(d => d.nodeId)).toEqual(['Bc5']);
+  });
+
+  it("doesn't drill a deviation on your first two moves (another opening), even from an older card", () => {
+    expect(sources(novelty([deviation('root'), deviation('e5'), deviation('Nc6')]))).toEqual([['Nc6', 'deviation']]);
+    const old = syncCards(emptyFile('r1', NOW), rep, nodes, novelty([deviation('Nc6')]), NOW);
+    old.cards.e5 = { ...old.cards.Nc6, answer: 'Nf3' };
+    const synced = syncCards(old, rep, nodes, novelty(), NOW);
+    expect(synced.cards.e5).toBeDefined(); // kept (D35)
+    expect(dueDrills(synced, rep, nodes, NOW, everything).map(d => d.nodeId)).toEqual(['Nc6']);
   });
 });
 

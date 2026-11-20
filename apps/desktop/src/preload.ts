@@ -73,8 +73,8 @@ contextBridge.exposeInMainWorld("api", {
   updateFinding: (repertoireId: string, key: string, update: FindingUpdate): Promise<void> =>
     ipcRenderer.invoke("novelty:update", repertoireId, key, update),
 
-  weakpointsQueue: (repertoireId: string): Promise<WeakPointsQueue> =>
-    ipcRenderer.invoke("weakpoints:queue", repertoireId),
+  weakpointsQueue: (repertoireId: string, mode: "focused" | "mistakes", branchId: string | null): Promise<WeakPointsQueue> =>
+    ipcRenderer.invoke("weakpoints:queue", repertoireId, mode, branchId),
 
   // returns when the card is next due (ms since epoch)
   weakpointsGrade: (repertoireId: string, nodeId: string, correct: boolean, played: string): Promise<number> =>

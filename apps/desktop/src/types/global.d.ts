@@ -37,7 +37,7 @@ declare global {
       loadNovelty(repertoireId: string): Promise<NoveltyFile | null>;
       updateFinding(repertoireId: string, key: string, update: FindingUpdate): Promise<void>;
       onNoveltyProgress(listener: (done: number, total: number) => void): () => void;
-      weakpointsQueue(repertoireId: string): Promise<WeakPointsQueue>;
+      weakpointsQueue(repertoireId: string, mode: "focused" | "mistakes", branchId: string | null): Promise<WeakPointsQueue>;
       weakpointsGrade(repertoireId: string, nodeId: string, correct: boolean, played: string): Promise<number>;
     };
   }

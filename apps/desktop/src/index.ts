@@ -137,7 +137,7 @@ ipcMain.handle("novelty:update", (_event, repertoireId: unknown, key: unknown, u
 });
 
 // WeakPoints (D32): main builds the queue and schedules; the renderer only says right or wrong, and the move it played (D30)
-ipcMain.handle("weakpoints:queue", (_event, repertoireId: unknown) => weakpointsQueue(repertoireId));
+ipcMain.handle("weakpoints:queue", (_event, repertoireId: unknown, mode: unknown, branchId: unknown) => weakpointsQueue(repertoireId, mode, branchId));
 
 ipcMain.handle("weakpoints:grade", (_event, repertoireId: unknown, nodeId: unknown, correct: unknown, played: unknown) =>
   weakpointsGrade(repertoireId, nodeId, correct, played));
