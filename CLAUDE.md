@@ -11,7 +11,7 @@ ChessBox is a free, all-in-one chess training desktop app, built by Harry for hi
 | Project | **ChessBox** · free chess training app: graph repertoires + a novelty finder over your own games |
 | Builder | Harry Tennant (`Harryt3nn`): owns every design decision except visual / UI (§2); Claude types |
 | Goal · deadline | Stage-1 MVP from `system.md` (milestones M1–M7, `plan.md` §7) · {{date, or "none"}} |
-| Repo | `github.com/Harryt3nn/ChessBox` (public) + submodule `vendor/chessbox-server` (`github.com/Harryt3nn/chessbox-server`: API + `@chessbox/shared`) · `main` = code · one branch per feature (`<what-it-does>`), merged to `main` when green |
+| Repo | `github.com/Harryt3nn/ChessBox` (public) + submodule `vendor/chessbox-server` (`github.com/Harryt3nn/ChessBox-Server`: API + `@chessbox/shared`) · `main` = code · one branch per feature (`<what-it-does>`), merged to `main` when green |
 | Docs mode | **branch** (`git config solo.docs`). **branch:** plan docs live on the orphan `context` branch, never merged into `main`, kept out of it by `.git/info/exclude`. **inline:** plan docs are committed on `main` |
 | Plan docs | `CLAUDE.md` (this), `plan.md` (spec, §0 NOW at the top), `tasks.md` (ranked tasks, 📊 Latest, Done log), `decisions.md` (why it's built this way), `handoff.md` (notes from one session to the next), `research.md` (graded sources), `skills/`, `ctx.sh` |
 | Local only, never committed | `.claude/`, `.env*`, `.vscode/settings.json` (holds a DB connection), `node_modules/`, `apps/desktop/out/`, `.webpack/`, app data in `%APPDATA%/ChessBox/ChessBox-data/` |
