@@ -62,6 +62,8 @@ const RepertoireBuilder = ({ repertoire, onOpenInBoard, onBack }: RepertoireBuil
   const [pendingPromotion, setPendingPromotion] = useState<{ from: Square; to: Square } | null>(null);
   // folded positions: view state only, so big repertoires stay readable; not saved
   const [collapsed, setCollapsed] = useState<ReadonlySet<string>>(new Set());
+  // bumped by collapse / expand all to remount the canvas, since React Flow only fits the view on mount
+  const [viewKey, setViewKey] = useState(0);
 
   const toggle = useCallback((id: string) => setCollapsed(prev => {
     const next = new Set(prev);
@@ -80,6 +82,9 @@ const RepertoireBuilder = ({ repertoire, onOpenInBoard, onBack }: RepertoireBuil
       return null;
     }
   }, [nodes, repertoire.rootNodeId, collapsed]);
+
+  // shown plus folded away, so the count doesn't shrink when branches fold
+  const positions = (graph?.nodes ?? []).reduce((sum, n) => sum + 1 + (n.data.hidden ?? 0), 0);
 
   const selected = graph?.nodes.find(n => n.id === selectedId) ?? graph?.nodes[0];
   useEffect(() => {
@@ -135,10 +140,23 @@ const RepertoireBuilder = ({ repertoire, onOpenInBoard, onBack }: RepertoireBuil
     return false;
   }
 
-  // fold every first move, leaving Start and the replies to it
+  // fold where the lines first split: folding the first move of a one-opening repertoire would hide everything
   function collapseAll() {
     const root = nodes?.[repertoire.rootNodeId];
-    if (root) setCollapsed(new Set(childrenOf(root)));
+    if (!nodes || !root) return;
+    const seen = new Set<string>();
+    let kids = childrenOf(root);
+    while (kids.length === 1 && nodes[kids[0]] && !seen.has(kids[0])) {
+      seen.add(kids[0]);
+      kids = childrenOf(nodes[kids[0]]);
+    }
+    setCollapsed(new Set(kids));
+    setViewKey(k => k + 1);
+  }
+
+  function expandAll() {
+    setCollapsed(new Set());
+    setViewKey(k => k + 1);
   }
 
   async function saveComment() {
@@ -171,10 +189,10 @@ const RepertoireBuilder = ({ repertoire, onOpenInBoard, onBack }: RepertoireBuil
       <header className={styles.header}>
         <button className={styles.btn} onClick={onBack}>← Repertoires</button>
         <h1 className={styles.title}>{repertoire.name}</h1>
-        <span className={styles.meta}>plays {repertoire.side} · {graph?.nodes.length ?? 0} positions</span>
+        <span className={styles.meta}>plays {repertoire.side} · {positions} positions</span>
         <div className={styles.headerActions}>
           <button className={styles.btn} onClick={collapseAll}>Collapse all</button>
-          <button className={styles.btn} onClick={() => setCollapsed(new Set())} disabled={!collapsed.size}>Expand all</button>
+          <button className={styles.btn} onClick={expandAll} disabled={!collapsed.size}>Expand all</button>
           <button className={styles.btn} onClick={() => onOpenInBoard(repertoire)}>Open in board</button>
           <button className={`${styles.btn} ${styles.danger}`} onClick={removeRepertoire}>Delete repertoire</button>
         </div>
@@ -184,6 +202,7 @@ const RepertoireBuilder = ({ repertoire, onOpenInBoard, onBack }: RepertoireBuil
         <div className={styles.canvas}>
           {graph ? (
             <ReactFlow
+              key={viewKey}
               nodes={flowNodes}
               edges={flowEdges}
               nodeTypes={nodeTypes}
