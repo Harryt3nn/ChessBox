@@ -42,6 +42,8 @@ Work **▶ Now** top to bottom. Tags: `[🟠 your call: …]` = a design decisio
 - [x] **T20 · Research pass: spaced repetition (Anki SM-2 / FSRS) + Aimchess** · Done when: `research.md` Pass 1 is graded and a recommendation is ready for Harry.
 - [ ] **T21 · WeakPoints drills (D21–D23)** · Done when: cards from deviations (minus ones within 0.3 pawns), rarely hit and strong lines are drilled as short sequences on a board without analysis, auto-graded and scheduled by FSRS, saved to `weakpoints/<id>.json`; verdict gains the prepared-move score; deleting a repertoire removes its weakpoints file.
 
+- [ ] **T24 · WeakPoints modes (D36, D37)** · Done when: the page offers Focused, Mistakes only and Random; Random works with no novelty data and saves nothing; tested.
+
 **Loose ends**
 - [x] **T6 · Check B8 in the app** (Escape in "New Folder" may still create one).
 

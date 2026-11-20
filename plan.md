@@ -38,6 +38,8 @@ A bare § means this file. `tasks.md` holds the ranked work; `decisions.md` hold
 - D33: Cards = deviations (non-dismissed, outside 0.3) + rare (hit 1–2) + strong (hit ≥ 5, never deviated); 10 new / day (TUNE).
 - D34: A drill starts 2 of your moves back (TUNE); only the target move is graded.
 - D35: Unreadable weakpoints file → backed up, fresh start, toast; deleted node → card dropped; changed reply → card reset.
+- D36: WeakPoints modes: Focused (D33 pool), Mistakes only (deviations), Random.
+- D37: Random mode saves nothing; built in the renderer, no new IPC.
 - D13: A saved session is cleared only when the server answers `UNAUTHORIZED` or `NOT_FOUND` (deleted account); unreachable / erroring server → stay signed in, toast, local features keep working.
 
 **Pending / Unconfirmed** (*not decided*; each with the condition that decides it):

@@ -335,3 +335,21 @@ The record of design choices, the features added and dropped, and the reasons. R
 - **Revisit if:** n/a.
 - **Evidence:** n/a.
 - **One-liner:** Bad data is set aside, never lost, and never blocks training.
+
+### D36 · training · WeakPoints has three modes: Focused, Mistakes only, Random: Status: Planned · Updated: 2026-11-20 22:40
+- **Decision:** Harry: **Focused** = the full D33 pool (deviations + rare + strong, FSRS); **Mistakes only** = deviation cards only (same FSRS schedule); **Random** = random sequences from the repertoire, mainly for when there's no game data.
+- **Why:** Harry wanted both "targeted at what I'm weak at" and the broader refresh, as separate choices, plus something that works without novelty data.
+- **Alternatives rejected:** picking only one of Focused-as-D33 or deviations-only.
+- **Trade-off / risk:** three modes to explain on one page.
+- **Revisit if:** one mode is never used.
+- **Evidence:** n/a.
+- **One-liner:** Drill everything, only your mistakes, or random lines.
+
+### D37 · training · Random mode saves nothing and runs in the renderer: Status: Planned · Updated: 2026-11-20 22:40
+- **Decision:** Harry: Random drills are practice only: no FSRS, no file writes. Built in the window from the repertoire it already loads, so no new IPC.
+- **Why:** a practice path with no side effects can't fill the schedule with arbitrary positions, and D33 stays intact.
+- **Alternatives rejected:** a random mistake becomes a Focused card (needs a new IPC call and card source, changes D33); log attempts without scheduling (a second history with no use yet).
+- **Trade-off / risk:** mistakes in Random are forgotten.
+- **Revisit if:** Harry wants Random mistakes to feed Focused.
+- **Evidence:** n/a.
+- **One-liner:** Random is free practice; it never touches your schedule.
