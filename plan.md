@@ -42,6 +42,9 @@ A bare § means this file. `tasks.md` holds the ranked work; `decisions.md` hold
 
 **Pending / Unconfirmed** (*not decided*; each with the condition that decides it):
 - **Revisit D27 (sign other devices out on password change):** chose A only *for now*. *Decide before the API leaves Tailscale or before stage 2, whichever comes first. Leading candidate: `passwordChangedAt` column checked in `createContext`.*
+- **WeakPoints review log has no `played` move:** D30 listed `{at, rating, played}` but D32 only sends right / wrong, so the log is `{at, rating}`. *Decide: add the played SAN to `weakpoints:grade` (validated, ≤ 10 chars) or drop it from D30.*
+- **A card whose deviation is later dismissed (or re-checked within 0.3) keeps being scheduled:** D35 only drops deleted nodes. *Decide: keep (it's learned material) or drop deviation-source cards that leave the pool.*
+- **Corrupt-file backup name:** built with the app's existing `quarantine` helper, so it's `<id>.json.corrupt-<time>`, not D35's `<id>.corrupt-<time>.json`. *Confirm, or change the helper app-wide.*
 - Deadline: none stated in `system.md`. *Decide if a date matters.*
 
 **Active gates** (date · what must work · what we fall back to if it doesn't):

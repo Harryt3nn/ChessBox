@@ -201,7 +201,7 @@ The record of design choices, the features added and dropped, and the reasons. R
 - **Evidence:** the 888-node White Aggressive Italian renders in ~1.2 s in the dev app (observed 1,184 / 1,281 ms). Versions pinned to stable releases: `@xyflow/react` 12.12.0 (not the 2-day-old 13.0 major), `@dagrejs/dagre` 3.1.3 (the maintained, typed `dagre`).
 - **One-liner:** A React canvas for graphs plus an automatic layout.
 
-### D21 · training · WeakPoints scheduled with FSRS (ts-fsrs 5.4.2): Status: Planned · Updated: 2026-11-19 03:15
+### D21 · training · WeakPoints scheduled with FSRS (ts-fsrs 5.4.2): Status: Built · Updated: 2026-11-20 21:45
 - **Decision:** Harry picked FSRS via `ts-fsrs` 5.4.2 (MIT, no dependencies, Node ≥ 20), default parameters, desired retention 90%. A card = one prepared reply on your move, drilled as a short sequence (starting 2–3 moves earlier, opponent moves auto-played), auto-graded: wrong move → Again, right first time → Good.
 - **Why:** FSRS beat SM-2 on 99.6% of ~10k benchmarked Anki collections and is Anki's built-in alternative (research Pass 1).
 - **Alternatives rejected:** SM-2 by hand (less accurate, can't be tuned); `ts-fsrs` 6.0 (3 weeks old, Node ≥ 24, adds a dependency).
@@ -210,7 +210,7 @@ The record of design choices, the features added and dropped, and the reasons. R
 - **Evidence:** research.md Pass 1.
 - **One-liner:** The drills come back just before you'd forget them.
 
-### D22 · storage · WeakPoints schedules in weakpoints/<repertoireId>.json: Status: Planned · Updated: 2026-11-19 03:15
+### D22 · storage · WeakPoints schedules in weakpoints/<repertoireId>.json: Status: Built · Updated: 2026-11-20 21:45
 - **Decision:** Harry: one local file per repertoire in `ChessBox-data/weakpoints/`, cards keyed by repertoire node id (FSRS state + review log), separate from `novelty/`.
 - **Why:** re-running the novelty finder (which rebuilds its derived data) never touches drill history.
 - **Alternatives rejected:** a `cards` section inside the novelty file.
@@ -219,7 +219,7 @@ The record of design choices, the features added and dropped, and the reasons. R
 - **Evidence:** n/a.
 - **One-liner:** Your practice history lives on its own.
 
-### D23 · training · A deviation within 0.3 pawns of the prepared move isn't drilled: Status: Planned · Updated: 2026-11-19 03:15
+### D23 · training · A deviation within 0.3 pawns of the prepared move isn't drilled: Status: Built · Updated: 2026-11-20 21:45
 - **Decision:** Harry: if full Stockfish rates the deviation within 0.3 pawns (TUNE) of the prepared move, it isn't drilled as a mistake; deviations without a verdict are drilled.
 - **Why:** system.md: "a deviation doesn't necessarily mean it's a bad move… should be taken into account by stockfish".
 - **Alternatives rejected:** drill every deviation; decide each one by hand.
@@ -282,16 +282,16 @@ The record of design choices, the features added and dropped, and the reasons. R
 - **Evidence:** 17 tests in ~26 s (Argon2id hashing dominates).
 - **One-liner:** Both repos test with Vitest.
 
-### D30 · storage · weakpoints/<id>.json = FSRS state + full review log: Status: Planned · Updated: 2026-11-20 21:00
+### D30 · storage · weakpoints/<id>.json = FSRS state + full review log: Status: Built · Updated: 2026-11-20 21:45
 - **Decision:** Harry (took Claude's rec): `{ version: 1, repertoireId, updatedAt, cards: { "<nodeId>": { source, fsrs, log: [{ at, rating, played }] } } }`, keyed by the node where it's your move (same `nodeId` as a deviation `Finding`).
 - **Why:** fitting FSRS parameters later (D21 "Revisit if") needs full review history; `version` lets a future format spot old files.
 - **Alternatives rejected:** state only (history lost for good); state + last 20 reviews (the optimiser needs full histories).
 - **Trade-off / risk:** the file grows ~40 bytes per review (estimate, not measured).
 - **Revisit if:** the file gets big enough to slow loading.
-- **Evidence:** TBD (measure file size after a month of drills).
+- **Evidence:** TBD (measure file size after a month of drills). Sync + queue on the 1,082-node data: Italian ~130 ms, 1.e4 12–21 ms warm (each node replayed once; was 385–603 ms replaying every line from the root), measured in Vitest on `weakpoints-drills`.
 - **One-liner:** Every drill you do is kept, not just the next due date.
 
-### D31 · storage · Verdicts store numeric scores from your side: Status: Planned · Updated: 2026-11-20 21:00
+### D31 · storage · Verdicts store numeric scores from your side: Status: Built · Updated: 2026-11-20 21:45
 - **Decision:** Harry (took Claude's rec): `Finding.eval` gains `playedCp` and `preparedCp`, centipawns from the repertoire side; a mate counts as ±100 pawns. The display string stays. Old verdicts without `preparedCp` count as "no verdict" (drilled, D23) until re-evaluated.
 - **Why:** store data, not presentation; D23's comparison becomes one subtraction.
 - **Alternatives rejected:** parse the `"+0.35"` / `"#3"` strings.
@@ -300,7 +300,7 @@ The record of design choices, the features added and dropped, and the reasons. R
 - **Evidence:** n/a.
 - **One-liner:** Scores are saved as numbers so they can be compared.
 
-### D32 · contract · WeakPoints scheduling runs in main; renderer only reports right / wrong: Status: Planned · Updated: 2026-11-20 21:00
+### D32 · contract · WeakPoints scheduling runs in main; renderer only reports right / wrong: Status: Built · Updated: 2026-11-20 21:45
 - **Decision:** Harry (took Claude's rec): `weakpoints:queue(repId)` returns due + new cards with their lead-in lines; `weakpoints:grade(repId, nodeId, correct: boolean)`. Main builds the pool, runs `ts-fsrs` on its own clock, saves.
 - **Why:** a boolean is trivial to re-sanitise (D8); the nodes and novelty file already live in main (D4).
 - **Alternatives rejected:** renderer runs FSRS and sends whole cards (main must validate ~10 untrusted fields; ts-fsrs in the renderer bundle).
@@ -309,16 +309,16 @@ The record of design choices, the features added and dropped, and the reasons. R
 - **Evidence:** n/a.
 - **One-liner:** The window says "right" or "wrong"; the main process decides when you see it again.
 
-### D33 · training · What becomes a WeakPoints card (TUNE): Status: Planned · Updated: 2026-11-20 21:00
+### D33 · training · What becomes a WeakPoints card (TUNE): Status: Built · Updated: 2026-11-20 21:45
 - **Decision:** Harry (took Claude's rec): only positions your games reached. Deviations: non-dismissed, outside 0.3 (D23), due now. Rare: your-move positions hit 1–2 times. Strong: hit ≥ 5, never deviated. Rare + strong enter at 10 new per day, rare first. Dismissed deviations are skipped.
 - **Why:** `system.md` builds WeakPoints from the novelty-finder data.
 - **Alternatives rejected:** count never-reached (0-hit) positions as rare (months-long new queue on the 888-node Italian); every your-move node is a card (Chessable model, drifts from "weak points").
 - **Trade-off / risk:** lines you never reach are never drilled.
 - **Revisit if:** the queue runs dry, or the numbers feel off.
-- **Evidence:** TBD (card counts per source on the Italian).
+- **Evidence:** White Aggressive Italian (real data, 2026-11-20): 96 deviation, 37 rare, 42 strong candidates; the first sync makes 106 cards (96 deviations + the 10 new / day). 1.e4 Repertoire: 9 deviation, 6 strong, 15 cards.
 - **One-liner:** Your mistakes, your rarely seen lines, and now and then your strong ones.
 
-### D34 · training · Only the target move of a drill is graded: Status: Planned · Updated: 2026-11-20 21:00
+### D34 · training · Only the target move of a drill is graded: Status: Built · Updated: 2026-11-20 21:45
 - **Decision:** Harry (took Claude's rec): a drill starts 2 of your moves before the target (TUNE); a wrong lead-in move shows the right one and carries on ungraded; only the target card gets Again / Good.
 - **Why:** FSRS assumes one review per card when it's due; grading lead-ins would review cards early and stop strong ones stretching out.
 - **Alternatives rejected:** grade every your-move in the sequence that is a card.
@@ -327,7 +327,7 @@ The record of design choices, the features added and dropped, and the reasons. R
 - **Evidence:** n/a.
 - **One-liner:** One drill, one grade.
 
-### D35 · failure modes · WeakPoints file and repertoire changes: Status: Planned · Updated: 2026-11-20 21:00
+### D35 · failure modes · WeakPoints file and repertoire changes: Status: Built · Updated: 2026-11-20 21:45
 - **Decision:** Harry (took Claude's rec): an unreadable file is renamed `<id>.corrupt-<time>.json`, a fresh one starts, toast. A card whose node is deleted is dropped; a card whose prepared reply changed resets to New (log kept). No novelty file → "Run the Novelty Finder on this repertoire first" with a button there.
 - **Why:** fail safe without deleting anything; old history must not grade you against a move you no longer play.
 - **Alternatives rejected:** block WeakPoints until the file is fixed by hand; keep orphaned / changed cards and skip them.

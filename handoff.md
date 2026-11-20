@@ -13,6 +13,13 @@ For the next session. One entry per handoff, at most ~15 lines.
 
 ---
 
+## 2026-11-20 21:45 · T21 WeakPoints built on a branch
+- **Done:** D30–D35 decided (Harry took all recs) and built on `weakpoints-drills` (`2b805d7`, pushed): `src/weakpoints/cards.ts` (pool, lead-in, FSRS), `src/Storage/WeakPoints.ts` (file + IPC), `pages/WeakPoints.tsx`, verdict gains `playedCp` / `preparedCp` + a Re-check button. 196 tests green.
+- **In progress:** not merged. Needs Harry to run a drill session in the dev app.
+- **Next step:** Harry: Toolkit → WeakPoints → Start, play a few drills (get one wrong on purpose). Then merge, tick T21, set D21–D35 Verified.
+- **Gotchas:** open flags in plan §0 Pending (review log has no `played` move; dismissed deviations keep their card; backup name is `<id>.json.corrupt-<time>`). Old verdicts need Re-check to be filtered by the 0.3 rule.
+- **Commands to run:** `./ctx.sh sync` · `cd apps/desktop && npm test` · `npm start`
+
 ## 2026-11-20 20:30 · M6 done: settings page + server account features live
 - **Done:** T18 merged (`main@bfa85b4`), T19 deployed (server `1717269`) and checked live by Harry on a new `dev` account (linked both sites, renamed, changed password, signed back in). D25 + D28 Verified.
 - **In progress:** nothing; no open branches.
