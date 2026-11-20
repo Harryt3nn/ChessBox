@@ -3,9 +3,9 @@
 Work **▶ Now** top to bottom. Tags: `[🟠 your call: …]` = a design decision for the builder (CLAUDE.md §1) · `[⏸ waits on: …]` = blocked.
 
 ## 📊 Latest (the only home of volatile facts)
-- **Updated:** 2026-11-19 00:30
-- **`main` at:** bb66569 (pushed) · **open branches:** none · **Electron:** 42.11.18
-- **Tests:** 159 passing (19 files) · **Builder:** 888-node Italian renders in ~1.2 s · **Verdict:** full Stockfish (single-threaded) depth 18 in ~4 s per finding · **Novelty run:** "Check all games" on White Aggressive Italian = 4,396 games in 22 s in the dev app (2,627 deviations, 1,757 novelties, 12 in prep) · **Walk alone:** ~3 ms / game · **npm audit:** 47, build / dev tooling only
+- **Updated:** 2026-11-20 18:30
+- **`main` at:** b34dc17 (pushed) · **open branches:** none · **Electron:** 42.11.18
+- **Tests:** 162 passing (19 files) · **Builder:** 888-node Italian renders in ~1.2 s · **Verdict:** full Stockfish (single-threaded) depth 18 in ~4 s per finding · **Novelty run:** "Check all games" on White Aggressive Italian = 4,396 games in 22 s in the dev app (2,627 deviations, 1,757 novelties, 12 in prep) · **Walk alone:** ~3 ms / game · **npm audit:** 47, build / dev tooling only
 
 ## ▶ Now (ranked): stage-1 MVP from `system.md` (2026-11-18)
 **M1 · Layout**
@@ -34,7 +34,7 @@ Work **▶ Now** top to bottom. Tags: `[🟠 your call: …]` = a design decisio
 - [x] **T17 · Visual graph builder (chessgraph style), CRUD, folders** (React Flow + dagre, D20) · Done when: create / rename / delete repertoires and nodes visually, saved to disk.
 
 **M6 · Profile and settings**
-- [ ] **T23 · Builder polish (UI)** · Done when: React Flow controls match the theme; collapse/expand branches for big repertoires; promotion picker on the mini board (it always queens now).
+- [x] **T23 · Builder polish (UI)** · Done when: React Flow controls match the theme; collapse/expand branches for big repertoires; promotion picker on the mini board (it always queens now).
 - [ ] **T18 · One settings page replaces the profile cards** (UI: Claude's call) · Note: today's Settings hangs on "Loading profile…" when the Pi is unreachable. · Done when: profile info, linked accounts, change password and change username live on one page; forms have correct `autocomplete` attributes.
 - [ ] **T19 · Server: change password / username + rate-limit login and register (was T5)** · Done when: tested on the server, deployed to the Pi first, then the desktop switched over.
 
@@ -79,6 +79,7 @@ Work **▶ Now** top to bottom. Tags: `[🟠 your call: …]` = a design decisio
 ## ── Archived (superseded, do NOT action) ──
 
 ## ✅ Done log (newest first)
+- 2026-11-20 18:30 · T23 builder polish: fold / unfold branches (+N = positions hidden; collapse all folds where the lines first split, expand all; view state only, not saved), promotion picker on the mini board, React Flow controls + grid in the app theme; verified in the app on the 1.e4 repertoire (52 positions, collapse all shows 7, counts 1 + 22 + 22); promotion picker not clicked through (no promotion position in the data), type-checked against the same props as the board · `main@b34dc17` · 3 tests
 - 2026-11-19 03:00 · T20 research Pass 1 (WeakPoints): FSRS via ts-fsrs 5.4.2 recommended; drill = short sequence ending in your prepared reply; cards from deviations, rarely hit and strong lines · `research.md` Pass 1
 - 2026-11-19 02:30 · T17 visual builder (React Flow 12.12 + @dagrejs/dagre 3.1, D20): layout, mini board add (drag or click), comments, delete branch, new / delete repertoire; found + fixed: the start position lost its graph id in the board tree (adding from the start silently failed); verified in the app on real data, then restored from backup · `main@bb66569` · 11 tests
 - 2026-11-19 01:30 · T22 account picker (D19): with lichess/theoneandonlylipika unticked, a full check covers 4,171 of Harry's own games instead of 4,396 · 3 tests
