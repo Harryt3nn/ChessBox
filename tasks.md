@@ -46,6 +46,7 @@ Work **▶ Now** top to bottom. Tags: `[🟠 your call: …]` = a design decisio
 - [x] **T6 · Check B8 in the app** (Escape in "New Folder" may still create one).
 
 ## 🅿️ Parked (ideas, not agreed work; offered when ▶ Now is empty)
+- **Revisit D27:** sign other devices out when the password changes (`passwordChangedAt` + check in `createContext`, one migration). Must be decided before the API leaves Tailscale or stage 2.
 *Stage 2, from `system.md`:* repertoires on a server (maybe MongoDB, user details stay in Postgres) · email verification · MFA · Google sign-in / sign-up · AI move explanations (theory presets + interpreting Stockfish, no paid API keys) · AI "add suggestions" for repertoires · a private chess-theory knowledge base · multi-reply "acceptable alternatives" so a reasonable non-prep move isn't penalised (D17) · more toolkit tools.
 *From the 2026-11-18 bug sweep (not bugs that need fixing now):*
 - The `locked` class on the app layout never applied (it lives in a CSS module, so its name is hashed); the login overlay covers the page anyway.

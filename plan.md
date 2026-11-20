@@ -28,9 +28,13 @@ A bare § means this file. `tasks.md` holds the ranked work; `decisions.md` hold
 - D23: Deviations within 0.3 pawns (TUNE) of the prepared move aren't drilled.
 - D24: Login tokens (JWT) last 3 days.
 - D25: Server hardening: CORS allow-list, rate limits, safe `user.me`, Postgres not published.
+- D26: Login 10 fails / 15 min per IP + username (reset on success); register 5 / hour per IP (TUNE).
+- D27: A password change doesn't sign out other devices **for now** (revisit: see Pending).
+- D28: Change password / username both re-ask the current password; contract in `decisions.md`.
 - D13: A saved session is cleared only when the server answers `UNAUTHORIZED` or `NOT_FOUND` (deleted account); unreachable / erroring server → stay signed in, toast, local features keep working.
 
 **Pending / Unconfirmed** (*not decided*; each with the condition that decides it):
+- **Revisit D27 (sign other devices out on password change):** chose A only *for now*. *Decide before the API leaves Tailscale or before stage 2, whichever comes first. Leading candidate: `passwordChangedAt` column checked in `createContext`.*
 - Deadline: none stated in `system.md`. *Decide if a date matters.*
 
 **Active gates** (date · what must work · what we fall back to if it doesn't):

@@ -245,3 +245,30 @@ The record of design choices, the features added and dropped, and the reasons. R
 - **Revisit if:** the API is exposed beyond Tailscale (needs HTTPS) or runs as more than one instance.
 - **Evidence:** server type-checks clean; TBD (deployed and checked from the desktop over Tailscale).
 - **One-liner:** The server only trusts the app, limits abuse and never sends secrets.
+
+### D26 · security · Login and register rate limits: Status: Planned · Updated: 2026-11-20 19:20
+- **Decision:** Harry (option A): login = 10 failed tries per 15 min per IP + username, reset on a successful login; register = 5 per hour per IP. Numbers are (TUNE). Re-auth checks in D28 count as login tries.
+- **Why:** stops password guessing without letting someone lock you out from every machine; a success resets so typos never lock you out.
+- **Alternatives rejected:** per IP only (B: misses nothing on Tailscale but shares a budget per IP); per username only (C: anyone can lock you out).
+- **Trade-off / risk:** many usernames from one IP are only held back by the 300/min global limit. Counters are in memory and reset on restart.
+- **Revisit if:** the API leaves Tailscale, or the numbers lock Harry out.
+- **Evidence:** TBD (server tests in T19).
+- **One-liner:** Ten wrong passwords and that login waits 15 minutes.
+
+### D27 · auth · Changing your password doesn't sign out other devices (for now): Status: Planned · Updated: 2026-11-20 19:20
+- **Decision:** Harry (option A, **for now: must be revisited**): existing tokens stay valid until they expire (at most 3 days, D24).
+- **Why:** no schema change, consistent with D9 (sign-out-everywhere reverted 2026-10-05); behind Tailscale a stolen token is unlikely.
+- **Alternatives rejected (for now):** B: `passwordChangedAt` column, tokens issued before it rejected in `createContext`, the changing device gets a fresh token (one migration).
+- **Trade-off / risk:** a leaked token survives a password change for up to 3 days.
+- **Revisit if:** before the API is exposed beyond Tailscale, or before stage 2, whichever is first. Tracked in `plan.md` §0 Pending and `tasks.md` 🅿️ Parked.
+- **Evidence:** n/a.
+- **One-liner:** A new password doesn't kick out old logins yet; that's a known gap to close.
+
+### D28 · contract · Change password / username API: Status: Planned · Updated: 2026-11-20 19:20
+- **Decision:** Harry (option A): `user.changePassword({ currentPassword, newPassword })` → `{ ok: true }`; `user.changeUsername({ password, newUsername })` → `{ username }`. Wrong password → `UNAUTHORIZED` "Current password is incorrect"; taken name → `CONFLICT` "Username already taken". The token is unchanged (it holds the user id).
+- **Why:** the username is half the login, so changing it is as sensitive as the password; an unlocked laptop can't take the account.
+- **Alternatives rejected:** B: only password change re-asks the password.
+- **Trade-off / risk:** one extra field per form.
+- **Revisit if:** email change or account deletion are added (same re-auth rule).
+- **Evidence:** TBD (server tests in T19).
+- **One-liner:** Changing your login details asks for your password again.
