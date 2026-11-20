@@ -31,6 +31,7 @@ A bare § means this file. `tasks.md` holds the ranked work; `decisions.md` hold
 - D26: Login 10 fails / 15 min per IP + username (reset on success); register 5 / hour per IP (TUNE).
 - D27: A password change doesn't sign out other devices **for now** (revisit: see Pending).
 - D28: Change password / username both re-ask the current password; contract in `decisions.md`.
+- D29: Server tests run on Vitest too (`npm test` in `vendor/chessbox-server/apps/api`).
 - D13: A saved session is cleared only when the server answers `UNAUTHORIZED` or `NOT_FOUND` (deleted account); unreachable / erroring server → stay signed in, toast, local features keep working.
 
 **Pending / Unconfirmed** (*not decided*; each with the condition that decides it):

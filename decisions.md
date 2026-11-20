@@ -246,13 +246,13 @@ The record of design choices, the features added and dropped, and the reasons. R
 - **Evidence:** server type-checks clean; TBD (deployed and checked from the desktop over Tailscale).
 - **One-liner:** The server only trusts the app, limits abuse and never sends secrets.
 
-### D26 · security · Login and register rate limits: Status: Planned · Updated: 2026-11-20 19:20
+### D26 · security · Login and register rate limits: Status: Built · Updated: 2026-11-20 19:50
 - **Decision:** Harry (option A): login = 10 failed tries per 15 min per IP + username, reset on a successful login; register = 5 per hour per IP. Numbers are (TUNE). Re-auth checks in D28 count as login tries.
 - **Why:** stops password guessing without letting someone lock you out from every machine; a success resets so typos never lock you out.
 - **Alternatives rejected:** per IP only (B: misses nothing on Tailscale but shares a budget per IP); per username only (C: anyone can lock you out).
 - **Trade-off / risk:** many usernames from one IP are only held back by the 300/min global limit. Counters are in memory and reset on restart.
 - **Revisit if:** the API leaves Tailscale, or the numbers lock Harry out.
-- **Evidence:** TBD (server tests in T19).
+- **Evidence:** 6 server tests (`credentials.test.ts`): 11th try blocked even with the right password, other IP unaffected, success clears the count, case-insensitive, 6th sign-up refused, re-auth shares the limit; removing the reset turns its test red. Server `1717269`. Not deployed yet.
 - **One-liner:** Ten wrong passwords and that login waits 15 minutes.
 
 ### D27 · auth · Changing your password doesn't sign out other devices (for now): Status: Planned · Updated: 2026-11-20 19:20
@@ -264,11 +264,20 @@ The record of design choices, the features added and dropped, and the reasons. R
 - **Evidence:** n/a.
 - **One-liner:** A new password doesn't kick out old logins yet; that's a known gap to close.
 
-### D28 · contract · Change password / username API: Status: Planned · Updated: 2026-11-20 19:20
+### D28 · contract · Change password / username API: Status: Built · Updated: 2026-11-20 19:50
 - **Decision:** Harry (option A): `user.changePassword({ currentPassword, newPassword })` → `{ ok: true }`; `user.changeUsername({ password, newUsername })` → `{ username }`. Wrong password → `UNAUTHORIZED` "Current password is incorrect"; taken name → `CONFLICT` "Username already taken". The token is unchanged (it holds the user id).
 - **Why:** the username is half the login, so changing it is as sensitive as the password; an unlocked laptop can't take the account.
 - **Alternatives rejected:** B: only password change re-asks the password.
 - **Trade-off / risk:** one extra field per form.
 - **Revisit if:** email change or account deletion are added (same re-auth rule).
-- **Evidence:** TBD (server tests in T19).
+- **Evidence:** 10 server tests: new hash stored / old rejected, wrong password keeps the hash, password and username rules enforced, signed-out → `UNAUTHORIZED`, deleted account → `NOT_FOUND`, rename then sign in with the new name, taken name → `CONFLICT` (via the unique index, so a race can't double-claim), same name is a no-op. Server `1717269`. Not deployed yet.
 - **One-liner:** Changing your login details asks for your password again.
+
+### D29 · tooling · Server tests run on Vitest too: Status: Built · Updated: 2026-11-20 19:50
+- **Decision:** Harry: the server (`apps/api`) uses Vitest 5.1.1 as a devDependency, like the desktop (D12). `npm test` in `vendor/chessbox-server/apps/api`.
+- **Why:** same runner and API in both repos; T19 had to be tested on the server.
+- **Alternatives rejected:** Node's built-in `node --test` (no new dependency, but a different API and weaker output).
+- **Trade-off / risk:** one more dev dependency; the Docker image's `npm ci` installs dev deps too, so the image is a bit bigger.
+- **Revisit if:** the image size on the Pi matters (`npm ci --omit=dev` would need tsx and prisma moved to dependencies).
+- **Evidence:** 17 tests in ~26 s (Argon2id hashing dominates).
+- **One-liner:** Both repos test with Vitest.
