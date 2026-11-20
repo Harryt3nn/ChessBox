@@ -13,6 +13,13 @@ For the next session. One entry per handoff, at most ~15 lines.
 
 ---
 
+## 2026-11-20 20:30 · M6 done: settings page + server account features live
+- **Done:** T18 merged (`main@bfa85b4`), T19 deployed (server `1717269`) and checked live by Harry on a new `dev` account (linked both sites, renamed, changed password, signed back in). D25 + D28 Verified.
+- **In progress:** nothing; no open branches.
+- **Next step:** T21 WeakPoints drills (D21–D23; adds `ts-fsrs` 5.4.2 to the desktop).
+- **Gotchas:** see the 20:00 entry. D27 still needs revisiting before the API leaves Tailscale.
+- **Commands to run:** `./ctx.sh sync` · `cd apps/desktop && npm test` · server `cd vendor/chessbox-server/apps/api && npm test`
+
 ## 2026-11-20 20:00 · T23 done, server hardening committed, T19 server built, T18 on a branch
 - **Done:** T23 builder polish (`main@b34dc17`). Harry's server edits committed and merged with 3 Pi commits (`48a45b3`); T19 server side (`1717269`): change password / username, login + register limits, Vitest on the server (D24–D29). Submodule URL now `ChessBox-Server`.
 - **In progress:** T18 settings page on branch `settings-page` (`bfa85b4`, pushed). Not merged: needs the server deployed, and nobody has seen it signed in.

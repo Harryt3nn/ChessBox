@@ -237,13 +237,13 @@ The record of design choices, the features added and dropped, and the reasons. R
 - **Evidence:** `apps/api/src/routers/auth.ts:10` signs with `expiresIn: '3d'` (server `48a45b3`).
 - **One-liner:** A login token lasts 3 days.
 
-### D25 · security · Server hardening (Harry's edits, committed 2026-11-20): Status: Built · Updated: 2026-11-20 19:00
+### D25 · security · Server hardening (Harry's edits, committed 2026-11-20): Status: Verified · Updated: 2026-11-20 20:30
 - **Decision:** Harry: env vars checked at startup; CORS allow-list (`localhost:3000`, `null`); rate limits 300/min per IP and 10 account links per 15 min per user (in memory); 64 KB body, 10 calls per batch; `user.me` selects safe fields only; production errors hide internals; Postgres not published; container runs as `node` and runs `prisma migrate deploy` on start; chess usernames limited to `[A-Za-z0-9_-]`, 8 s upstream timeout.
 - **Why:** the API was open to any origin, leaked `passwordHash` through `user.me`, and published Postgres on the Pi.
 - **Alternatives rejected:** none recorded.
 - **Trade-off / risk:** rate limits reset on restart and won't work across several instances (one Pi, so fine).
 - **Revisit if:** the API is exposed beyond Tailscale (needs HTTPS) or runs as more than one instance.
-- **Evidence:** server type-checks clean; TBD (deployed and checked from the desktop over Tailscale).
+- **Evidence:** deployed 2026-11-20; from the desktop over Tailscale: `GET /` → `{"ok":true}`, a foreign `Origin` gets no `Access-Control-Allow-Origin`; the dev app signs in and uses every account call.
 - **One-liner:** The server only trusts the app, limits abuse and never sends secrets.
 
 ### D26 · security · Login and register rate limits: Status: Built · Updated: 2026-11-20 19:50
@@ -252,7 +252,7 @@ The record of design choices, the features added and dropped, and the reasons. R
 - **Alternatives rejected:** per IP only (B: misses nothing on Tailscale but shares a budget per IP); per username only (C: anyone can lock you out).
 - **Trade-off / risk:** many usernames from one IP are only held back by the 300/min global limit. Counters are in memory and reset on restart.
 - **Revisit if:** the API leaves Tailscale, or the numbers lock Harry out.
-- **Evidence:** 6 server tests (`credentials.test.ts`): 11th try blocked even with the right password, other IP unaffected, success clears the count, case-insensitive, 6th sign-up refused, re-auth shares the limit; removing the reset turns its test red. Server `1717269`. Not deployed yet.
+- **Evidence:** 6 server tests (`credentials.test.ts`): 11th try blocked even with the right password, other IP unaffected, success clears the count, case-insensitive, 6th sign-up refused, re-auth shares the limit; removing the reset turns its test red. Server `1717269`, deployed 2026-11-20 (limits not hit live).
 - **One-liner:** Ten wrong passwords and that login waits 15 minutes.
 
 ### D27 · auth · Changing your password doesn't sign out other devices (for now): Status: Planned · Updated: 2026-11-20 19:20
@@ -264,13 +264,13 @@ The record of design choices, the features added and dropped, and the reasons. R
 - **Evidence:** n/a.
 - **One-liner:** A new password doesn't kick out old logins yet; that's a known gap to close.
 
-### D28 · contract · Change password / username API: Status: Built · Updated: 2026-11-20 19:50
+### D28 · contract · Change password / username API: Status: Verified · Updated: 2026-11-20 20:30
 - **Decision:** Harry (option A): `user.changePassword({ currentPassword, newPassword })` → `{ ok: true }`; `user.changeUsername({ password, newUsername })` → `{ username }`. Wrong password → `UNAUTHORIZED` "Current password is incorrect"; taken name → `CONFLICT` "Username already taken". The token is unchanged (it holds the user id).
 - **Why:** the username is half the login, so changing it is as sensitive as the password; an unlocked laptop can't take the account.
 - **Alternatives rejected:** B: only password change re-asks the password.
 - **Trade-off / risk:** one extra field per form.
 - **Revisit if:** email change or account deletion are added (same re-auth rule).
-- **Evidence:** 10 server tests: new hash stored / old rejected, wrong password keeps the hash, password and username rules enforced, signed-out → `UNAUTHORIZED`, deleted account → `NOT_FOUND`, rename then sign in with the new name, taken name → `CONFLICT` (via the unique index, so a race can't double-claim), same name is a no-op. Server `1717269`. Not deployed yet.
+- **Evidence:** 10 server tests: new hash stored / old rejected, wrong password keeps the hash, password and username rules enforced, signed-out → `UNAUTHORIZED`, deleted account → `NOT_FOUND`, rename then sign in with the new name, taken name → `CONFLICT` (via the unique index, so a race can't double-claim), same name is a no-op. Server `1717269`, deployed; Harry changed username and password in the app on a `dev` account and signed back in (2026-11-20).
 - **One-liner:** Changing your login details asks for your password again.
 
 ### D29 · tooling · Server tests run on Vitest too: Status: Built · Updated: 2026-11-20 19:50
