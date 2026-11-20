@@ -25,6 +25,7 @@ const TOOLS: { icon: string; title: string; text: string; page?: Page }[] = [
         icon: weakPointsIcon,
         title: 'WeakPoints',
         text: 'Drill the lines you get wrong, revisit the ones you rarely reach, keep the strong ones fresh.',
+        page: 'weakpoints',
     },
 ];
 

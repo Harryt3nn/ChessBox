@@ -15,7 +15,7 @@ import type { BoardFocus } from './BoardView';
 import { findingPositions } from '../novelty/positions';
 import { Engine } from '../engine/Engine';
 import { createFullWorker } from '../engine/stockfishWorker';
-import { formatScore, uciToSan, whiteScore, type EngineLine } from '../engine/uci';
+import { formatScore, sideCentipawns, uciToSan, whiteScore, type EngineLine } from '../engine/uci';
 
 import noveltyIcon from '../assets/icons/020-chess.png';
 import deviationsIcon from '../assets/icons/204-folder-6.png';
@@ -100,21 +100,30 @@ const NoveltyFinder = ({ currentUser, onOpenInBoard }: NoveltyFinderProps) => {
 
   const refresh = async () => setResults(await window.api.loadNovelty(repertoireId));
 
-  // the verdict: the engine's score after the move played, and its own best move in the position before
+  // the verdict: the engine's score after the move played, its own best move in the position before,
+  // and for a deviation the score after your prepared move, so WeakPoints can skip near-equal ones (D23, D31)
   async function evaluate(f: Finding) {
     const positions = findingPositions(f.line, f.move);
-    if (!positions) return setSummary("That position couldn't be replayed.");
+    const prepared = f.kind === 'deviation' && f.expected ? findingPositions(f.line, f.expected) : null;
+    if (!positions || !repertoire) return setSummary("That position couldn't be replayed.");
     setEvaluating(keyOf(f));
     try {
-      engine.current ??= new Engine(createFullWorker());
-      const bestUci = await engine.current.analyse(positions.before, { depth: VERDICT_DEPTH }, () => undefined);
-      let after: EngineLine[] = [];
-      await engine.current.analyse(positions.after, { depth: VERDICT_DEPTH }, lines => { after = lines; });
+      const stockfish = (engine.current ??= new Engine(createFullWorker()));
+      const topLine = async (fen: string) => {
+        let lines: EngineLine[] = [];
+        await stockfish.analyse(fen, { depth: VERDICT_DEPTH }, l => { lines = l; });
+        return lines[0];
+      };
+      const bestUci = await stockfish.analyse(positions.before, { depth: VERDICT_DEPTH }, () => undefined);
+      const after = await topLine(positions.after);
+      const afterPrepared = prepared && await topLine(prepared.after);
       await window.api.updateFinding(repertoireId, keyOf(f), {
         eval: {
-          score: after[0] ? formatScore(whiteScore(after[0].score, positions.after)) : '?',
-          depth: after[0]?.depth ?? 0,
+          score: after ? formatScore(whiteScore(after.score, positions.after)) : '?',
+          depth: after?.depth ?? 0,
           best: bestUci ? uciToSan(positions.before, [bestUci])[0] ?? '?' : '—',
+          ...(after ? { playedCp: sideCentipawns(after.score, positions.after, repertoire.side) } : {}),
+          ...(afterPrepared && prepared ? { preparedCp: sideCentipawns(afterPrepared.score, prepared.after, repertoire.side) } : {}),
         },
       });
       await refresh();
@@ -131,9 +140,9 @@ const NoveltyFinder = ({ currentUser, onOpenInBoard }: NoveltyFinderProps) => {
   const actions = (f: Finding) => (
     <td className={styles.rowActions}>
       <button className={styles.rowBtn} onClick={() => repertoire && onOpenInBoard(repertoire, { nodeId: f.nodeId, move: f.move })} title="Show this position in the analysis board">Board</button>
-      {f.eval
-        ? <span className={styles.verdict} title={`Stockfish depth ${f.eval.depth}: score after ${f.move}, and its own best move`}>{f.eval.score} · best {f.eval.best}</span>
-        : <button className={styles.rowBtn} onClick={() => evaluate(f)} disabled={!!evaluating}>{evaluating === keyOf(f) ? 'Evaluating…' : 'Evaluate'}</button>}
+      {f.eval && <span className={styles.verdict} title={`Stockfish depth ${f.eval.depth}: score after ${f.move}, and its own best move`}>{f.eval.score} · best {f.eval.best}</span>}
+      {/* a verdict from before D31 has no prepared-move score, so WeakPoints can't tell if the deviation was fine */}
+      {(!f.eval || (f.kind === 'deviation' && f.eval.preparedCp === undefined)) && <button className={styles.rowBtn} onClick={() => evaluate(f)} disabled={!!evaluating}>{evaluating === keyOf(f) ? 'Evaluating…' : f.eval ? 'Re-check' : 'Evaluate'}</button>}
       <button className={styles.rowBtn} onClick={() => toggleDismissed(f)}>{f.status === 'dismissed' ? 'Restore' : 'Dismiss'}</button>
     </td>
   );

@@ -57,7 +57,7 @@ export function ensureDirs() {
 
 // a file that can't be parsed is renamed aside rather than overwritten,
 // so one bad file can't crash the app or silently lose the user's data
-async function quarantine(filePath: string, err: unknown) {
+export async function quarantine(filePath: string, err: unknown) {
   const aside = `${filePath}.corrupt-${Date.now()}`;
   console.error(`Could not read ${filePath}, moved it to ${aside}:`, err);
   try {
@@ -206,7 +206,7 @@ export async function saveNodePatch(patch: unknown, remove: unknown = []): Promi
   await saveNodes(nodes);
 }
 
-/** removes a repertoire with its nodes and its novelty-finder results */
+/** removes a repertoire with its nodes, its novelty-finder results and its WeakPoints drills (D22) */
 export async function deleteRepertoire(id: unknown): Promise<void> {
   const file = repertoirePath(id);
   if (!file) throw new Error("Invalid repertoire id");
@@ -218,6 +218,7 @@ export async function deleteRepertoire(id: unknown): Promise<void> {
   await saveNodes(nodes);
   await fs.promises.rm(file, { force: true });
   await fs.promises.rm(path.join(DATA_DIR, "novelty", `${id}.json`), { force: true });
+  await fs.promises.rm(path.join(DATA_DIR, "weakpoints", `${id}.json`), { force: true });
 }
 
 export async function saveNodes(nodes: Record<string, Node>): Promise<void> {

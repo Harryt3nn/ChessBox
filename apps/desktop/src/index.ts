@@ -8,6 +8,7 @@ import { importRepertoires } from "./Storage/ImportService";
 import { importChesscom } from "./Storage/ChesscomImporter";
 import { importLichess } from "./Storage/LichessImporter";
 import { listAccounts, loadNovelty, runNovelty, updateFinding, type FindingUpdate } from "./Storage/NoveltyRunner";
+import { weakpointsGrade, weakpointsQueue } from "./Storage/WeakPoints";
 import {
   loadFolders,
   saveFolders,
@@ -134,6 +135,12 @@ ipcMain.handle("novelty:update", (_event, repertoireId: unknown, key: unknown, u
   if (typeof repertoireId !== "string" || typeof key !== "string" || !update || typeof update !== "object") throw new Error("Invalid finding update");
   return updateFinding(repertoireId, key, update as FindingUpdate);
 });
+
+// WeakPoints (D32): main builds the queue and schedules; the renderer only says right or wrong
+ipcMain.handle("weakpoints:queue", (_event, repertoireId: unknown) => weakpointsQueue(repertoireId));
+
+ipcMain.handle("weakpoints:grade", (_event, repertoireId: unknown, nodeId: unknown, correct: unknown) =>
+  weakpointsGrade(repertoireId, nodeId, correct));
 
 ipcMain.handle("storage:saveAuthToken", (_event, token: string) => saveAuthToken(token));
 

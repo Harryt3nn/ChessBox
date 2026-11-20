@@ -59,6 +59,7 @@
     "react-chessboard": "^4.0.0",
     "react-dom": "^19.2.8",
     "react-hot-toast": "^2.6.0",
-    "stockfish": "^18.0.8"
+    "stockfish": "^18.0.8",
+    "ts-fsrs": "5.4.2"
   }
 }

@@ -6,7 +6,7 @@ import { Chess, DEFAULT_POSITION } from "chess.js";
 import { DATA_DIR, GAMES_DIR, loadNodes, loadRepertoires, readJson } from "./MainStorage";
 import { isSafeId } from "../importsAndExports/sanitiseImport";
 import { walkGame } from "../novelty/walk";
-import { buildResults, gameInfo, type GameRecord, type NoveltyFile } from "../novelty/results";
+import { buildResults, gameInfo, type Finding, type GameRecord, type NoveltyFile } from "../novelty/results";
 
 // runs the novelty finder in the main process, where the games live (D4): walks imported games
 // against one repertoire and writes ChessBox-data/novelty/<repertoireId>.json (D18)
@@ -153,8 +153,10 @@ export async function runNovelty(
 
 export interface FindingUpdate {
   status?: "new" | "dismissed";
-  eval?: { score: string; depth: number; best: string };
+  eval?: Finding["eval"];
 }
+
+const isCentipawns = (v: unknown): v is number => Number.isInteger(v) && Math.abs(v as number) <= 10_000;
 
 /** sets a finding's status and/or engine verdict; the update comes from the renderer, so only valid fields are kept */
 export async function updateFinding(repertoireId: string, key: string, update: FindingUpdate): Promise<void> {
@@ -165,7 +167,11 @@ export async function updateFinding(repertoireId: string, key: string, update: F
   if (update.status === "new" || update.status === "dismissed") finding.status = update.status;
   const e = update.eval;
   if (e && typeof e.score === "string" && e.score.length <= 12 && Number.isFinite(e.depth) && typeof e.best === "string" && e.best.length <= 12) {
-    finding.eval = { score: e.score, depth: e.depth, best: e.best };
+    finding.eval = {
+      score: e.score, depth: e.depth, best: e.best,
+      ...(isCentipawns(e.playedCp) ? { playedCp: e.playedCp } : {}),
+      ...(isCentipawns(e.preparedCp) ? { preparedCp: e.preparedCp } : {}),
+    };
   }
   await fs.promises.writeFile(noveltyPath(repertoireId), JSON.stringify(file), "utf8");
 }

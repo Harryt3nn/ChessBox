@@ -88,6 +88,14 @@ describe('runNovelty', () => {
     expect((await loadNovelty('rep'))?.findings['e5|Bc4|deviation'].eval).toBeUndefined();
   });
 
+  it('keeps the numeric scores of a verdict only when they are whole centipawns within ±100 pawns', async () => {
+    await runNovelty('rep', 'all');
+    await updateFinding('rep', 'e5|Bc4|deviation', { eval: { score: '-0.40', depth: 20, best: 'Nf3', playedCp: -40, preparedCp: 25 } });
+    expect((await loadNovelty('rep'))?.findings['e5|Bc4|deviation'].eval).toEqual({ score: '-0.40', depth: 20, best: 'Nf3', playedCp: -40, preparedCp: 25 });
+    await updateFinding('rep', 'e5|Bc4|deviation', { eval: { score: '-0.40', depth: 20, best: 'Nf3', playedCp: 0.5, preparedCp: 99_999 } });
+    expect((await loadNovelty('rep'))?.findings['e5|Bc4|deviation'].eval).toEqual({ score: '-0.40', depth: 20, best: 'Nf3' });
+  });
+
   it('lists the imported accounts', async () => {
     expect(await listAccounts()).toEqual(['chesscom/Harry_Tennant', 'lichess/harryt3nn']);
   });

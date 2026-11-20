@@ -6,6 +6,7 @@ import type { Repertoire } from "./Repertoire";
 import type { Node } from "./Node";
 import type { NoveltyFile } from "../novelty/results";
 import type { FindingUpdate, RunSummary } from "../Storage/NoveltyRunner";
+import type { WeakPointsQueue } from "../Storage/WeakPoints";
 import type { ImportResult } from "./ImportResults";
 import type { ImportRepertoiresPayload } from "./ImportPayload";
 
@@ -36,6 +37,8 @@ declare global {
       loadNovelty(repertoireId: string): Promise<NoveltyFile | null>;
       updateFinding(repertoireId: string, key: string, update: FindingUpdate): Promise<void>;
       onNoveltyProgress(listener: (done: number, total: number) => void): () => void;
+      weakpointsQueue(repertoireId: string): Promise<WeakPointsQueue>;
+      weakpointsGrade(repertoireId: string, nodeId: string, correct: boolean): Promise<number>;
     };
   }
 }

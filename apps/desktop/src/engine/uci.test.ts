@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { DEFAULT_POSITION } from 'chess.js';
-import { evalBarPercent, formatScore, parseBestMove, parseInfo, shortScore, uciToSan, whiteScore } from './uci';
+import { evalBarPercent, formatScore, parseBestMove, parseInfo, shortScore, sideCentipawns, uciToSan, whiteScore } from './uci';
 
 describe('parseInfo', () => {
   it('reads depth, line number, centipawn score and the principal variation', () => {
@@ -26,6 +26,23 @@ describe('parseBestMove', () => {
     expect(parseBestMove('bestmove e2e4 ponder e7e5')).toBe('e2e4');
     expect(parseBestMove('bestmove (none)')).toBeNull();
     expect(parseBestMove('info depth 1')).toBeNull();
+  });
+});
+
+describe('sideCentipawns', () => {
+  const whiteToMove = 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1';
+  const blackToMove = 'rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR b KQkq - 0 1';
+
+  it("turns a side-to-move score into your side's point of view", () => {
+    expect(sideCentipawns({ type: 'cp', value: 30 }, whiteToMove, 'white')).toBe(30);
+    expect(sideCentipawns({ type: 'cp', value: 30 }, whiteToMove, 'black')).toBe(-30);
+    expect(sideCentipawns({ type: 'cp', value: 30 }, blackToMove, 'white')).toBe(-30);
+  });
+
+  it('counts a mate as 100 pawns, and mate in 0 against the side to move', () => {
+    expect(sideCentipawns({ type: 'mate', value: 3 }, blackToMove, 'black')).toBe(10_000);
+    expect(sideCentipawns({ type: 'mate', value: -2 }, blackToMove, 'black')).toBe(-10_000);
+    expect(sideCentipawns({ type: 'mate', value: 0 }, blackToMove, 'white')).toBe(10_000);
   });
 });
 

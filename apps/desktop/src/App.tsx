@@ -8,6 +8,7 @@ import Settings from './pages/Settings';
 import TrainingToolkit from './pages/TrainingToolkit';
 import BoardView from './pages/BoardView';
 import NoveltyFinder from './pages/NoveltyFinder';
+import WeakPoints from './pages/WeakPoints';
 import RepertoireBuilder from './pages/RepertoireBuilder';
 import Home from './pages/Home';
 import { LogIn } from './components/logIn';
@@ -72,6 +73,7 @@ const App = () => {
     if (page === 'tools') return <TrainingToolkit page={page} setPage={setPage} />;
     if (page === 'settings') return <Settings onLogout={handleLogout} onUserChange={setCurrentUser} />;
     if (page === 'board') return <BoardView repertoire={boardRepertoire} focus={boardFocus} onCloseRepertoire={() => { setBoardRepertoire(null); setBoardFocus(null); }} />;
+    if (page === 'weakpoints') return <WeakPoints setPage={setPage} />;
     if (page === 'novelty') return <NoveltyFinder page={page} currentUser={currentUser} onOpenInBoard={openInBoard} />;
 
     return <Home setPage={setPage} currentUser={currentUser} />;

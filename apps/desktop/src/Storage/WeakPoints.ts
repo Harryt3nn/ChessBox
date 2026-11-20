@@ -1,0 +1,92 @@
+/*apps/desktop/src/Storage/WeakPoints.ts*/
+
+import fs from "fs";
+import path from "path";
+import { DATA_DIR, loadNodes, loadRepertoires, quarantine } from "./MainStorage";
+import { loadNovelty } from "./NoveltyRunner";
+import { isSafeId } from "../importsAndExports/sanitiseImport";
+import { dueDrills, emptyFile, gradeCard, syncCards, type Drill, type WeakPointsFile } from "../weakpoints/cards";
+
+// WeakPoints in the main process (D32): the renderer asks for the queue and reports right / wrong;
+// scheduling and the file (ChessBox-data/weakpoints/<repertoireId>.json, D22 + D30) stay here
+
+const WEAKPOINTS_DIR = path.join(DATA_DIR, "weakpoints");
+
+export interface WeakPointsQueue {
+  drills: Drill[];
+  cards: number; // every card, due or not
+  recovered: boolean; // the file was unreadable, set aside and started fresh (D35)
+  noNovelty: boolean; // the novelty finder hasn't run on this repertoire yet
+}
+
+function checkedId(repertoireId: unknown): string {
+  if (!isSafeId(repertoireId)) throw new Error("Invalid repertoire id");
+  return repertoireId;
+}
+
+const weakpointsPath = (repertoireId: string) => path.join(WEAKPOINTS_DIR, `${repertoireId}.json`);
+
+const FSRS_NUMBERS = ["due", "stability", "difficulty", "elapsed_days", "scheduled_days", "learning_steps", "reps", "lapses", "state"];
+
+function isValidFile(data: unknown, repertoireId: string): data is WeakPointsFile {
+  if (!data || typeof data !== "object") return false;
+  const file = data as WeakPointsFile;
+  if (file.version !== 1 || file.repertoireId !== repertoireId || !file.cards || typeof file.cards !== "object") return false;
+  return Object.values(file.cards).every(c =>
+    c && ["deviation", "rare", "strong"].includes(c.source) && typeof c.answer === "string" && Number.isFinite(c.added)
+    && c.fsrs && FSRS_NUMBERS.every(k => Number.isFinite((c.fsrs as unknown as Record<string, unknown>)[k]))
+    && Array.isArray(c.log));
+}
+
+/** the file, or a fresh one; an unreadable file is renamed aside first, never overwritten (D35) */
+async function loadFile(repertoireId: string, now: number): Promise<{ file: WeakPointsFile; recovered: boolean }> {
+  const target = weakpointsPath(repertoireId);
+  if (!fs.existsSync(target)) return { file: emptyFile(repertoireId, now), recovered: false };
+
+  let data: unknown;
+  try {
+    data = JSON.parse(await fs.promises.readFile(target, "utf8"));
+  } catch (err) {
+    await quarantine(target, err);
+    return { file: emptyFile(repertoireId, now), recovered: true };
+  }
+  if (isValidFile(data, repertoireId)) return { file: data, recovered: false };
+  await quarantine(target, new Error("not a WeakPoints file"));
+  return { file: emptyFile(repertoireId, now), recovered: true };
+}
+
+async function saveFile(file: WeakPointsFile): Promise<void> {
+  await fs.promises.mkdir(WEAKPOINTS_DIR, { recursive: true });
+  await fs.promises.writeFile(weakpointsPath(file.repertoireId), JSON.stringify(file), "utf8");
+}
+
+async function loadRepertoire(repertoireId: string) {
+  const rep = (await loadRepertoires()).find(r => r.id === repertoireId);
+  if (!rep) throw new Error("That repertoire doesn't exist any more.");
+  return rep;
+}
+
+export async function weakpointsQueue(repertoireId: unknown): Promise<WeakPointsQueue> {
+  const id = checkedId(repertoireId);
+  const rep = await loadRepertoire(id);
+  const novelty = await loadNovelty(id);
+  if (!novelty) return { drills: [], cards: 0, recovered: false, noNovelty: true };
+
+  const now = Date.now();
+  const nodes = await loadNodes();
+  const loaded = await loadFile(id, now);
+  const file = syncCards(loaded.file, rep, nodes, novelty, now);
+  await saveFile(file);
+  return { drills: dueDrills(file, rep, nodes, now), cards: Object.keys(file.cards).length, recovered: loaded.recovered, noNovelty: false };
+}
+
+/** grades one card; returns when it's next due (ms) */
+export async function weakpointsGrade(repertoireId: unknown, nodeId: unknown, correct: unknown): Promise<number> {
+  const id = checkedId(repertoireId);
+  if (typeof nodeId !== "string" || typeof correct !== "boolean") throw new Error("Invalid grade");
+  const now = Date.now();
+  const { file } = await loadFile(id, now);
+  const graded = gradeCard(file, nodeId, correct, now);
+  await saveFile(graded);
+  return graded.cards[nodeId].fsrs.due;
+}

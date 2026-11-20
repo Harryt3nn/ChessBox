@@ -26,7 +26,8 @@ export interface Finding {
   lastSeen: number;
   games: string[];
   status: 'new' | 'dismissed' | 'added';
-  eval?: { score: string; depth: number; best: string };
+  // playedCp / preparedCp: centipawns from your side, mate = ±10000 (D31); older verdicts don't have them
+  eval?: { score: string; depth: number; best: string; playedCp?: number; preparedCp?: number };
 }
 
 export interface NoveltyFile {

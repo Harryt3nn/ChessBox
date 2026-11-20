@@ -1,0 +1,76 @@
+/*apps/desktop/src/pages/WeakPoints.module.css*/
+
+.row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.select {
+  min-width: 240px;
+  padding: 8px 10px;
+  background: var(--color-surface-2);
+  border: 1px solid var(--color-border-strong);
+  color: var(--color-text-primary);
+  font-family: inherit;
+  font-size: 13px;
+}
+
+.hint {
+  color: var(--color-text-tertiary);
+  font-size: 13px;
+  margin: 12px 0 0;
+}
+
+/* the drill: a bare board and a narrow column for what's happening, no analysis */
+.drill {
+  display: flex;
+  gap: 32px;
+  align-items: flex-start;
+}
+
+.board {
+  flex: 0 0 auto;
+}
+
+.side {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  min-width: 220px;
+}
+
+.source {
+  color: var(--color-amber);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.prompt {
+  color: var(--color-text-primary);
+  font-size: 16px;
+  margin: 0;
+}
+
+.right,
+.wrong {
+  font-size: 14px;
+  margin: 0;
+  padding: 8px 12px;
+  border-left: 3px solid;
+}
+
+.right {
+  color: var(--color-amber-hover);
+  border-color: var(--color-amber);
+  background: rgba(var(--color-amber-rgb), 0.1);
+}
+
+.wrong {
+  color: var(--color-text-primary);
+  border-color: var(--color-coral);
+  background: rgba(var(--color-coral-rgb), 0.18);
+}

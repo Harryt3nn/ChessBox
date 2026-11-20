@@ -54,6 +54,16 @@ export function whiteScore(score: Score, fen: string): Score {
   return fen.split(' ')[1] === 'b' ? { type: score.type, value: -score.value } : score;
 }
 
+// a forced mate counts as 100 pawns, so it's never "about as good" as a normal score (D31)
+const MATE_CP = 10_000;
+
+/** a side-to-move score as centipawns from `side`'s point of view; mate in 0 means the side to move is mated */
+export function sideCentipawns(score: Score, fen: string, side: 'white' | 'black'): number {
+  const forMover = score.type === 'mate' ? (score.value > 0 ? MATE_CP : -MATE_CP) : score.value;
+  const moverIsSide = fen.split(' ')[1] === side[0];
+  return moverIsSide ? forMover : -forMover;
+}
+
 export function formatScore(score: Score): string {
   if (score.type === 'mate') return `#${score.value}`;
   const pawns = (score.value / 100).toFixed(2);

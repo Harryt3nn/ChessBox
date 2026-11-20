@@ -21,7 +21,7 @@ const SECTIONS: { page: Page; label: string }[] = [
 ];
 
 // tools live inside the Toolkit, so their pages highlight it
-const SECTION_OF: Partial<Record<Page, Page>> = { novelty: 'tools', builder: 'repertoires' };
+const SECTION_OF: Partial<Record<Page, Page>> = { novelty: 'tools', weakpoints: 'tools', builder: 'repertoires' };
 
 export function TopBar({ page, setPage }: TopBarProps) {
   const active = SECTION_OF[page] ?? page;

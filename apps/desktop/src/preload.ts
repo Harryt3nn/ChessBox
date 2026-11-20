@@ -6,6 +6,7 @@ import type { Repertoire } from "./types/Repertoire";
 import type { Node } from "./types/Node";
 import type { NoveltyFile } from "./novelty/results";
 import type { FindingUpdate, RunSummary } from "./Storage/NoveltyRunner";
+import type { WeakPointsQueue } from "./Storage/WeakPoints";
 import { ImportRepertoiresPayload } from "./types/ImportPayload";
 
 // the only place where the renderer can communicate with main processes
@@ -71,6 +72,13 @@ contextBridge.exposeInMainWorld("api", {
 
   updateFinding: (repertoireId: string, key: string, update: FindingUpdate): Promise<void> =>
     ipcRenderer.invoke("novelty:update", repertoireId, key, update),
+
+  weakpointsQueue: (repertoireId: string): Promise<WeakPointsQueue> =>
+    ipcRenderer.invoke("weakpoints:queue", repertoireId),
+
+  // returns when the card is next due (ms since epoch)
+  weakpointsGrade: (repertoireId: string, nodeId: string, correct: boolean): Promise<number> =>
+    ipcRenderer.invoke("weakpoints:grade", repertoireId, nodeId, correct),
 
   // returns a function that stops listening
   onNoveltyProgress: (listener: (done: number, total: number) => void): (() => void) => {
