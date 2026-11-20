@@ -57,7 +57,7 @@ export function ensureDirs() {
 
 // a file that can't be parsed is renamed aside rather than overwritten,
 // so one bad file can't crash the app or silently lose the user's data
-export async function quarantine(filePath: string, err: unknown) {
+async function quarantine(filePath: string, err: unknown) {
   const aside = `${filePath}.corrupt-${Date.now()}`;
   console.error(`Could not read ${filePath}, moved it to ${aside}:`, err);
   try {

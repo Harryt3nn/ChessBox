@@ -103,7 +103,7 @@ describe('syncCards', () => {
 
   it('drops a card whose node is deleted and resets one whose prepared reply changed, keeping its log', () => {
     let file = syncCards(emptyFile('r1', NOW), rep, nodes, novelty([deviation('Bc5'), deviation('Nc6')]), NOW);
-    file = gradeCard(file, 'Nc6', true, NOW);
+    file = gradeCard(file, 'Nc6', true, 'c3', NOW);
     const edited = graph(...Object.values(nodes).filter(x => !['Bc5', 'c3'].includes(x.id)),
       { ...nodes.Bc4, childIDs: [] }, n('Bb5', 'Nc6', 'Bb5'));
     edited.Nc6 = { ...nodes.Nc6, childIDs: ['Bb5'] };
@@ -117,7 +117,7 @@ describe('syncCards', () => {
 
   it('makes a card due again when you deviate there after its last drill', () => {
     let file = syncCards(emptyFile('r1', NOW), rep, nodes, novelty([deviation('Bc5')]), NOW);
-    file = gradeCard(file, 'Bc5', true, NOW);
+    file = gradeCard(file, 'Bc5', true, 'c3', NOW);
     expect(file.cards.Bc5.fsrs.due).toBeGreaterThan(NOW);
 
     const sameGames = syncCards(file, rep, nodes, novelty([deviation('Bc5')]), NOW + 1000);
@@ -144,7 +144,7 @@ describe('dueDrills', () => {
 
   it('leaves out cards that aren\'t due yet', () => {
     let file = syncCards(emptyFile('r1', NOW), rep, nodes, novelty([deviation('Bc5')]), NOW);
-    file = gradeCard(file, 'Bc5', true, NOW);
+    file = gradeCard(file, 'Bc5', true, 'c3', NOW);
     expect(dueDrills(file, rep, nodes, NOW + 1000)).toEqual([]);
   });
 
@@ -159,11 +159,11 @@ describe('dueDrills', () => {
 describe('gradeCard', () => {
   it('schedules a correct answer later than a wrong one and logs both', () => {
     const file = syncCards(emptyFile('r1', NOW), rep, nodes, novelty([deviation('Bc5')]), NOW);
-    const good = gradeCard(file, 'Bc5', true, NOW);
-    const again = gradeCard(file, 'Bc5', false, NOW);
+    const good = gradeCard(file, 'Bc5', true, 'c3', NOW);
+    const again = gradeCard(file, 'Bc5', false, 'd4', NOW);
     expect(good.cards.Bc5.fsrs.due).toBeGreaterThan(again.cards.Bc5.fsrs.due);
-    expect(good.cards.Bc5.log).toEqual([{ at: NOW, rating: Rating.Good }]);
-    expect(again.cards.Bc5.log).toEqual([{ at: NOW, rating: Rating.Again }]);
+    expect(good.cards.Bc5.log).toEqual([{ at: NOW, rating: Rating.Good, played: 'c3' }]);
+    expect(again.cards.Bc5.log).toEqual([{ at: NOW, rating: Rating.Again, played: 'd4' }]);
     expect(file.cards.Bc5.log).toEqual([]); // the input isn't changed
   });
 
@@ -172,7 +172,7 @@ describe('gradeCard', () => {
     let at = NOW;
     const gaps: number[] = [];
     for (let i = 0; i < 4; i++) {
-      file = gradeCard(file, 'Bc5', true, at);
+      file = gradeCard(file, 'Bc5', true, 'c3', at);
       gaps.push(file.cards.Bc5.fsrs.due - at);
       at = file.cards.Bc5.fsrs.due;
     }
@@ -181,6 +181,6 @@ describe('gradeCard', () => {
   });
 
   it('refuses a card that doesn\'t exist', () => {
-    expect(() => gradeCard(emptyFile('r1', NOW), 'nope', true, NOW)).toThrow("doesn't exist");
+    expect(() => gradeCard(emptyFile('r1', NOW), 'nope', true, 'c3', NOW)).toThrow("doesn't exist");
   });
 });

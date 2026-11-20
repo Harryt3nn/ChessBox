@@ -38,7 +38,7 @@ declare global {
       updateFinding(repertoireId: string, key: string, update: FindingUpdate): Promise<void>;
       onNoveltyProgress(listener: (done: number, total: number) => void): () => void;
       weakpointsQueue(repertoireId: string): Promise<WeakPointsQueue>;
-      weakpointsGrade(repertoireId: string, nodeId: string, correct: boolean): Promise<number>;
+      weakpointsGrade(repertoireId: string, nodeId: string, correct: boolean, played: string): Promise<number>;
     };
   }
 }

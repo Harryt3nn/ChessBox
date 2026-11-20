@@ -2,7 +2,7 @@
 
 import fs from "fs";
 import path from "path";
-import { DATA_DIR, loadNodes, loadRepertoires, quarantine } from "./MainStorage";
+import { DATA_DIR, loadNodes, loadRepertoires } from "./MainStorage";
 import { loadNovelty } from "./NoveltyRunner";
 import { isSafeId } from "../importsAndExports/sanitiseImport";
 import { dueDrills, emptyFile, gradeCard, syncCards, type Drill, type WeakPointsFile } from "../weakpoints/cards";
@@ -38,7 +38,14 @@ function isValidFile(data: unknown, repertoireId: string): data is WeakPointsFil
     && Array.isArray(c.log));
 }
 
-/** the file, or a fresh one; an unreadable file is renamed aside first, never overwritten (D35) */
+/** renames an unreadable file to <id>.corrupt-<time>.json (D35); if that fails it throws, so the fresh file never overwrites it */
+async function setAside(repertoireId: string, reason: unknown): Promise<void> {
+  const aside = path.join(WEAKPOINTS_DIR, `${repertoireId}.corrupt-${Date.now()}.json`);
+  console.error(`Could not read the WeakPoints file for ${repertoireId}, moved it to ${aside}:`, reason);
+  await fs.promises.rename(weakpointsPath(repertoireId), aside);
+}
+
+/** the file, or a fresh one; an unreadable file is set aside first, never overwritten (D35) */
 async function loadFile(repertoireId: string, now: number): Promise<{ file: WeakPointsFile; recovered: boolean }> {
   const target = weakpointsPath(repertoireId);
   if (!fs.existsSync(target)) return { file: emptyFile(repertoireId, now), recovered: false };
@@ -47,11 +54,11 @@ async function loadFile(repertoireId: string, now: number): Promise<{ file: Weak
   try {
     data = JSON.parse(await fs.promises.readFile(target, "utf8"));
   } catch (err) {
-    await quarantine(target, err);
+    await setAside(repertoireId, err);
     return { file: emptyFile(repertoireId, now), recovered: true };
   }
   if (isValidFile(data, repertoireId)) return { file: data, recovered: false };
-  await quarantine(target, new Error("not a WeakPoints file"));
+  await setAside(repertoireId, new Error("not a WeakPoints file"));
   return { file: emptyFile(repertoireId, now), recovered: true };
 }
 
@@ -81,12 +88,15 @@ export async function weakpointsQueue(repertoireId: unknown): Promise<WeakPoints
 }
 
 /** grades one card; returns when it's next due (ms) */
-export async function weakpointsGrade(repertoireId: unknown, nodeId: unknown, correct: unknown): Promise<number> {
+// a SAN move: pieces, squares, captures, castling, promotion, check marks
+const SAN = /^[A-Za-z0-9=+#-]{2,10}$/;
+
+export async function weakpointsGrade(repertoireId: unknown, nodeId: unknown, correct: unknown, played: unknown): Promise<number> {
   const id = checkedId(repertoireId);
-  if (typeof nodeId !== "string" || typeof correct !== "boolean") throw new Error("Invalid grade");
+  if (typeof nodeId !== "string" || typeof correct !== "boolean" || typeof played !== "string" || !SAN.test(played)) throw new Error("Invalid grade");
   const now = Date.now();
   const { file } = await loadFile(id, now);
-  const graded = gradeCard(file, nodeId, correct, now);
+  const graded = gradeCard(file, nodeId, correct, played, now);
   await saveFile(graded);
   return graded.cards[nodeId].fsrs.due;
 }

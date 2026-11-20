@@ -61,10 +61,10 @@ const WeakPoints = ({ setPage }: WeakPointsProps) => {
     if (repertoireId) loadQueue(repertoireId);
   }, [repertoireId]);
 
-  async function onGraded(drill: Drill, correct: boolean) {
+  async function onGraded(drill: Drill, correct: boolean, played: string) {
     let due = Infinity;
     try {
-      due = await window.api.weakpointsGrade(repertoireId, drill.nodeId, correct);
+      due = await window.api.weakpointsGrade(repertoireId, drill.nodeId, correct, played);
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Couldn't save that drill.");
     }
@@ -133,7 +133,7 @@ const WeakPoints = ({ setPage }: WeakPointsProps) => {
         )}
 
         {session && current && (
-          <DrillBoard key={`${session.index}-${current.nodeId}`} drill={current} onGraded={c => onGraded(current, c)} onNext={next} />
+          <DrillBoard key={`${session.index}-${current.nodeId}`} drill={current} onGraded={(correct, played) => onGraded(current, correct, played)} onNext={next} />
         )}
 
         {session && !current && (
@@ -156,7 +156,7 @@ type Feedback = { kind: 'right' | 'wrong'; text: string } | null;
  * plays a drill out (D34): the moves before `from` are set up silently, opponent moves are played
  * for you, lead-in mistakes are corrected and forgiven, and only the final move is graded
  */
-function DrillBoard({ drill, onGraded, onNext }: { drill: Drill; onGraded: (correct: boolean) => void; onNext: () => void }) {
+function DrillBoard({ drill, onGraded, onNext }: { drill: Drill; onGraded: (correct: boolean, played: string) => void; onNext: () => void }) {
   // the board starts set up at `from`; the parent remounts this component for every drill
   const [chess] = useState(() => {
     const board = new Chess(drill.startFen);
@@ -204,7 +204,7 @@ function DrillBoard({ drill, onGraded, onNext }: { drill: Drill; onGraded: (corr
       if (isTarget) {
         setFeedback({ kind: 'right', text: `${san}: right.` });
         setDone(true);
-        onGraded(true);
+        onGraded(true, san);
       } else {
         setFeedback(null);
       }
@@ -214,7 +214,7 @@ function DrillBoard({ drill, onGraded, onNext }: { drill: Drill; onGraded: (corr
     // wrong: show the prepared move, then carry on from it
     setFeedback({ kind: 'wrong', text: `Not ${san}. Your prepared move is ${expected}.` });
     setBusy(true);
-    if (isTarget) onGraded(false);
+    if (isTarget) onGraded(false, san);
     setTimeout(() => {
       play(expected);
       setBusy(false);

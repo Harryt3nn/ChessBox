@@ -27,7 +27,7 @@ export interface WeakCard {
   answer: string; // the prepared reply the card was made for; a changed reply resets the card (D35)
   added: number;
   fsrs: StoredFsrs;
-  log: { at: number; rating: Rating.Again | Rating.Good }[];
+  log: { at: number; rating: Rating.Again | Rating.Good; played: string }[]; // played: your first try, in SAN (D30)
 }
 
 export interface WeakPointsFile {
@@ -222,7 +222,7 @@ function leadInStart(moves: string[]): number {
 }
 
 /** grades the card's target move (D34): wrong → Again, right first time → Good (D21) */
-export function gradeCard(file: WeakPointsFile, nodeId: string, correct: boolean, now: number): WeakPointsFile {
+export function gradeCard(file: WeakPointsFile, nodeId: string, correct: boolean, played: string, now: number): WeakPointsFile {
   if (!has(file.cards, nodeId)) throw new Error("That card doesn't exist any more.");
   const card = file.cards[nodeId];
   const rating = correct ? Rating.Good : Rating.Again;
@@ -230,6 +230,6 @@ export function gradeCard(file: WeakPointsFile, nodeId: string, correct: boolean
   return {
     ...file,
     updatedAt: now,
-    cards: { ...file.cards, [nodeId]: { ...card, fsrs: toStored(next), log: [...card.log, { at: now, rating }] } },
+    cards: { ...file.cards, [nodeId]: { ...card, fsrs: toStored(next), log: [...card.log, { at: now, rating, played }] } },
   };
 }

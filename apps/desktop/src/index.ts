@@ -136,11 +136,11 @@ ipcMain.handle("novelty:update", (_event, repertoireId: unknown, key: unknown, u
   return updateFinding(repertoireId, key, update as FindingUpdate);
 });
 
-// WeakPoints (D32): main builds the queue and schedules; the renderer only says right or wrong
+// WeakPoints (D32): main builds the queue and schedules; the renderer only says right or wrong, and the move it played (D30)
 ipcMain.handle("weakpoints:queue", (_event, repertoireId: unknown) => weakpointsQueue(repertoireId));
 
-ipcMain.handle("weakpoints:grade", (_event, repertoireId: unknown, nodeId: unknown, correct: unknown) =>
-  weakpointsGrade(repertoireId, nodeId, correct));
+ipcMain.handle("weakpoints:grade", (_event, repertoireId: unknown, nodeId: unknown, correct: unknown, played: unknown) =>
+  weakpointsGrade(repertoireId, nodeId, correct, played));
 
 ipcMain.handle("storage:saveAuthToken", (_event, token: string) => saveAuthToken(token));
 

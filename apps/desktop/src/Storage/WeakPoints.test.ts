@@ -55,7 +55,7 @@ describe('weakpointsQueue', () => {
       fs.writeFileSync(FILE, bad);
       expect((await weakpointsQueue('rep')).recovered).toBe(true);
     }
-    const aside = fs.readdirSync(path.dirname(FILE)).filter(f => f.startsWith('rep.json.corrupt-'));
+    const aside = fs.readdirSync(path.dirname(FILE)).filter(f => /^rep\.corrupt-\d+\.json$/.test(f));
     expect(aside).toHaveLength(2);
     expect((await weakpointsQueue('rep')).recovered).toBe(false);
   });
@@ -70,17 +70,21 @@ describe('weakpointsGrade', () => {
   it('schedules the card and takes it out of the queue until it is due', async () => {
     await runNovelty('rep', 'all');
     await weakpointsQueue('rep');
-    const due = await weakpointsGrade('rep', 'e5', true);
+    const due = await weakpointsGrade('rep', 'e5', true, 'Nf3');
     expect(due).toBeGreaterThan(Date.now());
     expect((await weakpointsQueue('rep')).drills).toEqual([]);
-    expect(JSON.parse(fs.readFileSync(FILE, 'utf8')).cards.e5.log).toHaveLength(1);
+    expect(JSON.parse(fs.readFileSync(FILE, 'utf8')).cards.e5.log).toEqual([expect.objectContaining({ rating: 3, played: 'Nf3' })]);
   });
 
-  it('only accepts a node id and a true / false answer from the renderer', async () => {
+  it('only accepts a node id, a true / false answer and a SAN move from the renderer', async () => {
     await runNovelty('rep', 'all');
     await weakpointsQueue('rep');
-    await expect(weakpointsGrade('rep', 'e5', 'yes')).rejects.toThrow('Invalid grade');
-    await expect(weakpointsGrade('rep', 'nope', true)).rejects.toThrow("doesn't exist");
+    await expect(weakpointsGrade('rep', 'e5', 'yes', 'Nf3')).rejects.toThrow('Invalid grade');
+    for (const played of [undefined, '', 'N', '<script>', 'Nf3'.repeat(4)]) {
+      await expect(weakpointsGrade('rep', 'e5', true, played)).rejects.toThrow('Invalid grade');
+    }
+    await expect(weakpointsGrade('rep', 'e5', false, 'exd8=Q+')).resolves.toBeGreaterThan(0);
+    await expect(weakpointsGrade('rep', 'nope', true, 'Nf3')).rejects.toThrow("doesn't exist");
   });
 });
 

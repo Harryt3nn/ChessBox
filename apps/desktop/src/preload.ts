@@ -77,8 +77,8 @@ contextBridge.exposeInMainWorld("api", {
     ipcRenderer.invoke("weakpoints:queue", repertoireId),
 
   // returns when the card is next due (ms since epoch)
-  weakpointsGrade: (repertoireId: string, nodeId: string, correct: boolean): Promise<number> =>
-    ipcRenderer.invoke("weakpoints:grade", repertoireId, nodeId, correct),
+  weakpointsGrade: (repertoireId: string, nodeId: string, correct: boolean, played: string): Promise<number> =>
+    ipcRenderer.invoke("weakpoints:grade", repertoireId, nodeId, correct, played),
 
   // returns a function that stops listening
   onNoveltyProgress: (listener: (done: number, total: number) => void): (() => void) => {
