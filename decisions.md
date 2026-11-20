@@ -300,8 +300,8 @@ The record of design choices, the features added and dropped, and the reasons. R
 - **Evidence:** n/a.
 - **One-liner:** Scores are saved as numbers so they can be compared.
 
-### D32 · contract · WeakPoints scheduling runs in main; renderer only reports right / wrong: Status: Built · Updated: 2026-11-20 21:45
-- **Decision:** Harry (took Claude's rec): `weakpoints:queue(repId)` returns due + new cards with their lead-in lines; `weakpoints:grade(repId, nodeId, correct: boolean)`. Main builds the pool, runs `ts-fsrs` on its own clock, saves.
+### D32 · contract · WeakPoints scheduling runs in main; renderer only reports right / wrong: Status: Built · Updated: 2026-11-20 22:00
+- **Decision:** Harry (took Claude's rec): `weakpoints:queue(repId)` returns due + new cards with their lead-in lines; `weakpoints:grade(repId, nodeId, correct: boolean, played: SAN)`. **Amended 2026-11-20 22:00:** `played` added (validated `[A-Za-z0-9=+#-]{2,10}`) because D30's log keeps the move; Harry's rule: on a conflict the earlier decision wins. Main builds the pool, runs `ts-fsrs` on its own clock, saves.
 - **Why:** a boolean is trivial to re-sanitise (D8); the nodes and novelty file already live in main (D4).
 - **Alternatives rejected:** renderer runs FSRS and sends whole cards (main must validate ~10 untrusted fields; ts-fsrs in the renderer bundle).
 - **Trade-off / risk:** one IPC round trip per grade.
@@ -327,11 +327,11 @@ The record of design choices, the features added and dropped, and the reasons. R
 - **Evidence:** n/a.
 - **One-liner:** One drill, one grade.
 
-### D35 · failure modes · WeakPoints file and repertoire changes: Status: Built · Updated: 2026-11-20 21:45
+### D35 · failure modes · WeakPoints file and repertoire changes: Status: Built · Updated: 2026-11-20 22:00
 - **Decision:** Harry (took Claude's rec): an unreadable file is renamed `<id>.corrupt-<time>.json`, a fresh one starts, toast. A card whose node is deleted is dropped; a card whose prepared reply changed resets to New (log kept). No novelty file → "Run the Novelty Finder on this repertoire first" with a button there.
 - **Why:** fail safe without deleting anything; old history must not grade you against a move you no longer play.
 - **Alternatives rejected:** block WeakPoints until the file is fixed by hand; keep orphaned / changed cards and skip them.
-- **Trade-off / risk:** a corrupt file resets the schedule (the backup keeps it).
+- **Trade-off / risk:** a corrupt file resets the schedule (the backup keeps it). If the rename fails, the load throws rather than overwrite the file. A card stays scheduled when its deviation is later dismissed or re-checked within 0.3 (only a deleted node drops it); confirmed by Harry 2026-11-20 22:00.
 - **Revisit if:** n/a.
 - **Evidence:** n/a.
 - **One-liner:** Bad data is set aside, never lost, and never blocks training.

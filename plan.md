@@ -34,7 +34,7 @@ A bare § means this file. `tasks.md` holds the ranked work; `decisions.md` hold
 - D29: Server tests run on Vitest too (`npm test` in `vendor/chessbox-server/apps/api`).
 - D30: `weakpoints/<id>.json` = `{version, cards: {nodeId: {source, fsrs, log}}}`, full review log kept.
 - D31: Verdicts store `playedCp` / `preparedCp` from your side (mate = ±100 pawns); old ones count as no verdict.
-- D32: WeakPoints scheduling runs in main; IPC = `weakpoints:queue` + `weakpoints:grade(nodeId, correct)`.
+- D32: WeakPoints scheduling runs in main; IPC = `weakpoints:queue` + `weakpoints:grade(nodeId, correct, played)` (amended: D30 wins).
 - D33: Cards = deviations (non-dismissed, outside 0.3) + rare (hit 1–2) + strong (hit ≥ 5, never deviated); 10 new / day (TUNE).
 - D34: A drill starts 2 of your moves back (TUNE); only the target move is graded.
 - D35: Unreadable weakpoints file → backed up, fresh start, toast; deleted node → card dropped; changed reply → card reset.
@@ -42,9 +42,6 @@ A bare § means this file. `tasks.md` holds the ranked work; `decisions.md` hold
 
 **Pending / Unconfirmed** (*not decided*; each with the condition that decides it):
 - **Revisit D27 (sign other devices out on password change):** chose A only *for now*. *Decide before the API leaves Tailscale or before stage 2, whichever comes first. Leading candidate: `passwordChangedAt` column checked in `createContext`.*
-- **WeakPoints review log has no `played` move:** D30 listed `{at, rating, played}` but D32 only sends right / wrong, so the log is `{at, rating}`. *Decide: add the played SAN to `weakpoints:grade` (validated, ≤ 10 chars) or drop it from D30.*
-- **A card whose deviation is later dismissed (or re-checked within 0.3) keeps being scheduled:** D35 only drops deleted nodes. *Decide: keep (it's learned material) or drop deviation-source cards that leave the pool.*
-- **Corrupt-file backup name:** built with the app's existing `quarantine` helper, so it's `<id>.json.corrupt-<time>`, not D35's `<id>.corrupt-<time>.json`. *Confirm, or change the helper app-wide.*
 - Deadline: none stated in `system.md`. *Decide if a date matters.*
 
 **Active gates** (date · what must work · what we fall back to if it doesn't):
