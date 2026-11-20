@@ -13,6 +13,13 @@ For the next session. One entry per handoff, at most ~15 lines.
 
 ---
 
+## 2026-11-20 20:00 · T23 done, server hardening committed, T19 server built, T18 on a branch
+- **Done:** T23 builder polish (`main@b34dc17`). Harry's server edits committed and merged with 3 Pi commits (`48a45b3`); T19 server side (`1717269`): change password / username, login + register limits, Vitest on the server (D24–D29). Submodule URL now `ChessBox-Server`.
+- **In progress:** T18 settings page on branch `settings-page` (`bfa85b4`, pushed). Not merged: needs the server deployed, and nobody has seen it signed in.
+- **Next step:** Harry deploys the server on the Pi (`git pull && docker compose --env-file ./apps/api/.env up --build -d`), signs in to the dev app, and checks Settings: link a site, rename, change password. Then merge `settings-page`, tick T18 + T19. Then T21 WeakPoints.
+- **Gotchas:** the dev app came up **signed out** at 19:55 (server rejected the saved token: expired, or the deploy changed `JWT_SECRET`). npm in the server crashed with `reading 'location'`: workspace junctions had lower-case paths; fixed by recreating them. `createCaller` skips the API error formatter, so tests see raw zod messages. "magnus" is on the username blacklist. D27 must be revisited (plan §0 Pending).
+- **Commands to run:** `./ctx.sh sync` · desktop `cd apps/desktop && npm test` · server `cd vendor/chessbox-server/apps/api && npm test`
+
 ## 2026-11-19 02:40 · Stage-1 MVP: M1–M5 done
 - **Done:** M4 finished (T16 actions, T22 account picker) and M5 builder (T17). `main@bb66569`, pushed. 159 tests.
 - **In progress:** nothing uncommitted. Dev app processes stopped.

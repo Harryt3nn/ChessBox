@@ -4,8 +4,8 @@ Work **▶ Now** top to bottom. Tags: `[🟠 your call: …]` = a design decisio
 
 ## 📊 Latest (the only home of volatile facts)
 - **Updated:** 2026-11-20 19:50
-- **`main` at:** f37e6d2 (pushed) · **server `main`:** 1717269 (pushed, not deployed) · **open branches:** none · **Electron:** 42.11.18
-- **Tests:** desktop 162 passing (19 files) · server 17 passing (1 file, ~26 s) · **Builder:** 888-node Italian renders in ~1.2 s · **Verdict:** full Stockfish (single-threaded) depth 18 in ~4 s per finding · **Novelty run:** "Check all games" on White Aggressive Italian = 4,396 games in 22 s in the dev app (2,627 deviations, 1,757 novelties, 12 in prep) · **Walk alone:** ~3 ms / game · **npm audit:** 47, build / dev tooling only
+- **`main` at:** f37e6d2 (pushed) · **server `main`:** 1717269 (pushed, not deployed) · **open branches:** `settings-page` (T18, waits on the deploy) · **Electron:** 42.11.18
+- **Tests:** desktop 162 passing on `main` (168 on `settings-page`) · server 17 passing (1 file, ~26 s) · **Builder:** 888-node Italian renders in ~1.2 s · **Verdict:** full Stockfish (single-threaded) depth 18 in ~4 s per finding · **Novelty run:** "Check all games" on White Aggressive Italian = 4,396 games in 22 s in the dev app (2,627 deviations, 1,757 novelties, 12 in prep) · **Walk alone:** ~3 ms / game · **npm audit:** 47, build / dev tooling only
 
 ## ▶ Now (ranked): stage-1 MVP from `system.md` (2026-11-18)
 **M1 · Layout**
@@ -35,7 +35,7 @@ Work **▶ Now** top to bottom. Tags: `[🟠 your call: …]` = a design decisio
 
 **M6 · Profile and settings**
 - [x] **T23 · Builder polish (UI)** · Done when: React Flow controls match the theme; collapse/expand branches for big repertoires; promotion picker on the mini board (it always queens now).
-- [ ] **T18 · One settings page replaces the profile cards** (UI: Claude's call) · Note: today's Settings hangs on "Loading profile…" when the Pi is unreachable. · Done when: profile info, linked accounts, change password and change username live on one page; forms have correct `autocomplete` attributes.
+- [ ] **T18 · One settings page replaces the profile cards** (UI: Claude's call) · Built on branch `settings-page` (`bfa85b4`, pushed, not merged): 6 tests; not seen signed in yet. ⏸ waits on: server deploy + Harry signing in to check it, then merge · Note: today's Settings hangs on "Loading profile…" when the Pi is unreachable. · Done when: profile info, linked accounts, change password and change username live on one page; forms have correct `autocomplete` attributes.
 - [ ] **T19 · Server: change password / username + rate-limit login and register (was T5)** · Server side built + tested (D26–D29, server `1717269`); ⏸ waits on: Harry deploying to the Pi · Done when: tested on the server, deployed to the Pi first, then the desktop switched over.
 
 **M7 · WeakPoints trainer (toolkit tool)**
