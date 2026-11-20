@@ -191,6 +191,13 @@ const NoveltyFinder = ({ currentUser, onOpenInBoard, onOpenInGraph }: NoveltyFin
 
   // the games behind a finding, newest first, shown under its row
   const [openRow, setOpenRow] = useState<string | null>(null);
+  // deviations first: they're what WeakPoints drills
+  const [tab, setTab] = useState<'deviations' | 'novelties'>('deviations');
+  // long lines are cut short; the whole line is in the tooltip
+  const lineCell = (f: Finding) => {
+    const line = describeLine(f.line);
+    return <td className={styles.lineCell} title={line}>{line}</td>;
+  };
   const timesCell = (f: Finding) => (
     <td>
       <button className={styles.linkBtn} onClick={() => setOpenRow(r => (r === keyOf(f) ? null : keyOf(f)))} title="Show the games">
@@ -222,6 +229,7 @@ const NoveltyFinder = ({ currentUser, onOpenInBoard, onOpenInGraph }: NoveltyFin
   const findings = Object.values(results?.findings ?? {});
   const deviations = findings.filter(f => f.kind === 'deviation').sort(byCount);
   const novelties = findings.filter(f => f.kind === 'novelty').sort(byCount);
+  const shown = tab === 'deviations' ? deviations : novelties;
   const gameCount = Object.keys(results?.games ?? {}).length;
 
   const [importing, setImporting] = useState(false);
@@ -354,31 +362,41 @@ const NoveltyFinder = ({ currentUser, onOpenInBoard, onOpenInGraph }: NoveltyFin
           {summary && <p className={styles.importHint}>{summary}</p>}
         </section>
 
-        <div className={shared.panelGrid}>
-          {/* Deviations: your move left the prepared line */}
-          <section className={shared.panel}>
-            <div className={shared.panelHeader}>
-              <h2 className={shared.sectionTitle}>Deviations</h2>
-              {checking && <span className={styles.importHint}>Stockfish checking {checking.done + 1} of {checking.total}…</span>}
-              {deviations.length > SHOWN && <span className={styles.importHint}>top {SHOWN} of {deviations.length}</span>}
+        {/* Deviations and novelties share one full-width panel, so the long lines and row buttons fit */}
+        <section className={shared.panel}>
+          <div className={shared.panelHeader}>
+            <div className={shared.toggle}>
+              {(['deviations', 'novelties'] as const).map(t => (
+                <button
+                  key={t}
+                  className={`${shared.toggleBtn} ${tab === t ? shared.toggleActive : ''}`}
+                  onClick={() => { setTab(t); setOpenRow(null); }}
+                >
+                  {t === 'deviations' ? `Deviations (${deviations.length})` : `Novelties (${novelties.length})`}
+                </button>
+              ))}
             </div>
+            {/* shown on both tabs, so the background check never looks stalled */}
+            {checking && <span className={styles.importHint}>Stockfish checking {checking.done + 1} of {checking.total}…</span>}
+            {shown.length > SHOWN && <span className={styles.importHint}>top {SHOWN} of {shown.length}</span>}
+          </div>
 
-            {deviations.length > 0 ? (
-              <table className={shared.table}>
-                <thead><tr><th>After</th><th>You played</th><th>Prepared</th><th>Times</th><th>Last</th><th /></tr></thead>
-                <tbody>
-                  {deviations.slice(0, SHOWN).map(f => (
-                    <Fragment key={keyOf(f)}>
-                      <tr className={f.status === 'dismissed' ? styles.dismissed : undefined}>
-                        <td>{describeLine(f.line)}</td><td>{f.move}</td><td>{f.expected}</td>{timesCell(f)}<td>{formatDateTime(f.lastSeen)}</td>
-                        {actions(f)}
-                      </tr>
-                      {gamesRow(f)}
-                    </Fragment>
-                  ))}
-                </tbody>
-              </table>
-            ) : (
+          {tab === 'deviations' && (deviations.length > 0 ? (
+            <table className={shared.table}>
+              <thead><tr><th>After</th><th>You played</th><th>Prepared</th><th>Times</th><th>Last</th><th /></tr></thead>
+              <tbody>
+                {deviations.slice(0, SHOWN).map(f => (
+                  <Fragment key={keyOf(f)}>
+                    <tr className={f.status === 'dismissed' ? styles.dismissed : undefined}>
+                      {lineCell(f)}<td>{f.move}</td><td>{f.expected}</td>{timesCell(f)}<td>{formatDateTime(f.lastSeen)}</td>
+                      {actions(f)}
+                    </tr>
+                    {gamesRow(f)}
+                  </Fragment>
+                ))}
+              </tbody>
+            </table>
+          ) : (
             <div className={shared.emptyState}>
               <img src={deviationsIcon} className={shared.emptyIcon} />
               <span className={shared.emptyTitle}>No deviations found yet</span>
@@ -387,34 +405,26 @@ const NoveltyFinder = ({ currentUser, onOpenInBoard, onOpenInGraph }: NoveltyFin
                 here, so you can drill them later.
               </span>
             </div>
-            )}
-          </section>
+          ))}
 
-          {/* Novelties — game followed a line to its end, next move is new */}
-          <section className={shared.panel}>
-            <div className={shared.panelHeader}>
-              <h2 className={shared.sectionTitle}>Novelties</h2>
-              {novelties.length > SHOWN && <span className={styles.importHint}>top {SHOWN} of {novelties.length}</span>}
-            </div>
-
-            {novelties.length > 0 ? (
-              <table className={shared.table}>
-                <thead><tr><th>After</th><th>Move</th><th>Why new</th><th>Times</th><th>Last</th><th /></tr></thead>
-                <tbody>
-                  {novelties.slice(0, SHOWN).map(f => (
-                    <Fragment key={keyOf(f)}>
-                      <tr className={f.status === 'dismissed' ? styles.dismissed : undefined}>
-                        <td>{describeLine(f.line)}</td><td>{f.move}</td>
-                        <td>{f.reason === 'opponent-move' ? "opponent's move" : 'line ended'}</td>
-                        {timesCell(f)}<td>{formatDateTime(f.lastSeen)}</td>
-                        {actions(f)}
-                      </tr>
-                      {gamesRow(f)}
-                    </Fragment>
-                  ))}
-                </tbody>
-              </table>
-            ) : (
+          {tab === 'novelties' && (novelties.length > 0 ? (
+            <table className={shared.table}>
+              <thead><tr><th>After</th><th>Move</th><th>Why new</th><th>Times</th><th>Last</th><th /></tr></thead>
+              <tbody>
+                {novelties.slice(0, SHOWN).map(f => (
+                  <Fragment key={keyOf(f)}>
+                    <tr className={f.status === 'dismissed' ? styles.dismissed : undefined}>
+                      {lineCell(f)}<td>{f.move}</td>
+                      <td>{f.reason === 'opponent-move' ? "opponent's move" : 'line ended'}</td>
+                      {timesCell(f)}<td>{formatDateTime(f.lastSeen)}</td>
+                      {actions(f)}
+                    </tr>
+                    {gamesRow(f)}
+                  </Fragment>
+                ))}
+              </tbody>
+            </table>
+          ) : (
             <div className={shared.emptyState}>
               <img src={ideaIcon} className={shared.emptyIcon} />
               <span className={shared.emptyTitle}>No novelties found yet</span>
@@ -423,9 +433,8 @@ const NoveltyFinder = ({ currentUser, onOpenInBoard, onOpenInGraph }: NoveltyFin
                 ends, are saved here as candidates to add.
               </span>
             </div>
-            )}
-          </section>
-        </div>
+          ))}
+        </section>
       </div>
     </main>
 

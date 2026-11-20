@@ -217,3 +217,10 @@
   min-width: 150px;
   color: var(--color-text-tertiary);
 }
+
+.line-cell {
+  max-width: 420px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
