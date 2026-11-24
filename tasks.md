@@ -63,7 +63,9 @@ Work **▶ Now** top to bottom. Tags: `[🟠 your call: …]` = a design decisio
 
 ## ▶ Now · 2.0 "Less AI-like: UI + security" (from `system.md`, 2026-11-24; lanes per D44)
 **Feedback from Harry's manual testing** (A1 logs each item, routes it; overflow → A1)
-- *(none yet)*
+- [ ] **F1 · WeakPoints: open each drill in the analysis board (A2)** · Harry 2026-11-24: "a link to the analysis board for every drill sequence". Done when: every drill, once answered, has an Open in board button that loads the drill's line at its target position; it isn't shown before you answer, so it can't give the move away (UI call, A1); tested.
+- [ ] **F2 · Strongest Stockfish (🟠, Harry is picky: options first, nothing built)** · Harry: "if there is any way to get the strongest version of stockfish, either a link to a web page. run this by me first".
+- [ ] **F3 · Google sign-in instead of email verification (🟠, A4 drafts)** · Harry: "no email verification, I would ideally like to sign in with google to save on all of this stuff".
 
 **A3 · UI**
 - [ ] **T34 · Moodboard: art deco / Casino Royale** · Done when: a moodboard (palette with hex codes, type pairing with licences, ornament / border motifs, button and card treatments, 6–10 references with links) matched to `src/assets/icons/`, checked against both avoid lists in `system.md`, sent to A1 for Harry. Harry may change it a lot.
