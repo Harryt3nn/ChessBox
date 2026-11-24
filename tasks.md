@@ -4,7 +4,7 @@ Work **▶ Now** top to bottom. Tags: `[🟠 your call: …]` = a design decisio
 
 ## 📊 Latest (the only home of volatile facts)
 - **Updated:** 2026-11-21 00:40
-- **`main` at:** 7ff4b3e (pushed) · **server `main`:** 0267f60 (pushed, **not deployed**; Pi on 1717269) · **open branches:** none · **Electron:** 42.11.18
+- **`main` at:** 2e0896d (pushed) · **server `main`:** 0267f60 (pushed, **not deployed**; Pi on 1717269) · **open branches:** none · **Electron:** 42.11.18
 - **Tests:** desktop 211 passing + 2 expected fails (T31 bugs) (25 files) · server 24 passing (1 file, ~26 s) · **Builder:** 888-node Italian renders in ~1.2 s · **Lite engine (live board, D14):** d15 0.2–0.8 s, d20 1.8–7.2 s by position (A3, 2026-11-24) · **Verdict:** full Stockfish (single-threaded) depth 18 in ~4 s per finding · **Novelty run:** "Check all games" on White Aggressive Italian = 4,396 games in 22 s in the dev app (2,627 deviations, 1,757 novelties, 12 in prep) · **Walk alone:** ~3 ms / game · **WeakPoints sync + queue:** Italian ~130 ms, 106 cards on first sync (D30, D33) · **npm audit (2026-11-24, A4):** desktop 47, build / dev only (0 with `--omit=dev`) · server 8, all in the image, none reachable from requests today (zod is the nearest) · server base image `node:20` is end-of-life
 
 ## ▶ Now (ranked): stage-1 MVP from `system.md` (2026-11-18)
