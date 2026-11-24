@@ -6,9 +6,9 @@ It is a personal project by Harry Tennant, a computer science student at Newcast
 
 ## Why it exists
 
-Most of the useful chess training tools are paywalled, and the free ones are spread across many sites that each do one thing. ChessBox puts the tools I use in one place, driven by my own game data.
+Many of the training tools I wanted are paywalled, and the free ones are spread across many sites that each do one thing. ChessBox puts the tools I use in one place, driven by my own game data.
 
-The graph model comes from [chessgraph.net](https://chessgraph.net), which represents repertoires as graphs to handle transpositions. ChessBox imports its JSON format and adds what it was missing for me: a way to use that data, by checking real games against it.
+The graph model comes from [chessgraph.net](https://chessgraph.net), which represents repertoires as graphs to handle transpositions. ChessBox imports its JSON format and adds what it was missing for me: a way to use that data, by checking your own games against it.
 
 ## Features
 
@@ -30,7 +30,7 @@ The graph model comes from [chessgraph.net](https://chessgraph.net), which repre
 
 **WeakPoints**
 - Drills positions from your deviations, from lines you rarely reach and from lines you know well, as short move sequences on a board with no analysis.
-- Schedules reviews with FSRS, the spaced-repetition algorithm used by Anki.
+- Schedules reviews with FSRS, the spaced-repetition algorithm also available in Anki.
 - Three modes: Focused, Mistakes only and Random, limited to one opening branch or the whole repertoire.
 
 **Accounts**
