@@ -60,20 +60,20 @@ const Home = ({ setPage, currentUser }: HomeProps) => {
         <section className={styles.grid}>
           {/* Analysis board: the biggest tile */}
           <button className={`${styles.tile} ${styles.tileFeature}`} onClick={() => setPage('board')}>
-            <img src={boardIcon} className={styles.featureIcon} />
+            <img alt="" src={boardIcon} className={styles.featureIcon} />
             <span className={styles.tileTitle}>Analysis Board</span>
             <span className={styles.tileText}>Play through lines, explore variations, import and export PGN or FEN.</span>
           </button>
 
           {/* Repertoires, with the most recently edited ones */}
-          <div className={`${styles.tile} ${styles.tileWide}`} onClick={() => setPage('repertoires')} role="button">
-            <div className={styles.tileHead}>
-              <img src={repertoiresIcon} className={styles.tileIcon} />
+          <div className={`${styles.tile} ${styles.tileWide}`} onClick={() => setPage('repertoires')}>
+            <button type="button" className={`${styles.tileHead} ${styles.tileHeadButton}`} onClick={() => setPage('repertoires')}>
+              <img alt="" src={repertoiresIcon} className={styles.tileIcon} />
               <span className={styles.tileTitle}>Repertoires</span>
               <span className={styles.count}>
-                {repertoires.length} repertoire{repertoires.length === 1 ? '' : 's'} · {folders.length} folder{folders.length === 1 ? '' : 's'}
+                {repertoires.length} repertoire{repertoires.length === 1 ? '' : 's'}, {folders.length} folder{folders.length === 1 ? '' : 's'}
               </span>
-            </div>
+            </button>
             {recent.length > 0 ? (
               <ul className={styles.list}>
                 {recent.map(r => (
@@ -89,18 +89,18 @@ const Home = ({ setPage, currentUser }: HomeProps) => {
           </div>
 
           {/* Toolkit and its tools */}
-          <div className={`${styles.tile} ${styles.tileWide}`} onClick={() => setPage('tools')} role="button">
-            <div className={styles.tileHead}>
-              <img src={toolsIcon} className={styles.tileIcon} />
+          <div className={`${styles.tile} ${styles.tileWide}`} onClick={() => setPage('tools')}>
+            <button type="button" className={`${styles.tileHead} ${styles.tileHeadButton}`} onClick={() => setPage('tools')}>
+              <img alt="" src={toolsIcon} className={styles.tileIcon} />
               <span className={styles.tileTitle}>Toolkit</span>
-            </div>
+            </button>
             <div className={styles.toolRow}>
               <button className={styles.tool} onClick={e => { e.stopPropagation(); setPage('novelty'); }}>
-                <img src={noveltyIcon} className={styles.toolIcon} />
+                <img alt="" src={noveltyIcon} className={styles.toolIcon} />
                 <span>Novelty Finder</span>
               </button>
               <button className={styles.tool} onClick={e => { e.stopPropagation(); setPage('weakpoints'); }}>
-                <img src={weakPointsIcon} className={styles.toolIcon} />
+                <img alt="" src={weakPointsIcon} className={styles.toolIcon} />
                 <span>WeakPoints</span>
               </button>
             </div>
@@ -108,7 +108,7 @@ const Home = ({ setPage, currentUser }: HomeProps) => {
 
           <button className={styles.tile} onClick={() => setPage('analytics')}>
             <div className={styles.tileHead}>
-              <img src={analyticsIcon} className={styles.tileIcon} />
+              <img alt="" src={analyticsIcon} className={styles.tileIcon} />
               <span className={styles.tileTitle}>Analytics</span>
             </div>
             <span className={styles.tileText}>Opening success rates across Chess.com and Lichess.</span>
@@ -117,7 +117,7 @@ const Home = ({ setPage, currentUser }: HomeProps) => {
           {/* Settings, showing which chess accounts are linked */}
           <button className={styles.tile} onClick={() => setPage('settings')}>
             <div className={styles.tileHead}>
-              <img src={settingsIcon} className={styles.tileIcon} />
+              <img alt="" src={settingsIcon} className={styles.tileIcon} />
               <span className={styles.tileTitle}>Settings</span>
             </div>
             <span className={styles.account}>

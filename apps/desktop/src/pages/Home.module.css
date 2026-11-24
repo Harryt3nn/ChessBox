@@ -73,6 +73,16 @@
   width: 100%;
 }
 
+.tile-head-button {
+  padding: 0;
+  background: none;
+  border: 0;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
 .tile-icon {
   width: 30px;
   height: 30px;

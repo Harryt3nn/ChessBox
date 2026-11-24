@@ -120,7 +120,7 @@ const Analytics = () => {
             </table>
 
             <div className={shared.emptyState}>
-              <img src={checkmateIcon} className={shared.emptyIcon} />
+              <img alt="" src={checkmateIcon} className={shared.emptyIcon} />
               <span className={shared.emptyTitle}>No games analysed yet</span>
               <span className={shared.emptyHint}>
                 Import your games from the Novelty Finder, then your most played openings
@@ -137,7 +137,7 @@ const Analytics = () => {
             </div>
 
             <div className={shared.emptyState}>
-              <img src={trophyIcon} className={shared.emptyIcon} />
+              <img alt="" src={trophyIcon} className={shared.emptyIcon} />
               <span className={shared.emptyTitle}>Nothing to compare yet</span>
               <span className={shared.emptyHint}>
                 See how often your games stay inside your saved repertoires, and how

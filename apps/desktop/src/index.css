@@ -59,6 +59,12 @@
   }
 }
 
+/* one keyboard focus ring for everything; !important because several inputs set outline: none */
+:focus-visible {
+  outline: 2px solid var(--color-amber-hover) !important;
+  outline-offset: 2px;
+}
+
 * {
   margin: 0;
   padding: 0;

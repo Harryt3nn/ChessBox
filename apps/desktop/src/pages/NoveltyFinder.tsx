@@ -398,7 +398,7 @@ const NoveltyFinder = ({ currentUser, onOpenInBoard, onOpenInGraph }: NoveltyFin
             </table>
           ) : (
             <div className={shared.emptyState}>
-              <img src={deviationsIcon} className={shared.emptyIcon} />
+              <img alt="" src={deviationsIcon} className={shared.emptyIcon} />
               <span className={shared.emptyTitle}>No deviations found yet</span>
               <span className={shared.emptyHint}>
                 Moves where you left a prepared line will be collected
@@ -426,7 +426,7 @@ const NoveltyFinder = ({ currentUser, onOpenInBoard, onOpenInGraph }: NoveltyFin
             </table>
           ) : (
             <div className={shared.emptyState}>
-              <img src={ideaIcon} className={shared.emptyIcon} />
+              <img alt="" src={ideaIcon} className={shared.emptyIcon} />
               <span className={shared.emptyTitle}>No novelties found yet</span>
               <span className={shared.emptyHint}>
                 Opponent moves your repertoire doesn't cover, and the next move after a line

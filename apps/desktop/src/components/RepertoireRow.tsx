@@ -31,10 +31,11 @@ const RepertoireRow: React.FC<Props> = ({ rep, onRename, onOpen, onBuild }) => {
   return (
     <div className={styles.repRow}>
 
-      <img src={boardIcon} className={styles.repRowIcon} />
+      <img alt="" src={boardIcon} className={styles.repRowIcon} />
 
       {editing ? (
         <input
+          aria-label="Repertoire name"
           ref={inputRef}
           value={name}
           onChange={e => setName(e.target.value)}
