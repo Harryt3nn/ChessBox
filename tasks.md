@@ -4,7 +4,7 @@ Work **▶ Now** top to bottom. Tags: `[🟠 your call: …]` = a design decisio
 
 ## 📊 Latest (the only home of volatile facts)
 - **Updated:** 2026-11-21 00:40
-- **`main` at:** 2e0896d (pushed) · **server `main`:** 0c25879 (pushed, **not deployed**; Pi on 1717269; brings T29 + pentest fixes) · **open branches:** none · **Electron:** 42.11.18
+- **`main` at:** 774b42b (pushed) · **server `main`:** 0c25879 (pushed, **not deployed**; Pi on 1717269; brings T29 + pentest fixes) · **open branches:** none · **Electron:** 42.11.18
 - **Tests:** desktop 211 passing + 2 expected fails (T31 bugs) (25 files) · server 38 passing (3 files) · **Builder:** 888-node Italian renders in ~1.2 s · **Lite engine (live board, D14):** d15 0.2–0.8 s, d20 1.8–7.2 s by position (A3, 2026-11-24) · **Verdict:** full Stockfish (single-threaded) depth 18 in ~4 s per finding · **Novelty run:** "Check all games" on White Aggressive Italian = 4,396 games in 22 s in the dev app (2,627 deviations, 1,757 novelties, 12 in prep) · **Walk alone:** ~3 ms / game · **WeakPoints sync + queue:** Italian ~130 ms, 106 cards on first sync (D30, D33) · **npm audit (2026-11-24, A4):** desktop 47, build / dev only (0 with `--omit=dev`) · server 8, all in the image, none reachable from requests today (zod is the nearest) · server base image `node:20` is end-of-life
 
 ## ▶ Now (ranked): stage-1 MVP from `system.md` (2026-11-18)
@@ -70,7 +70,7 @@ Work **▶ Now** top to bottom. Tags: `[🟠 your call: …]` = a design decisio
 **A3 · UI**
 - [ ] **T34 · Moodboard: art deco / Casino Royale** · Done when: a moodboard (palette with hex codes, type pairing with licences, ornament / border motifs, button and card treatments, 6–10 references with links) matched to `src/assets/icons/`, checked against both avoid lists in `system.md`, sent to A1 for Harry. Harry may change it a lot.
 - [x] **T35 · UI audit against the avoid lists** (A3, 2026-11-24: biggest hits are low-contrast errors and faint text, button fades, coloured left borders, everything in cards, 30 images without alt, Home tiles not keyboard-reachable) · Done when: every page is checked against the "avoid" and "DO NOT have" lists (em dashes in copy, gradients, Inter, cards, fades, …), and the findings are listed per page with `file:line`.
-- [ ] **T36 · Accessibility + avoid-list fixes that don't need the moodboard (A3, branch `accessibility-pass`)** · Done when: colour contrast measured (WCAG AA), keyboard navigation works on every page, every image has `alt`; fixes on a branch.
+- [x] **T36 · Accessibility + avoid-list fixes that don't need the moodboard (A3, branch `accessibility-pass`)** · Done when: colour contrast measured (WCAG AA), keyboard navigation works on every page, every image has `alt`; fixes on a branch.
 - [ ] **T37 · Restyle to the agreed moodboard** · Waits on Harry's OK of T34.
 
 **A4 · Security**
