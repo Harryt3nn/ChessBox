@@ -99,7 +99,7 @@
 }
 
 .error {
-  color: var(--color-coral);
+  color: var(--color-danger-text);
   font-size: 12px;
   margin-top: -8px;
   user-select: none;

@@ -215,6 +215,6 @@
 }
 
 .danger:hover {
-  color: var(--color-coral-hover);
+  color: var(--color-danger-text);
   border-color: var(--color-coral-hover);
 }

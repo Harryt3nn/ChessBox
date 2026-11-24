@@ -190,7 +190,7 @@
 }
 
 .error {
-  color: var(--color-coral-hover);
+  color: var(--color-danger-text);
   font-size: 13px;
   line-height: 1.5;
 }

@@ -270,7 +270,7 @@
 }
 
 .panelError {
-  color: var(--color-coral-hover);
+  color: var(--color-danger-text);
 }
 
 .panelInfo {

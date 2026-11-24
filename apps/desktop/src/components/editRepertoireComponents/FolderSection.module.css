@@ -130,7 +130,7 @@
 }
 
 .folder-btn-delete:hover {
-  color: var(--color-coral-hover);
+  color: var(--color-danger-text);
 }
 
 .repertoire-list {
