@@ -6,7 +6,7 @@
 set -euo pipefail
 cd "$(git rev-parse --show-toplevel)"
 
-DOCS=(CLAUDE.md plan.md tasks.md decisions.md handoff.md research.md skills ctx.sh)
+DOCS=(CLAUDE.md plan.md tasks.md decisions.md handoff.md research.md skills agents ctx.sh)
 MODE=$(git config solo.docs || echo branch)
 STAMP=.git/context-synced
 EMPTY_TREE=$(git hash-object -t tree /dev/null)

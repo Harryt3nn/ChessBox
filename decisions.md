@@ -389,3 +389,12 @@ The record of design choices, the features added and dropped, and the reasons. R
 - **Revisit if:** it keeps landing in the same lines.
 - **Evidence:** n/a.
 - **One-liner:** Five moves of your prep from somewhere random.
+
+### D42 · process · Four agents, every branch reviewed by all four: Status: Built · Updated: 2026-11-24
+- **Decision:** Harry: run 4 Claude Code sessions with agent 1 as master, every change reviewed by all 4 before `main`, agent 1 splits the work. Agent 1 (Claude, on Harry's delegation) picked the lanes: A1 lead + app shell / GUI, A2 analysis board + engine, A3 repertoires + Novelty Finder + WeakPoints + storage / IPC, A4 server + accounts + security + test lead. Only A1 writes plan docs, publishes and merges; 🟠s go through A1 to Harry. Rules in `agents/TEAM.md` (on the `context` branch).
+- **Why:** parallel work on stage 2 without four agents racing on the `context` branch or the same files; lanes follow the existing `src/` folders so branches rarely overlap.
+- **Alternatives rejected:** lanes by task type (frontend / backend / tests / docs): every feature would cross all four. Every agent publishing docs: `ctx.sh publish` refuses when `context` moved, so they would block each other.
+- **Trade-off / risk:** 3 reviews per branch slows each merge; A1 is a bottleneck for docs and 🟠s.
+- **Revisit if:** reviews routinely wait more than a turn, or a lane sits idle.
+- **Evidence:** n/a.
+- **One-liner:** Four lanes, one lead, nobody merges alone.

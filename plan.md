@@ -44,6 +44,7 @@ A bare § means this file. `tasks.md` holds the ranked work; `decisions.md` hold
 - D39: WeakPoints skips deviations on your first 2 moves (TUNE).
 - D40: Drills can be limited to one branch ("1.e4 e6") or Everything; queue takes `mode` + `branchNodeId`.
 - D41: Random drills: random your-move position, play your next N (default 5) moves forward.
+- D42: Four agents work in parallel (A1 lead + GUI, A2 board, A3 repertoires, A4 server + QA); all 4 review every branch, only A1 merges and writes plan docs (`agents/TEAM.md`).
 - D13: A saved session is cleared only when the server answers `UNAUTHORIZED` or `NOT_FOUND` (deleted account); unreachable / erroring server → stay signed in, toast, local features keep working.
 
 **Pending / Unconfirmed** (*not decided*; each with the condition that decides it):
