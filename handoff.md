@@ -13,6 +13,12 @@ For the next session. One entry per handoff, at most ~15 lines.
 
 ---
 
+## 2026-11-24 18:20 · Incident: main checkout's node_modules + server source deleted (fixed)
+- **What:** A3's `accessibility-pass` worktree had `node_modules` junctioned to the main checkout's (desktop + server). `git worktree remove --force` followed them: main's desktop and server `node_modules` emptied, and through npm's workspace junctions 40 tracked server files (`apps/api`, `packages/shared`) were deleted.
+- **Fixed:** `git checkout -- .` in `vendor/chessbox-server` (deletions only), `npm ci` in both. Desktop 211 + 2 expected fail, type-check clean, server 24 at `0267f60`.
+- **Not checkable by Claude:** the untracked local `vendor/chessbox-server/apps/api/.env` was inside a deleted folder. Harry must check and restore it himself if he uses a local server. The Pi is untouched.
+- **Rule added:** TEAM.md rule 1 (no linked `node_modules`; check for links before removing a worktree).
+
 ## 2026-11-21 00:40 · M7 merged: WeakPoints + Novelty Finder polish on main
 - **Done:** `weakpoints-drills` merged to `main@cf9f9ee` (pushed, branch deleted). T21 + T24–T28 ticked. D21, D30, D32, D38 Verified in the app; the rest Built. 209 tests.
 - **In progress:** nothing; no open branches.
