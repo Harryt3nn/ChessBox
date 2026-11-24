@@ -45,7 +45,7 @@ The graph model comes from [chessgraph.net](https://chessgraph.net), which repre
 | Engine | Stockfish (WebAssembly, in a Web Worker) |
 | Training | ts-fsrs |
 | API | Fastify, tRPC, zod, Prisma, PostgreSQL, Argon2id (hash-wasm), JWT |
-| Hosting | Docker Compose on a Raspberry Pi 5, reachable only over Tailscale |
+| Hosting | Docker Compose on a Raspberry Pi 5, reached over Tailscale |
 | Tests | Vitest, for both the desktop app and the API |
 
 Analysis runs on your machine. The server only handles accounts, so your repertoires and games stay on disk under `%APPDATA%/ChessBox/ChessBox-data/`.
@@ -132,7 +132,7 @@ Copy-Item -Recurse ..\..\node_modules\electron .\node_modules\electron
 - Sessions are JWTs, stored on disk encrypted by the operating system. Changing your password signs out your other devices.
 - Login and registration are rate-limited, and browsers can only call the API from an allow-list of origins (CORS).
 - The renderer runs sandboxed, and the main process re-checks everything that arrives over IPC or from an imported file.
-- The API is only reachable over Tailscale, and the database is never exposed outside its Docker network.
+- The API is meant to be reached only over Tailscale, and the database is never exposed outside its Docker network.
 
 The full list is in the Security section of [ARCHITECTURE.md](ARCHITECTURE.md#security).
 

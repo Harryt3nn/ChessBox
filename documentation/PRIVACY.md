@@ -15,16 +15,17 @@ ChessBox does not use cookies, analytics, crash reporting or automatic updates.
 
 ## On the ChessBox server
 
-The server only handles accounts. It runs on a Raspberry Pi that is reachable only over a private Tailscale network. For each account it stores:
+The server only handles accounts. It runs on a Raspberry Pi and is meant to be reached only over a private Tailscale network. For each account it stores:
 
 - your username and email address,
 - your password, stored only as an Argon2id hash (the password itself is never stored),
 - the Lichess and Chess.com usernames you link,
-- when the account was created.
+- when the account was created,
+- a counter that signs out your other devices when you change your password.
 
 These are kept until the account is deleted.
 
-The server also keeps a log line for each request it receives, with your IP address and the address that was requested. Request contents, such as passwords, are not logged. For now these log lines are kept with no time limit.
+The server also keeps a log line for each request it receives, with your IP address and the address that was requested. Passwords and request bodies are not logged. For now these log lines are kept with no time limit.
 
 There is no way to delete an account from inside the app yet. Until there is, ask Harry and it will be deleted by hand.
 
