@@ -49,6 +49,7 @@ A bare § means this file. `tasks.md` holds the ranked work; `decisions.md` hold
 
 **Pending / Unconfirmed** (*not decided*; each with the condition that decides it):
 - **Revisit D27 (sign other devices out on password change):** chose A only *for now*. *Decide before the API leaves Tailscale or before stage 2, whichever comes first. Leading candidate: `passwordChangedAt` column checked in `createContext`.*
+- **Multi-threaded Stockfish (D14):** single-threaded for now (Harry, 2026-11-24). *Decide when Harry's D38 timing lands: if the 147-check pass is too slow, move the full verdict engine to an `app://` scheme with COOP/COEP (~5× nps at 4 threads, measured).*
 - Deadline: none stated in `system.md`. *Decide if a date matters.*
 
 **Active gates** (date · what must work · what we fall back to if it doesn't):
