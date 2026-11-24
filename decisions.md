@@ -47,7 +47,7 @@ The record of design choices, the features added and dropped, and the reasons. R
 - **Evidence:** ARCHITECTURE.md "Data Storage on Disk".
 - **One-liner:** Raw data stays on your machine; only accounts live on the server.
 
-### D4 · compute placement · Analysis runs client-side: Status: Planned · Updated: 2026-11-18 17:20
+### D4 · compute placement · Analysis runs client-side: Status: Built · Updated: 2026-11-24
 - **Decision:** The graph walk and deviation detection run in the Electron main process. The server only ever receives aggregated output.
 - **Why:** A single Pi would be the bottleneck for every user's analysis. Client-side keeps the server thin and stateless.
 - **Alternatives rejected:** server-side processing.
@@ -110,13 +110,13 @@ The record of design choices, the features added and dropped, and the reasons. R
 - **Evidence:** f7335b2; `tsc` 0 errors and `electron-forge package` succeed without the root modules.
 - **One-liner:** The repo now builds from what it declares.
 
-### D11 · novelty finder · Layered data + deterministic walk: Status: Planned · Updated: 2026-11-18 17:20
+### D11 · novelty finder · Layered data + deterministic walk: Status: Built · Updated: 2026-11-24
 - **Decision:** Four layers: games (fs) → repertoires + nodes (fs) → match records (derived) → deviation catalogue (derived, one row per `(repertoireId, nodeId, move, sourceType)` with a `count`). Walk ply by ply from the root. A user move must match the single intended child, or it's a `prep-miss`. An opponent move may match a child or a transposition edge, or it's an `opponent-gap`. The deepest same-side walk is the best fit; below a minimum depth the game is discarded. Deviation status goes `new` → `dismissed` / `added`.
 - **Why:** The single-response constraint makes matching deterministic, with no fuzzy search. Derived layers can always be wiped and re-walked safely.
 - **Alternatives rejected:** fuzzy best-fit matching.
 - **Trade-off / risk:** depends on T4. The derived-layer location (Postgres vs. local) is Pending.
 - **Revisit if:** Harry's feature md changes the design.
-- **Evidence:** TBD (T3 tests).
+- **Evidence:** built in T3 + T15 (walk, results saved locally per D16 / D18; tests in `NoveltyRunner.test.ts`); run on the Italian: 4,396 games in 22 s, walk ~3 ms / game (📊 Latest).
 - **One-liner:** Walk the game down your graph and stop at the first surprise.
 
 ### D12 · testing · Vitest, test-first bug fixing: Status: Built · Updated: 2026-11-18 18:10

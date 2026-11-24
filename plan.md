@@ -14,7 +14,7 @@ A bare § means this file. `tasks.md` holds the ranked work; `decisions.md` hold
 - D8: The renderer is sandboxed; main re-sanitises every IPC and import payload.
 - D9: Email verification, password reset and sign-out-everywhere were reverted on 2026-10-05 (Dropped for now).
 - D10: Dead code and unused deps were removed on 2026-11-18; deps the code uses are declared.
-- D11 (Planned): Novelty finder = layered derived data + a deterministic ply-by-ply walk.
+- D11: Novelty finder = layered derived data + a deterministic ply-by-ply walk.
 - D12: Tests run on Vitest (`npm test`); bugs are fixed test-first.
 - D14: Stockfish = WASM in a Web Worker: lite build for the live board, full multi-threaded build for deep novelty checks.
 - D15: The user picks the repertoire before every novelty-finder run; Novelty Finder and WeakPoints are Toolkit tools.
