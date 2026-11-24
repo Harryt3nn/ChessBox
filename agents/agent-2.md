@@ -1,22 +1,22 @@
-# A2 · Board (`chessbox-65`)
+# A2 · Repertoires (`chessbox-80`)
 
-Read `TEAM.md` first. You own the analysis board and everything Stockfish.
+Read `TEAM.md` first. You own repertoire data and the two toolkit tools built on it, plus everything main reads from and writes to disk.
 
 ## Your files
-- `apps/desktop/src/chess/` (`analysisTree`, `material`, `repertoireTree`, `repertoireEdits`, and their tests)
-- `apps/desktop/src/engine/` (the UCI Web Worker wrapper, D14)
-- `apps/desktop/src/components/board/`
-- `apps/desktop/src/pages/BoardView.*`
-- Stockfish build / worker setup in the webpack config (ask A1 first: it's shared config)
+- `apps/desktop/src/builder/`, `pages/RepertoireBuilder.*`, `pages/EditRepertoires.*`, `components/editRepertoireComponents/`, `components/RepertoireRow.tsx`, `components/repertoireRow.module.css`
+- `apps/desktop/src/novelty/`, `pages/NoveltyFinder.*`, `Storage/NoveltyRunner.*`
+- `apps/desktop/src/weakpoints/`, `pages/WeakPoints.*`, `Storage/WeakPoints.*`
+- `apps/desktop/src/Storage/` (importers, `MainStorage`, PGN → JSON, the storage provider), `src/importsAndExports/`, `components/ImportModal.*`
+- **Shared, you're the owner:** `src/index.ts`, `src/preload.ts`, `src/types/` (the IPC bridge and saved data shapes). Others ask you before adding a channel or changing a type.
 
 ## The decisions you build on
-D12 (Vitest, bugs test-first) · D14 (lite Stockfish on the live board, full multi-threaded for deep checks) · D17 (one prepared reply per position) · D31 (verdict scores from your side, mate = ±100 pawns). Read their entries in `decisions.md` before touching that code.
+D1–D3 (graph model, chessgraph v3 import, local storage) · D8 (main re-sanitises every IPC and import payload; ids that become file names match `[A-Za-z0-9_-]{1,64}`) · D11, D15–D19 (novelty walk, results files, account picker) · D20 (React Flow + dagre) · D21–D23, D30–D41 (WeakPoints, FSRS, file format, modes). Read the entries before touching that code.
 
 ## How you work
-- The board is the most-reused screen: the Novelty Finder, WeakPoints and the builder all open positions in it. A change to how it's opened (props, route params, the "open at node" entry point) is a contract: tell A3 and A1 before you change it.
-- Engine work: every speed claim has a number and where it was measured (depth, ms, threads, build). Send the numbers to A1 as `DOC`.
-- Test borderline and invalid input (bad FEN, illegal PGN moves, promotions with check, castling through check). Harry asked for this explicitly in `system.md`.
-- Changing engine strength, depth, threads or time limits is a correctness vs speed trade-off → 🟠 to A1.
+- **Every file format is Harry's call.** A new field, a new file, a version bump or a migration → 🟠 to A1 before you write it. Show the exact JSON shape.
+- **Every IPC channel is a contract.** Name it, its arguments, what main validates, what it returns on bad input. Send that to A1 (and the lane that will call it) before building.
+- Failure modes (corrupt file, missing node, deleted repertoire, half-written save) are 🟠. D35 is the pattern so far.
+- Big data is the norm: the White Aggressive Italian has 888 nodes and 4,396 games. Re-measure timings after a change to the walk, the builder layout or the queue, and send the numbers to A1 as `DOC`.
 
 ## In review
-You're the one who catches chess-logic bugs: move legality, SAN / FEN handling, side-to-move, transpositions in `repertoireTree`, engine lines shown from the wrong side. Look hardest at anything A3 sends that uses `src/chess/` or the engine.
+You're the one who catches data bugs: unsanitised IPC input, file names built from untrusted ids, a save that can lose data, transposition loops, formats that break D2 compatibility. Look hardest at anything that adds an IPC channel or reads a saved file.

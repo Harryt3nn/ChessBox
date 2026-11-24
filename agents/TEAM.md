@@ -6,11 +6,11 @@ Harry runs four Claude Code sessions at once. `CLAUDE.md` still rules: Harry own
 | Agent | Session name | Lane (what it owns) | Brief |
 |---|---|---|---|
 | **A1 · Lead** | `chessbox-1f` | Plans, splits work, talks to Harry, owns the plan docs, merges to `main`. Codes the app shell + Home + Settings look (GUI) | `agent-1.md` |
-| **A2 · Board** | `chessbox-65` | Analysis board, Stockfish engine, chess helpers | `agent-2.md` |
-| **A3 · Repertoires** | `chessbox-80` | Repertoire builder, Novelty Finder, WeakPoints, game import + local storage | `agent-3.md` |
+| **A2 · Repertoires** | `chessbox-80` | Repertoire builder, Novelty Finder, WeakPoints, game import + local storage | `agent-2.md` |
+| **A3 · Board** | `chessbox-65` | Analysis board, Stockfish engine, chess helpers | `agent-3.md` |
 | **A4 · Server + QA** | `chessbox-36` | `vendor/chessbox-server`, accounts / auth / security, tRPC client, test lead | `agent-4.md` |
 
-Session names are from `ListAgents` on 2026-11-24. If a name changes, A1 updates this table. Message a peer with `SendMessage({to: "<name>", message: "..."})`.
+Session names are from `ListAgents` on 2026-11-24; numbers follow what Harry told each session. If a name changes, A1 updates this table. Message a peer with `SendMessage({to: "<name>", message: "..."})`.
 
 ## The 6 rules
 1. **One task, one branch, one worktree.** A1 hands you a task from `tasks.md` ▶ Now. Work on branch `<what-it-does>` in your own worktree: `git worktree add ../ChessBox-wt/<branch> -b <branch> main`, then `npm install` in its `apps/desktop`. Never code in the main checkout; that's where the plan docs live.
@@ -24,8 +24,8 @@ Session names are from `ListAgents` on 2026-11-24. If a name changes, A1 updates
 | File | Owner | Why it's shared |
 |---|---|---|
 | `apps/desktop/src/App.tsx`, `TopBar.tsx`, `PageHeader.tsx`, `index.css`, `pages/Home.tsx` | A1 | every page routes through them |
-| `apps/desktop/src/index.ts`, `preload.ts`, `types/global.d.ts` | A3 | the IPC bridge: every lane adds channels here |
-| `apps/desktop/src/types/*` (others) | A3 | data shapes the storage layer saves |
+| `apps/desktop/src/index.ts`, `preload.ts`, `types/global.d.ts` | A2 | the IPC bridge: every lane adds channels here |
+| `apps/desktop/src/types/*` (others) | A2 | data shapes the storage layer saves |
 | `apps/desktop/src/trpc.ts`, `@chessbox/shared` | A4 | the client ↔ server contract |
 | `package.json`, `package-lock.json` | A1 | a new dependency is always a 🟠 for Harry |
 
