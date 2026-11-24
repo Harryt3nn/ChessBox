@@ -8,6 +8,7 @@ import { PageHeader } from '../components/PageHeader';
 import shared from './PageShared.module.css';
 import styles from './WeakPoints.module.css';
 import type { Page } from '../types/Page';
+import type { BoardFocus } from './BoardView';
 import type { Repertoire } from '../types/Repertoire';
 import type { Node } from '../types/Node';
 import { branches, randomDrills, type Drill, type DrillSource } from '../weakpoints/lines';
@@ -19,6 +20,7 @@ import weakPointsIcon from '../assets/icons/041-checkmate.png';
 
 interface WeakPointsProps {
   setPage: (page: Page) => void;
+  onOpenInBoard: (repertoire: Repertoire, focus: BoardFocus) => void;
 }
 
 type Mode = 'focused' | 'mistakes' | 'random';
@@ -50,7 +52,7 @@ const SOURCE_LABEL: Record<DrillSource, string> = {
 
 interface Session { drills: Drill[]; index: number; right: number; scored: number }
 
-const WeakPoints = ({ setPage }: WeakPointsProps) => {
+const WeakPoints = ({ setPage, onOpenInBoard }: WeakPointsProps) => {
   const storage = useMemo(() => new FileSystemStorageProvider(), []);
   const [repertoires, setRepertoires] = useState<Repertoire[]>([]);
   const [nodes, setNodes] = useState<Record<string, Node>>({});
@@ -125,6 +127,8 @@ const WeakPoints = ({ setPage }: WeakPointsProps) => {
   }
 
   const next = () => setSession(s => s && { ...s, index: s.index + 1 });
+  // F1: leaves the session for the board; grades are already saved and Random saves nothing
+  const openDrillInBoard = (d: Drill) => repertoire && onOpenInBoard(repertoire, { nodeId: d.boardNodeId });
   const current = session?.drills[session.index] ?? null;
   const drill = useDrill(current, onScored, next);
   const modeInfo = MODES.find(m => m.id === mode);
