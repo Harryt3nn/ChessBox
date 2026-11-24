@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useState, type FormEvent } from 'react';
 import type { inferRouterOutputs } from '@trpc/server';
 import type { AppRouter } from '@chessbox/shared/router';
-import { trpc, setAuthToken } from '../trpc';
+import { trpc, setAuthToken, changePassword } from '../trpc';
 import { accountError, newPasswordError } from '../account/forms';
 import styles from './Settings.module.css';
 
@@ -131,7 +131,7 @@ function ChangePassword() {
 
     setBusy(true);
     try {
-      await trpc.user.changePassword.mutate({ currentPassword: current, newPassword: next });
+      await changePassword({ currentPassword: current, newPassword: next });
       setCurrent('');
       setNext('');
       setConfirm('');
