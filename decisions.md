@@ -33,7 +33,7 @@ The record of design choices, the features added and dropped, and the reasons. R
 - **Decision:** Accept chessgraph exports (nodes as an array, `childIds` / `children`), normalised to `childIDs` in a `Record<id, Node>`.
 - **Why:** Harry's existing repertoires were built in chessgraph; no native builder exists yet.
 - **Alternatives rejected:** a custom-only format (would strand existing data).
-- **Trade-off / risk:** older saved nodes may still carry `childIds` / `children` until re-imported.
+- **Trade-off / risk:** older saved nodes keep `childIds` / `children` until that node is next saved; re-importing doesn't replace them (existing nodes win, `ImportService.ts`). Readers go through `childrenOf`, so every spelling works. Checked 2026-11-24 (A2): all 1,082 of Harry's nodes predate the sanitiser (file last written 18 Jul 2026); nothing broken.
 - **Revisit if:** the native graph builder lands (export in the same format is Parked).
 - **Evidence:** sanitiser + `validateChessGraphExport.ts`.
 - **One-liner:** ChessBox reads chessgraph files natively.
