@@ -408,3 +408,12 @@ The record of design choices, the features added and dropped, and the reasons. R
 - **Revisit if:** per-device sign-out is wanted, or the API leaves Tailscale (then D).
 - **Evidence:** TBD (server tests + Pi deploy).
 - **One-liner:** Change your password and every other login dies.
+
+### D44 · process · Lanes become Lead / Features / UI / Security: Status: Built · Updated: 2026-11-24
+- **Decision:** Harry (system.md 2.0: "an agent for security and pen tests, an agent for UI and one for feature refining"): A2 Features (all feature logic, incl. board + engine, plus Harry's testing feedback), A3 UI (look of every page, art deco / Casino Royale, accessibility), A4 Security (pen tests, server, accounts, test lead), A1 Lead (routes Harry's feedback; overflow coding; README + legal text). Replaces D42's lanes; D42's review and docs rules stay.
+- **Why:** 2.0 is mostly UI and security work, plus changes Harry finds by testing by hand.
+- **Alternatives rejected:** keep D42's lanes by code area (UI and security would cut across all four).
+- **Trade-off / risk:** UI and Features both touch page `.tsx` files: they message each other before editing one with an open branch.
+- **Revisit if:** one lane runs dry while another queues.
+- **Evidence:** n/a.
+- **One-liner:** One agent each for features, looks and security, plus a lead.

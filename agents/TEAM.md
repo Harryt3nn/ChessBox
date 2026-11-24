@@ -5,12 +5,12 @@ Harry runs four Claude Code sessions at once. `CLAUDE.md` still rules: Harry own
 ## Who's who
 | Agent | Session name | Lane (what it owns) | Brief |
 |---|---|---|---|
-| **A1 · Lead** | `chessbox-1f` | Plans, splits work, talks to Harry, owns the plan docs, merges to `main`. Codes the app shell + Home + Settings look (GUI) | `agent-1.md` |
-| **A2 · Repertoires** | `chessbox-80` | Repertoire builder, Novelty Finder, WeakPoints, game import + local storage | `agent-2.md` |
-| **A3 · Board** | `chessbox-65` | Analysis board, Stockfish engine, chess helpers | `agent-3.md` |
-| **A4 · Server + QA** | `chessbox-36` | `vendor/chessbox-server`, accounts / auth / security, tRPC client, test lead | `agent-4.md` |
+| **A1 · Lead** | `chessbox-1f` | Plans, takes Harry's testing feedback and routes it, owns the plan docs, merges to `main`. Overflow coding when every agent is busy; README + legal text | `agent-1.md` |
+| **A2 · Features** | `chessbox-80` | Feature refining from Harry's testing. All feature logic: repertoires, builder, Novelty Finder, WeakPoints, board + engine, storage + IPC | `agent-2.md` |
+| **A3 · UI** | `chessbox-65` | Look and feel of every page (art deco / Casino Royale), CSS, assets, copy, accessibility | `agent-3.md` |
+| **A4 · Security** | `chessbox-36` | Pen testing + security checks, server submodule, accounts / auth, test lead | `agent-4.md` |
 
-Session names are from `ListAgents` on 2026-11-24; numbers follow what Harry told each session. If a name changes, A1 updates this table. Message a peer with `SendMessage({to: "<name>", message: "..."})`.
+Lanes changed on 2026-11-24 to Harry's suggested split (D44). Session names are from `ListAgents` on 2026-11-24; numbers follow what Harry told each session. If a name changes, A1 updates this table. Message a peer with `SendMessage({to: "<name>", message: "..."})`.
 
 ## The 6 rules
 1. **One task, one branch, one worktree.** A1 hands you a task from `tasks.md` ▶ Now. Work on branch `<what-it-does>` in your own worktree: `git worktree add ../ChessBox-wt/<branch> -b <branch> main`, then `git submodule update --init` and `npm install` in both `vendor/chessbox-server` and `apps/desktop` (an empty submodule breaks `forms.test.ts` and the type-check). Never code in the main checkout; that's where the plan docs live.
@@ -23,7 +23,9 @@ Session names are from `ListAgents` on 2026-11-24; numbers follow what Harry tol
 ## Shared files (ask the owner before editing)
 | File | Owner | Why it's shared |
 |---|---|---|
-| `apps/desktop/src/App.tsx`, `TopBar.tsx`, `PageHeader.tsx`, `index.css`, `pages/Home.tsx` | A1 | every page routes through them |
+| `apps/desktop/src/App.tsx` | A1 | every page routes through it |
+| `index.css`, `TopBar.*`, `PageHeader.*`, `pages/Home.*`, every `*.module.css` | A3 | the look of every page |
+| Any page `.tsx` | logic: A2 (A4 for Settings / login) · look: A3 | two lanes touch the same file: message the other before editing |
 | `apps/desktop/src/index.ts`, `preload.ts`, `types/global.d.ts` | A2 | the IPC bridge: every lane adds channels here |
 | `apps/desktop/src/types/*` (others) | A2 | data shapes the storage layer saves |
 | `apps/desktop/src/trpc.ts`, `@chessbox/shared` | A4 | the client ↔ server contract |

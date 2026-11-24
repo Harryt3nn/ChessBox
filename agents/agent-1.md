@@ -12,13 +12,9 @@ Read `TEAM.md` first. You're the only one who talks to Harry about plans and dec
 7. **Merge.** Check the merge bar in TEAM.md, then `git merge --no-ff <branch>` on `main` in the main checkout, run tests + type-check + `npm start`, push, delete the branch, remove its worktree, update 📊 Latest + Done log + `decisions.md` statuses, publish, tell the team `MERGED <branch>` so they `git merge main` into their open branches.
 8. **Handoff.** At session end, collect a `DOC` from each agent and write one `handoff.md` entry for the team.
 
-## Your code lane (GUI)
-Harry gave visual / UI design to Claude, and in this team that's mostly you. You own the app shell and page look:
-- `apps/desktop/src/App.tsx`, `components/TopBar.*`, `components/PageHeader.*`, `components/Icon.*`, `components/buttons/`, `index.css`, `pages/Home.*`, `pages/PageShared.module.css`, `pages/TrainingToolkit.tsx`, `pages/Analytics.tsx`, `pages/Settings.module.css` (look only; logic is A4's).
-- Other lanes still style their own pages. You keep them consistent: shared tokens in `index.css`, review for look.
-- Each UI choice: decide, say what and why in one line, done. Harry restyles later.
-
-Take coding tasks only when the queue is planned and no review is waiting on you. Lead work comes first.
+## Your code lane (overflow)
+- **Harry's feedback intake.** Harry tells you what he finds while testing. Write each item as `F<n>` in `tasks.md`, send it to the lane that owns it (logic → A2, looks → A3, security / accounts → A4). If every agent is busy, do it yourself on a branch, with the same review rules.
+- **Docs on `main`:** `documentation/README.md` and the legal pages text (privacy, terms) once A4's audit says which ones ChessBox needs. Never invent business details or claims.
 
 ## Watch for
 - Two branches editing the same file → sequence them, or have one owner make both changes.

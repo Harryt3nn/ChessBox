@@ -61,6 +61,28 @@ Work **▶ Now** top to bottom. Tags: `[🟠 your call: …]` = a design decisio
 - [x] **T32 · Research: Chess.com game-review data for statistics (A2, after T31)** (`research.md` Pass 2) · Done when: a graded `Pass 2` (CLAUDE.md §9) on what Chess.com exposes (public API, PGN annotations, exports) and what per-repertoire stats it could feed, sent to A1.
 - [x] **T33 · Research: move explanations with no paid API (A3)** (`research.md` Pass 3) · Done when: a graded `Pass 3` on theory presets (opening names / ECO tables) + Stockfish-based explanations + local models, with sizes and speeds from sources, sent to A1.
 
+## ▶ Now · 2.0 "Less AI-like: UI + security" (from `system.md`, 2026-11-24; lanes per D44)
+**Feedback from Harry's manual testing** (A1 logs each item, routes it; overflow → A1)
+- *(none yet)*
+
+**A3 · UI**
+- [ ] **T34 · Moodboard: art deco / Casino Royale** · Done when: a moodboard (palette with hex codes, type pairing with licences, ornament / border motifs, button and card treatments, 6–10 references with links) matched to `src/assets/icons/`, checked against both avoid lists in `system.md`, sent to A1 for Harry. Harry may change it a lot.
+- [ ] **T35 · UI audit against the avoid lists** · Done when: every page is checked against the "avoid" and "DO NOT have" lists (em dashes in copy, gradients, Inter, cards, fades, …), and the findings are listed per page with `file:line`.
+- [ ] **T36 · Accessibility pass** · Done when: colour contrast measured (WCAG AA), keyboard navigation works on every page, every image has `alt`; fixes on a branch.
+- [ ] **T37 · Restyle to the agreed moodboard** · Waits on Harry's OK of T34.
+
+**A4 · Security**
+- [ ] **T38 · Pen-test triage** · Done when: every item on `system.md`'s PEN TEST list is marked relevant / not relevant with a one-line reason; the relevant ones are tested against a local server; each real hole has a failing test and a 🟠 or a fix.
+- [ ] **T39 · Server deps + Node 20 → 22** · Waits on Harry (🟠 6).
+- [ ] **T40 · Account deletion (🟠 draft first)** · Done when: a 🟠 block covers what gets deleted (server account, local data, linked accounts), how it's confirmed, and what happens on other devices.
+
+**A2 · Features**
+- [ ] **T41 · Data + third-party audit** · Done when: a list of every piece of data ChessBox stores or sends (where, why, how long), every third-party package that runs at runtime and whether it talks to the network, plus which legal pages a personal, unpublished app actually needs. Sent to A1. Then Harry's feedback items.
+
+**A1 · Lead**
+- [ ] **T42 · README rewrite** · Done when: `documentation/README.md` reads like a professional project page (what it is, features, stack, setup, architecture link, credits), with no made-up stats or claims, and passes the avoid lists.
+- [ ] **T43 · Legal pages text** · Waits on T41: only the pages it says are needed.
+
 ## 🅿️ Parked (ideas, not agreed work; offered when ▶ Now is empty)
 *Stage 2, from `system.md`:* repertoires on a server (maybe MongoDB, user details stay in Postgres) · email verification · MFA · Google sign-in / sign-up · AI move explanations (theory presets + interpreting Stockfish, no paid API keys) · AI "add suggestions" for repertoires · a private chess-theory knowledge base · multi-reply "acceptable alternatives" so a reasonable non-prep move isn't penalised (D17) · more toolkit tools.
 *Stage 2, added to `system.md` on 2026-11-20:* bring Chess.com game-review data in for statistics (Harry has Premium) · statistics per saved repertoire and overall · credit chessgraph as the inspiration in the app, maybe tell its developer (Harry not sure yet) · note: Chess Atlas does something similar.
