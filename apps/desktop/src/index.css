@@ -72,6 +72,13 @@
   user-select: none;
 }
 
+/* the app chrome isn't selectable, but anything you might copy is: FENs, PGNs, typed text.
+   !important because several field classes still set user-select: none */
+input,
+textarea {
+  user-select: text !important;
+}
+
 body {
   background: var(--color-void);
   color: var(--color-text-secondary);

@@ -267,6 +267,7 @@
 
 .panelError {
   color: var(--color-danger-text);
+  user-select: text;
 }
 
 .panelInfo {
