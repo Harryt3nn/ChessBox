@@ -58,7 +58,7 @@ Work **▶ Now** top to bottom. Tags: `[🟠 your call: …]` = a design decisio
 
 **Prep for Harry (added 2026-11-24 so every agent has work; drafts only, nothing built until Harry picks)**
 - [x] **T31 · Two import 🟠s drafted (A2)** (branch `import-issue-tests` @ 04a2c99, 2 `it.fails` tests; 🟠s with Harry) · Done when: full 🟠 blocks for (a) orphan nodes piling up in `nodes.json` and (b) a Lichess idle timeout, each with a failing test showing the problem on a branch (not merged until Harry picks).
-- [ ] **T32 · Research: Chess.com game-review data for statistics (A2, after T31)** · Done when: a graded `Pass 2` (CLAUDE.md §9) on what Chess.com exposes (public API, PGN annotations, exports) and what per-repertoire stats it could feed, sent to A1.
+- [x] **T32 · Research: Chess.com game-review data for statistics (A2, after T31)** (`research.md` Pass 2) · Done when: a graded `Pass 2` (CLAUDE.md §9) on what Chess.com exposes (public API, PGN annotations, exports) and what per-repertoire stats it could feed, sent to A1.
 - [x] **T33 · Research: move explanations with no paid API (A3)** (`research.md` Pass 3) · Done when: a graded `Pass 3` on theory presets (opening names / ECO tables) + Stockfish-based explanations + local models, with sizes and speeds from sources, sent to A1.
 
 ## 🅿️ Parked (ideas, not agreed work; offered when ▶ Now is empty)
