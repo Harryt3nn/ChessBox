@@ -1,31 +1,56 @@
-##ChessBox
+# ChessBox
 
+ChessBox is a free desktop app for chess training, built around your own opening repertoires and your own games. Repertoires are stored as graphs rather than trees, so a position reached by two move orders is one position, not two copies. The Novelty Finder walks your imported Lichess and Chess.com games through a repertoire and shows where you, or your opponent, left your preparation. WeakPoints then drills those positions with spaced repetition.
 
-As an avid chess player, I find myself dissatisfied with the training tools available. Often the most useful tools are blocked behind paywalls, and the free options are limited. There are so many apps available in this area that offer a couple of useful features, but are mostly bloat or desperately need to be expanded upon. ChessBox is a single envioronment that contains all of the training tools you could ever possibly need, all for free. 
+It is a personal project by Harry Tennant, a computer science student at Newcastle University. It was built to train with, and to learn system design, desktop development and self-hosting.
 
-My name is Harry Tennant and I'm currently a student at Newcastle University, studying computer science. This is a project to help develop my skills in programming, system design, and familiarise myself with industry standard softwares that I wouldn't get the chance to try out ion the classroom. When I began development, I had quite a few unique ideas (which have since been formally published by teams of developers). The goal of this project isn't to make the next big app in the chess world, that will kickstart a startup and make a career. My aims are to learn as much as possible and have fun! I first came up with the idea for this app when I wanted to start getting back into competetive play, and wanted a place to train based on my own game data. There are plenty of options that exist, but most of the genuinely useful features are locked behind a paywall. Furthermore, I didn't like switching between websites for single useful features. I wanted a single envioronment that had features tailored to my specific needs and contained all of the features I personally wanted (both ones that exist and ones that don't.)
+## Why it exists
 
-The first peice of inspiration comes from a website called chess graph. This site has a unique concept of modelling chess games as graphs, not trees, as this accounts for transpositions. I had fun using the GUI to add repertoires from various courses and my own experience into one set repertoire. There were a couple of standout complaints, such as the site only supporting an export of JSON and not a PGN. Looking at the repository, it's clear that a lot of the code is AI generated, which is not necessarily a bad thing. In this age of computer science, avoiding AI is impossible, but its a slippery slope. Too much reliance on AI means you don't really have any skills. Too much avoidance and you'll simply fall behind. It's a fact that AI can write better code than all junior devlopers and it is only getting better. I believe 'agentic workflow' is simple a fad that will dissappear in the near future. Knowledge of systenm design and technologies that support developers is a far more valublee skill than coding now, as AI can never replicate human creativity when it comes to problem solving. Genuinely new ideas that can take humanity forward will not come from AI, but from humans building things with the tools we have available. AI is just another one of those tools. Chess graph was also seemingly missing a way to expand or use the data in any meaningful way. Tghis is where I came up with the novelty finder idea, using game data, graph traversal and Stockfish analysis. 
+Most of the useful chess training tools are paywalled, and the free ones are spread across many sites that each do one thing. ChessBox puts the tools I use in one place, driven by my own game data.
 
----
+The graph model comes from [chessgraph.net](https://chessgraph.net), which represents repertoires as graphs to handle transpositions. ChessBox imports its JSON format and adds what it was missing for me: a way to use that data, by checking real games against it.
 
-## What it does
+## Features
 
-- **Repertoires as graphs** — import opening repertoires from [chessgraph.net](https://chessgraph.net) JSON exports, organised into folders. Transpositions are explicit edges rather than duplicated lines.
-- **Analysis board** — play through lines with variations, legal-move hints, square highlights, and FEN / PGN copy.
-- **Game import** — pull your blitz and rapid games from Lichess and Chess.com using the accounts linked in Settings.
-- **Accounts** — sign up and sign in; link your Chess.com and Lichess usernames.
-- **Designed, being built** — the Novelty Finder (walk your games through your repertoires to find where you leave your prep), Analytics, and Training Tools pages.
+**Repertoires**
+- Import chessgraph.net JSON exports, organised into folders.
+- A visual graph builder to create, rename and delete repertoires and moves, with collapsible branches for large repertoires.
+- One prepared reply per position on your move, so matching a game against a repertoire is deterministic.
+- Open any repertoire in the analysis board, and jump between a board position and its node in the graph.
+
+**Analysis board**
+- Lichess-style board with variations, legal-move hints, FEN and PGN copy.
+- Stockfish running locally in a Web Worker, with an eval bar and the best lines.
+- Captured pieces and the material difference shown beside the board.
+
+**Novelty Finder**
+- Checks one game or every imported game against the repertoire you pick, using the accounts you choose.
+- Reports where you deviated from your prep and where the opponent played something your repertoire doesn't cover, following transpositions.
+- Checks each deviation with a full-strength Stockfish search in the background, and lets you add a move to the repertoire or open it on the board.
+
+**WeakPoints**
+- Drills positions from your deviations, from lines you rarely reach and from lines you know well, as short move sequences on a board with no analysis.
+- Schedules reviews with FSRS, the spaced-repetition algorithm used by Anki.
+- Three modes: Focused, Mistakes only and Random, limited to one opening branch or the whole repertoire.
+
+**Accounts**
+- Sign up and sign in, with the session stored encrypted by the operating system.
+- Link your Lichess and Chess.com usernames, and change your username or password from one settings page.
 
 ## Tech stack
 
 | Part | Built with |
 |---|---|
-| Desktop app | Electron, React, TypeScript, Electron Forge (webpack), react-chessboard, chess.js |
+| Desktop app | Electron, React, TypeScript, Electron Forge (webpack), react-chessboard, chess.js, React Flow |
+| Engine | Stockfish (WebAssembly, in a Web Worker) |
+| Training | ts-fsrs |
 | API | Fastify, tRPC, zod, Prisma, PostgreSQL, Argon2id (hash-wasm), JWT |
-| Hosting | Docker Compose on a Raspberry Pi 5, reachable over Tailscale |
+| Hosting | Docker Compose on a Raspberry Pi 5, reachable only over Tailscale |
+| Tests | Vitest, for both the desktop app and the API |
 
-The API lives in a separate repository, [chessbox-server](https://github.com/Harryt3nn/chessbox-server), included here as a git submodule at `vendor/chessbox-server` so the desktop app gets full tRPC type inference from the server's router.
+Analysis runs on your machine. The server only handles accounts, so your repertoires and games stay on disk under `%APPDATA%/ChessBox/ChessBox-data/`.
+
+The API lives in a separate repository, [chessbox-server](https://github.com/Harryt3nn/chessbox-server). It is included here as a git submodule at `vendor/chessbox-server`, so the desktop app gets full tRPC type inference from the server's router.
 
 ## Repository layout
 
@@ -37,7 +62,7 @@ ChessBox/
 └── tsconfig.json            Shared TypeScript config, incl. the @chessbox/shared path mapping
 ```
 
-See [ARCHITECTURE.md](ARCHITECTURE.md) for how the pieces fit together and [CHESSBOX_MASTER.md](CHESSBOX_MASTER.md) for design decisions and the roadmap.
+See [ARCHITECTURE.md](ARCHITECTURE.md) for how the pieces fit together and [CHESSBOX_MASTER.md](CHESSBOX_MASTER.md) for the design notes.
 
 ## Getting started
 
@@ -67,11 +92,17 @@ npm start
 
 The window opens once the console shows `[ForkTsCheckerWebpackPlugin] No errors found.` A type error stops it from opening, so check the terminal if nothing appears.
 
-The app talks to the API at the address in `apps/desktop/src/trpc.ts`. Signing in needs that API running and reachable (on the tailnet).
+The app talks to the API at the address in `apps/desktop/src/trpc.ts`. Signing in needs that API running and reachable on the tailnet.
 
-To type-check without launching: `npx tsc --noEmit -p tsconfig.json` from the repository root.
+### 4. Run the tests
 
-### 4. Run the API
+```bash
+cd apps/desktop && npm test                               # desktop
+cd vendor/chessbox-server/apps/api && npm test            # API
+npx --prefix apps/desktop tsc --noEmit -p tsconfig.json   # type-check, from the repository root
+```
+
+### 5. Run the API
 
 Full instructions are in [`vendor/chessbox-server/README.md`](../vendor/chessbox-server/README.md). In short:
 
@@ -81,7 +112,7 @@ cp apps/api/.env.example apps/api/.env      # then fill in JWT_SECRET and POSTGR
 docker compose --env-file ./apps/api/.env up --build
 ```
 
-Any pending database migrations run automatically when the API container starts.
+Pending database migrations run automatically when the API container starts.
 
 ## Troubleshooting
 
@@ -97,8 +128,20 @@ Copy-Item -Recurse ..\..\node_modules\electron .\node_modules\electron
 
 ## Security
 
-Passwords are hashed with Argon2id. Sessions are JWTs, stored on disk encrypted by the OS. The API is rate-limited per IP, and every imported file is sanitised before it touches the disk. The renderer runs sandboxed. The full list is in the Security section of [ARCHITECTURE.md](ARCHITECTURE.md#security).
+- Passwords are hashed with Argon2id, and login takes the same time whether or not the username exists.
+- Sessions are JWTs, stored on disk encrypted by the operating system. Changing your password signs out your other devices.
+- Login and registration are rate-limited, and the API only accepts requests from an allow-list of origins.
+- The renderer runs sandboxed, and the main process re-checks everything that arrives over IPC or from an imported file.
+- The API is only reachable over Tailscale, and the database is never exposed outside its Docker network.
+
+The full list is in the Security section of [ARCHITECTURE.md](ARCHITECTURE.md#security).
+
+## Credits
+
+- Repertoire graph model and import format: [chessgraph.net](https://chessgraph.net).
+- Engine: [Stockfish](https://stockfishchess.org) (GPL-3.0), shipped as a separate file with its licence.
+- Spaced repetition: [ts-fsrs](https://github.com/open-spaced-repetition/ts-fsrs).
 
 ## License
 
-The code is MIT licensed — see [LICENSE](LICENSE). The icons in `apps/desktop/src/assets/icons/` are Flaticon assets under a Premium license and are **not** covered by the MIT license; see [legal.md](legal.md).
+The code is MIT licensed, see [LICENSE](LICENSE). The icons in `apps/desktop/src/assets/icons/` are Flaticon assets used under a Premium licence and are **not** covered by the MIT licence; see [legal.md](legal.md).
