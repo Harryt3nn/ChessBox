@@ -9,26 +9,31 @@
    ============================================================ */
 :root {
   /* Surfaces — lighter charcoal-emerald ramp */
-  --color-void: #333e37;
-  --color-surface-1: #3d4941;
-  --color-surface-2: #48544b;
-  --color-surface-3: #535f55;
+  /* WCAG AA: every text token below is >= 4.5:1 on surface-3, the lightest surface it can sit on,
+     and borders are >= 3:1 there. Measure again after changing any of these. */
+  --color-void: #28302b;
+  --color-surface-1: #303933;
+  --color-surface-2: #38423b;
+  --color-surface-3: #414a42;
 
-  --color-border: #748075;
+  --color-border: #8c968c;
   --color-border-strong: #96a297;
 
   --color-text-primary: #f2e9d8;
   --color-text-secondary: #d6cbb5;
-  --color-text-tertiary: #ada38a;
-  --color-text-faint: #857c66;
+  --color-text-tertiary: #bdb5a1;
+  /* faint can't get any fainter than tertiary and still pass AA; size and weight carry the difference */
+  --color-text-faint: var(--color-text-tertiary);
 
-  --color-amber: #c9a24b;
+  --color-amber: #d2b26a;
   --color-amber-hover: #d9b562;
-  --color-amber-rgb: 201, 162, 75;
+  --color-amber-rgb: 210, 178, 106;
 
+  /* coral is a button fill (ivory on it is 6.75:1); as text on the dark surfaces it needs the lighter danger tone */
   --color-coral: #8c2f39;
   --color-coral-hover: #a83f4a;
   --color-coral-rgb: 140, 47, 57;
+  --color-danger-text: #eea1a7;
 
   --color-piece-light: #f2e9d8;
   --color-piece-dark: #3c4a44;
@@ -45,11 +50,33 @@
 }
 
 
+/* the eval bar, switch knob, folder chevron and loading spinner are the only animations left */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    transition: none !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+  }
+}
+
+/* one keyboard focus ring for everything; !important because several inputs set outline: none */
+:focus-visible {
+  outline: 2px solid var(--color-amber-hover) !important;
+  outline-offset: 2px;
+}
+
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
   user-select: none;
+}
+
+/* the app chrome isn't selectable, but anything you might copy is: FENs, PGNs, typed text.
+   !important because several field classes still set user-select: none */
+input,
+textarea {
+  user-select: text !important;
 }
 
 body {

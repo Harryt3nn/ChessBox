@@ -48,7 +48,7 @@ const TrainingToolkit = ({ setPage }: TrainingToolkitProps) => {
                             onClick={() => t.page && setPage(t.page)}
                         >
                             {!t.page && <span className={shared.soonBadge}>Coming soon</span>}
-                            <img src={t.icon} className={shared.featureCardIcon} />
+                            <img alt="" src={t.icon} className={shared.featureCardIcon} />
                             <span className={shared.featureCardTitle}>{t.title}</span>
                             <span className={shared.featureCardText}>{t.text}</span>
                         </button>

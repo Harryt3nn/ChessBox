@@ -189,9 +189,9 @@ const RepertoireBuilder = ({ repertoire, focusNodeId, onOpenInBoard, onBack }: R
   return (
     <main className={styles.builder}>
       <header className={styles.header}>
-        <button className={styles.btn} onClick={onBack}>← Repertoires</button>
+        <button className={styles.btn} onClick={onBack}>Back to repertoires</button>
         <h1 className={styles.title}>{repertoire.name}</h1>
-        <span className={styles.meta}>plays {repertoire.side} · {positions} positions</span>
+        <span className={styles.meta}>plays {repertoire.side}, {positions} positions</span>
         <div className={styles.headerActions}>
           <button className={styles.btn} onClick={collapseAll}>Collapse all</button>
           <button className={styles.btn} onClick={expandAll} disabled={!collapsed.size}>Expand all</button>

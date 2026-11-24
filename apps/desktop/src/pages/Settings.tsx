@@ -54,6 +54,7 @@ function LinkedSite({ site, current, onLinked }: { site: (typeof SITES)[number];
       {editing ? (
         <form className={styles.inline} onSubmit={save}>
           <input
+            aria-label={`${site.label} username`}
             className={styles.input}
             value={name}
             onChange={e => setName(e.target.value)}

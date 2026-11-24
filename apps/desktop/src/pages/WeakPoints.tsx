@@ -188,7 +188,7 @@ const WeakPoints = ({ setPage, onOpenInBoard }: WeakPointsProps) => {
                     {mode !== 'random' && queue && !queue.noNovelty && (
                       <p className={styles.hint}>
                         {queue.drills.length > 0
-                          ? `${queue.drills.length} due now · ${queue.cards} card${queue.cards === 1 ? '' : 's'} in total`
+                          ? `${queue.drills.length} due now, ${queue.cards} card${queue.cards === 1 ? '' : 's'} in total`
                           : queue.cards > 0
                             ? `Nothing due here. ${queue.cards} card${queue.cards === 1 ? '' : 's'} scheduled; come back later.`
                             : 'No drills yet: none of your games reached a position worth drilling.'}
@@ -216,7 +216,7 @@ const WeakPoints = ({ setPage, onOpenInBoard }: WeakPointsProps) => {
             {current && drill && session && (
               <>
                 <span className={styles.progress}>
-                  Drill {session.index + 1} of {session.drills.length} · {session.right} of {session.scored} right first time
+                  Drill {session.index + 1} of {session.drills.length}, {session.right} of {session.scored} right first time
                 </span>
                 <span className={styles.source}>{SOURCE_LABEL[current.source]}</span>
                 <p className={styles.prompt}>{drill.prompt}</p>

@@ -55,7 +55,6 @@
   letter-spacing: 0.04em;
   text-transform: uppercase;
   cursor: pointer;
-  transition: color 0.15s, border-color 0.15s;
 }
 
 .link:hover,

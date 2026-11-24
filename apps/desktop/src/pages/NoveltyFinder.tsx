@@ -33,7 +33,9 @@ interface NoveltyFinderProps {
 const SHOWN = 50;
 
 const describeLine = (line: string[]) => (line.length ? numberedLine(DEFAULT_POSITION, line) : 'Start position');
-const formatDateTime = (ms: number) => (ms ? new Date(ms).toLocaleString(undefined, { dateStyle: 'medium', timeStyle: 'short' }) : '—');
+// what a verdict saves as `best` when the engine had no move (mate or stalemate); saved files keep it
+const NO_BEST = '—';
+const formatDateTime = (ms: number) => (ms ? new Date(ms).toLocaleString(undefined, { dateStyle: 'medium', timeStyle: 'short' }) : 'Date unknown');
 // games listed under an opened row
 const GAMES_SHOWN = 20;
 // dismissed findings sink to the bottom; otherwise the most frequent first
@@ -120,7 +122,7 @@ const NoveltyFinder = ({ currentUser, onOpenInBoard, onOpenInGraph }: NoveltyFin
       eval: {
         score: after ? formatScore(whiteScore(after.score, positions.after)) : '?',
         depth: after?.depth ?? 0,
-        best: bestUci ? uciToSan(positions.before, [bestUci])[0] ?? '?' : '—',
+        best: bestUci ? uciToSan(positions.before, [bestUci])[0] ?? '?' : NO_BEST,
         ...(after ? { playedCp: sideCentipawns(after.score, positions.after, side) } : {}),
         ...(afterPrepared ? { preparedCp: sideCentipawns(afterPrepared.score, prepared.after, side) } : {}),
       },
@@ -184,7 +186,7 @@ const NoveltyFinder = ({ currentUser, onOpenInBoard, onOpenInGraph }: NoveltyFin
     <td className={styles.rowActions}>
       <button className={styles.rowBtn} onClick={() => repertoire && onOpenInBoard(repertoire, { nodeId: f.nodeId, move: f.move })} title="Show this position in the analysis board">Board</button>
       <button className={styles.rowBtn} onClick={() => repertoire && onOpenInGraph(repertoire, f.nodeId)} title="Show where this happens in the repertoire graph">Graph</button>
-      {f.eval && <span className={styles.verdict} title={`Stockfish depth ${f.eval.depth}: score after ${f.move}, and its own best move`}>{f.eval.score} · best {f.eval.best}</span>}
+      {f.eval && <span className={styles.verdict} title={`Stockfish depth ${f.eval.depth}: score after ${f.move}, and its own best move`}>{f.eval.score}, {f.eval.best === NO_BEST ? 'no best move' : `best ${f.eval.best}`}</span>}
       <button className={styles.rowBtn} onClick={() => toggleDismissed(f)}>{f.status === 'dismissed' ? 'Restore' : 'Dismiss'}</button>
     </td>
   );
@@ -217,7 +219,7 @@ const NoveltyFinder = ({ currentUser, onOpenInBoard, onOpenInGraph }: NoveltyFin
             .map(({ key, game }) => (
               <li key={key}>
                 <span className={styles.gameWhen}>{formatDateTime(game.playedAt)}</span>
-                {game.white} vs {game.black} · {game.result} · {key.startsWith('lichess:') ? 'Lichess' : 'Chess.com'}
+                {game.white} vs {game.black}, {game.result}, {key.startsWith('lichess:') ? 'Lichess' : 'Chess.com'}
               </li>
             ))}
           {f.games.length > GAMES_SHOWN && <li className={styles.importHint}>and {f.games.length - GAMES_SHOWN} older</li>}
@@ -398,7 +400,7 @@ const NoveltyFinder = ({ currentUser, onOpenInBoard, onOpenInGraph }: NoveltyFin
             </table>
           ) : (
             <div className={shared.emptyState}>
-              <img src={deviationsIcon} className={shared.emptyIcon} />
+              <img alt="" src={deviationsIcon} className={shared.emptyIcon} />
               <span className={shared.emptyTitle}>No deviations found yet</span>
               <span className={shared.emptyHint}>
                 Moves where you left a prepared line will be collected
@@ -426,7 +428,7 @@ const NoveltyFinder = ({ currentUser, onOpenInBoard, onOpenInGraph }: NoveltyFin
             </table>
           ) : (
             <div className={shared.emptyState}>
-              <img src={ideaIcon} className={shared.emptyIcon} />
+              <img alt="" src={ideaIcon} className={shared.emptyIcon} />
               <span className={shared.emptyTitle}>No novelties found yet</span>
               <span className={shared.emptyHint}>
                 Opponent moves your repertoire doesn't cover, and the next move after a line

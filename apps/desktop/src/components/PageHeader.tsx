@@ -17,7 +17,7 @@ export function PageHeader({ icon, title, subtitle, actions }: PageHeaderProps) 
   return (
     <header className={styles.header}>
       <div className={styles.iconFrame}>
-        <img src={icon} className={styles.icon} />
+        <img alt="" src={icon} className={styles.icon} />
       </div>
 
       <div className={styles.titles}>
