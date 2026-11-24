@@ -187,7 +187,7 @@ return (
       <h1>Your Repertoires</h1>
       <div className={styles.topbarActions}>
         <button className={styles.btnOutline} onClick={() => setCreatingFolder(true)}>
-          <img src={folderPlusIcon} className={styles.btnImg} />
+          <img alt="" src={folderPlusIcon} className={styles.btnImg} />
           New Folder
         </button>
         <button className={styles.btnPrimary} onClick={() => setCreatingGraph(true)}>
@@ -207,6 +207,7 @@ return (
       <div className={styles.searchWrapper}>
         <Icon src={searchGlyph} size={14} className={styles.searchIcon} />
         <input
+          aria-label="Search repertoires"
           className={styles.searchInput}
           value={search}
           onChange={e => setSearch(e.target.value)}
@@ -220,6 +221,7 @@ return (
         <div className={styles.newFolderContainer}>
           <div className={styles.newFolderInput}>
             <input
+              aria-label="New repertoire name"
               autoFocus
               value={graphName}
               onChange={e => setGraphName(e.target.value)}
@@ -242,8 +244,9 @@ return (
     {creatingFolder && (
       <div className={styles.newFolderContainer}>
         <div className={styles.newFolderInput}>
-          <img src={folderIcon} className={styles.btnImg} />
+          <img alt="" src={folderIcon} className={styles.btnImg} />
           <input
+            aria-label="New folder name"
             ref={newFolderRef}
             value={newFolderName}
             onChange={e => setNewFolderName(e.target.value)}

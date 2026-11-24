@@ -37,6 +37,14 @@
   user-select: none;
 }
 
+.folder-toggle {
+  display: flex;
+  padding: 0;
+  background: none;
+  border: 0;
+  cursor: pointer;
+}
+
 .folder-icon {
   width: 20px;
   height: 20px;
@@ -110,7 +118,6 @@
   cursor: pointer;
   padding: 4px;
   user-select: none;
-  transition: color 0.15s;
 }
 
 .folder-btn-rename {
@@ -130,7 +137,7 @@
 }
 
 .folder-btn-delete:hover {
-  color: var(--color-coral-hover);
+  color: var(--color-danger-text);
 }
 
 .repertoire-list {

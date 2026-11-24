@@ -8,7 +8,7 @@ export function ChessKnightIcon({ color }: { color: "white" | "black" }) {
 
   return (
     <div className={`${styles.knightIcon} ${isWhite ? styles.knightWhite : styles.knightBlack}`}>
-      <img src={knightIcon} className={styles.knightPiece} />
+      <img alt="" src={knightIcon} className={styles.knightPiece} />
     </div>
   );
 }

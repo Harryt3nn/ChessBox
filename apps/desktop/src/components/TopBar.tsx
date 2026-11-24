@@ -29,7 +29,7 @@ export function TopBar({ page, setPage }: TopBarProps) {
   return (
     <header className={styles.bar}>
       <button className={styles.brand} onClick={() => setPage('home')} title="Home">
-        <img src={knightIcon} className={styles.brandIcon} />
+        <img alt="" src={knightIcon} className={styles.brandIcon} />
         ChessBox
       </button>
 

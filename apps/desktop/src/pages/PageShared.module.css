@@ -96,6 +96,8 @@
 
 .stat-value-empty {
   color: var(--color-text-faint);
+  font-size: 15px;
+  font-weight: 500;
 }
 
 /* Segmented toggle (matches the BoardView SAN / FEN / PGN switcher) */
@@ -117,7 +119,6 @@
   font-weight: 600;
   letter-spacing: 0.04em;
   text-transform: uppercase;
-  transition: background 0.15s, color 0.15s;
 }
 
 .toggle-btn + .toggle-btn {
@@ -149,7 +150,6 @@
   text-transform: uppercase;
   cursor: pointer;
   clip-path: polygon(6px 0, 100% 0, 100% calc(100% - 6px), calc(100% - 6px) 100%, 0 100%, 0 6px);
-  transition: background 0.15s, color 0.15s, border-color 0.15s;
 }
 
 .btn-primary {
@@ -252,7 +252,6 @@
   font-family: inherit;
   text-align: left;
   cursor: pointer;
-  transition: background 0.15s, border-color 0.15s, transform 0.1s;
 }
 
 .feature-card:hover {

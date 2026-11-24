@@ -11,7 +11,6 @@
   flex-direction: column;
   gap: 8px;
   min-height: 110px;
-  transition: border-color 0.15s, background 0.15s, transform 0.1s;
   user-select: none;
 }
 

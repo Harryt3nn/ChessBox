@@ -366,7 +366,7 @@ const BoardView = ({ repertoire, focus, onOpenInGraph, onCloseRepertoire }: Boar
     try {
       const { tree: next, gameCount } = importPgn(pgnDraft);
       if (!confirmDiscard()) return;
-      replaceBoard(next, gameCount > 1 ? `That PGN had ${gameCount} games — the first one was imported.` : undefined);
+      replaceBoard(next, gameCount > 1 ? `That PGN had ${gameCount} games, so only the first one was imported.` : undefined);
     } catch (err) {
       setMessage({ kind: 'error', text: errorText(err) });
     }
@@ -475,7 +475,7 @@ return (
       {repertoire && (
         <div className={styles.repertoireBanner}>
           <span>
-            <strong>{repertoire.name}</strong> · plays {repertoire.side} · {unsaved > 0 ? `${unsaved} unsaved` : 'no unsaved moves'}
+            <strong>{repertoire.name}</strong>, plays {repertoire.side}, {unsaved > 0 ? `${unsaved} unsaved` : 'no unsaved moves'}
           </span>
           <div className={styles.bannerActions}>
             <button
@@ -514,37 +514,37 @@ return (
 
       {/* Navigation buttons — fixed, not part of the scroll */}
       <div className={styles.moveNav}>
-        <button className={styles.navArrow} onClick={goToStart} disabled={!canGoBack} title="Start (↑)">
-          <img src={farLeftArrow} className={iconStyles.icon} />
+        <button className={styles.navArrow} onClick={goToStart} disabled={!canGoBack} title="Start (↑)" aria-label="Start of the game">
+          <img alt="" src={farLeftArrow} className={iconStyles.icon} />
         </button>
-        <button className={styles.navArrow} onClick={goBack} disabled={!canGoBack} title="Back (←)">
-          <img src={leftArrow} className={iconStyles.icon} />
+        <button className={styles.navArrow} onClick={goBack} disabled={!canGoBack} title="Back (←)" aria-label="Previous move">
+          <img alt="" src={leftArrow} className={iconStyles.icon} />
         </button>
-        <button className={styles.navArrow} onClick={goForward} disabled={!canGoForward} title="Forward (→)">
-          <img src={rightArrow} className={iconStyles.icon} />
+        <button className={styles.navArrow} onClick={goForward} disabled={!canGoForward} title="Forward (→)" aria-label="Next move">
+          <img alt="" src={rightArrow} className={iconStyles.icon} />
         </button>
-        <button className={styles.navArrow} onClick={goToEnd} disabled={!canGoForward} title="End of line (↓)">
-          <img src={farRightArrow} className={iconStyles.icon} />
+        <button className={styles.navArrow} onClick={goToEnd} disabled={!canGoForward} title="End of line (↓)" aria-label="End of line">
+          <img alt="" src={farRightArrow} className={iconStyles.icon} />
         </button>
       </div>
 
       {/* Import / Export / Flip / Reset — fixed, not part of the scroll */}
       <div className={styles.boardPanelActions}>
         <button className={styles.btnSecondary} onClick={() => fileInputRef.current?.click()} title="Open a .pgn file (or a FEN / saved board)">
-          <img src={importIcon} className={iconStyles.icon} /> Import
+          <img alt="" src={importIcon} className={iconStyles.icon} /> Import
         </button>
         <input ref={fileInputRef} type="file" accept=".pgn,.txt,.fen,.json" style={{ display: 'none' }} onChange={importFile} />
 
         <button className={styles.btnSecondary} onClick={() => download(pgnFileName(tree), pgnText)} title="Download the game as a .pgn file">
-          <img src={exportIcon} className={iconStyles.icon} /> Export
+          <img alt="" src={exportIcon} className={iconStyles.icon} /> Export
         </button>
 
         <button className={styles.btnSecondary} onClick={() => setOrientation(o => (o === 'white' ? 'black' : 'white'))} title="Flip board (F)">
-          <img src={flipIcon} className={iconStyles.icon} /> Flip
+          <img alt="" src={flipIcon} className={iconStyles.icon} /> Flip
         </button>
 
         <button className={styles.btnReset} onClick={resetBoard}>
-          <img src={resetIcon} className={iconStyles.icon} /> Reset
+          <img alt="" src={resetIcon} className={iconStyles.icon} /> Reset
         </button>
       </div>
 
@@ -587,7 +587,7 @@ return (
                 </>
               ) : (
                 <button className={styles.btnSecondary} onClick={() => copy(currentFen, 'FEN')}>
-                  <img src={copyIcon} className={iconStyles.icon} /> Copy FEN
+                  <img alt="" src={copyIcon} className={iconStyles.icon} /> Copy FEN
                 </button>
               )}
             </div>
@@ -614,7 +614,7 @@ return (
                 </>
               ) : (
                 <button className={styles.btnSecondary} onClick={() => copy(pgnText, 'PGN')}>
-                  <img src={copyIcon} className={iconStyles.icon} /> Copy PGN
+                  <img alt="" src={copyIcon} className={iconStyles.icon} /> Copy PGN
                 </button>
               )}
             </div>

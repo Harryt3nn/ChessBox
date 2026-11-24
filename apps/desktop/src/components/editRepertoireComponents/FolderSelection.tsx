@@ -68,15 +68,20 @@ const FolderSelection: React.FC<FolderSelectionProps> = ({folder, repertoires, o
       {/* Folder Header */}
       <div className={styles.folderHeader}>
         {/* Expand/Collapse */}
-        <img
-          src={folder.collapsed ? folderClosedIcon : folderOpenIcon}
-          className={styles.folderIcon}
+        <button
+          type="button"
+          className={styles.folderToggle}
           onClick={() => onToggle(folder.id)}
-        />
+          aria-expanded={!folder.collapsed}
+          aria-label={`${folder.collapsed ? 'Open' : 'Close'} folder ${folder.name}`}
+        >
+          <img alt="" src={folder.collapsed ? folderClosedIcon : folderOpenIcon} className={styles.folderIcon} />
+        </button>
 
         {/* Folder Name or Input */}
         {editingFolder ? (
           <input
+            aria-label="Folder name"
             ref={folderInputRef}
             value={folderName}
             maxLength={MAX_FOLDER_NAME + 5}

@@ -24,7 +24,6 @@
   border: 1px solid var(--color-border-strong);
   border-radius: 9px;
   cursor: pointer;
-  transition: background 0.15s;
 }
 
 .toggle-on {

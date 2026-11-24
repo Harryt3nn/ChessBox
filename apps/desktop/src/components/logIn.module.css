@@ -50,7 +50,6 @@
   font-size: 14px;
   font-family: 'Segoe UI', sans-serif;
   outline: none;
-  transition: border-color 0.15s;
   user-select: text;
 }
 
@@ -70,7 +69,6 @@
   letter-spacing: 0.03em;
   text-transform: uppercase;
   cursor: pointer;
-  transition: background 0.15s;
   user-select: none;
 }
 
@@ -99,10 +97,10 @@
 }
 
 .error {
-  color: var(--color-coral);
+  color: var(--color-danger-text);
   font-size: 12px;
   margin-top: -8px;
-  user-select: none;
+  user-select: text;
 }
 
 .modeToggle {
@@ -116,7 +114,6 @@
   text-align: center;
   cursor: pointer;
   user-select: none;
-  transition: color 0.15s;
 }
 
 .modeToggle:hover {
