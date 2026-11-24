@@ -52,8 +52,11 @@ Work **▶ Now** top to bottom. Tags: `[🟠 your call: …]` = a design decisio
 **Loose ends**
 - [x] **T6 · Check B8 in the app** (Escape in "New Folder" may still create one).
 
+**Stage 2 · Auth (D43)**
+- [ ] **T29 · Server: token version (A4)** · Done when: migration adds `User.tokenVersion` (default 0); tokens carry `ver`; `createContext` rejects a mismatch and treats a missing `ver` as 0; `changePassword` bumps it and returns `{ok, token}` (shared type updated); server tests cover old token rejected, fresh token accepted, pre-deploy token accepted; reviewed by all 4, merged in ChessBox-Server, deployed to the Pi.
+- [ ] **T30 · Desktop: keep the fresh token + sign out on UNAUTHORIZED (A4, Settings look A1)** · Done when: Settings saves the token from `changePassword`; any `UNAUTHORIZED` response clears the session and shows a toast; tested; submodule pointer bumped as its own commit. Waits on T29 deployed.
+
 ## 🅿️ Parked (ideas, not agreed work; offered when ▶ Now is empty)
-- **Revisit D27:** sign other devices out when the password changes (`passwordChangedAt` + check in `createContext`, one migration). Must be decided before the API leaves Tailscale or stage 2.
 *Stage 2, from `system.md`:* repertoires on a server (maybe MongoDB, user details stay in Postgres) · email verification · MFA · Google sign-in / sign-up · AI move explanations (theory presets + interpreting Stockfish, no paid API keys) · AI "add suggestions" for repertoires · a private chess-theory knowledge base · multi-reply "acceptable alternatives" so a reasonable non-prep move isn't penalised (D17) · more toolkit tools.
 *Stage 2, added to `system.md` on 2026-11-20:* bring Chess.com game-review data in for statistics (Harry has Premium) · statistics per saved repertoire and overall · credit chessgraph as the inspiration in the app, maybe tell its developer (Harry not sure yet) · note: Chess Atlas does something similar.
 - **Novelty Finder reloads its file on every deviation check** (`NoveltyFinder.tsx:150,158`, plus a re-read in `updateFinding`): ≈105 ms p50 per check on the Italian's 2.2 MB file, ≈2.6% of a ~4 s verdict (A2, Node script on a copy, 2026-11-24). Cheap fix: reuse the line-158 load. Bigger fixes change `novelty:update` (🟠). Revisit if Harry's D38 mean is well above 4 s.

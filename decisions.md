@@ -256,7 +256,7 @@ The record of design choices, the features added and dropped, and the reasons. R
 - **Evidence:** 6 server tests (`credentials.test.ts`): 11th try blocked even with the right password, other IP unaffected, success clears the count, case-insensitive, 6th sign-up refused, re-auth shares the limit; removing the reset turns its test red. Server `1717269`, deployed 2026-11-20 (limits not hit live).
 - **One-liner:** Ten wrong passwords and that login waits 15 minutes.
 
-### D27 · auth · Changing your password doesn't sign out other devices (for now): Status: Planned · Updated: 2026-11-20 19:20
+### D27 · auth · Changing your password doesn't sign out other devices (for now): Status: Dropped (replaced by D43, 2026-11-24) · Updated: 2026-11-24
 - **Decision:** Harry (option A, **for now: must be revisited**): existing tokens stay valid until they expire (at most 3 days, D24).
 - **Why:** no schema change, consistent with D9 (sign-out-everywhere reverted 2026-10-05); behind Tailscale a stolen token is unlikely.
 - **Alternatives rejected (for now):** B: `passwordChangedAt` column, tokens issued before it rejected in `createContext`, the changing device gets a fresh token (one migration).
@@ -399,3 +399,12 @@ The record of design choices, the features added and dropped, and the reasons. R
 - **Revisit if:** reviews routinely wait more than a turn, or a lane sits idle.
 - **Evidence:** n/a.
 - **One-liner:** Four lanes, one lead, nobody merges alone.
+
+### D43 · auth · A password change signs out other devices (token version): Status: Planned · Updated: 2026-11-24
+- **Decision:** Harry ("go with your decision", took Claude's rec, drafted by A4): option C. `User.tokenVersion Int @default(0)`; tokens carry `ver`; `createContext` rejects `ver != user.tokenVersion`; `changePassword` increments it. Sub-choices: (1) `changePassword` returns a fresh token `{ok, token}` and Settings saves it, so the changing device stays signed in (amends D28); (2) the desktop signs out + toasts on any `UNAUTHORIZED` from the server, not only at app start; (3) tokens from before the deploy have no `ver` and count as 0, so nobody is signed out by the deploy. Replaces D27.
+- **Why:** closes D27's gap (a stolen token outliving the new password); exact integer match has no same-second bug; the same counter gives "sign out everywhere" (D9) later.
+- **Alternatives rejected:** A keep D27 (gap stays); B `passwordChangedAt` (`iat` is whole seconds, easy to reject the fresh token); D short access + refresh tokens with a `Session` table (most work, reopens D24; possible stage-2 end state, C doesn't block it).
+- **Trade-off / risk:** one primary-key lookup per authenticated request (TBD measure in server tests); still all-or-nothing per user. Server must deploy before the desktop (2026-10-05 revert).
+- **Revisit if:** per-device sign-out is wanted, or the API leaves Tailscale (then D).
+- **Evidence:** TBD (server tests + Pi deploy).
+- **One-liner:** Change your password and every other login dies.

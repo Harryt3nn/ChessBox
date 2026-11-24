@@ -29,8 +29,8 @@ A bare § means this file. `tasks.md` holds the ranked work; `decisions.md` hold
 - D24: Login tokens (JWT) last 3 days.
 - D25: Server hardening: CORS allow-list, rate limits, safe `user.me`, Postgres not published.
 - D26: Login 10 fails / 15 min per IP + username (reset on success); register 5 / hour per IP (TUNE).
-- D27: A password change doesn't sign out other devices **for now** (revisit: see Pending).
-- D28: Change password / username both re-ask the current password; contract in `decisions.md`.
+- D27: Dropped 2026-11-24, replaced by D43.
+- D28: Change password / username both re-ask the current password; contract in `decisions.md` (amended by D43: change password returns a fresh token).
 - D29: Server tests run on Vitest too (`npm test` in `vendor/chessbox-server/apps/api`).
 - D30: `weakpoints/<id>.json` = `{version, cards: {nodeId: {source, fsrs, log}}}`, full review log kept.
 - D31: Verdicts store `playedCp` / `preparedCp` from your side (mate = ±100 pawns); old ones count as no verdict.
@@ -44,11 +44,11 @@ A bare § means this file. `tasks.md` holds the ranked work; `decisions.md` hold
 - D39: WeakPoints skips deviations on your first 2 moves (TUNE).
 - D40: Drills can be limited to one branch ("1.e4 e6") or Everything; queue takes `mode` + `branchNodeId`.
 - D41: Random drills: random your-move position, play your next N (default 5) moves forward.
+- D43 (Planned): A password change signs out other devices via `User.tokenVersion`; the changing device gets a fresh token; any UNAUTHORIZED signs the desktop out; old tokens count as version 0.
 - D42: Four agents work in parallel (A1 lead + GUI, A2 repertoires, A3 board, A4 server + QA); all 4 review every branch, only A1 merges and writes plan docs (`agents/TEAM.md`).
 - D13: A saved session is cleared only when the server answers `UNAUTHORIZED` or `NOT_FOUND` (deleted account); unreachable / erroring server → stay signed in, toast, local features keep working.
 
 **Pending / Unconfirmed** (*not decided*; each with the condition that decides it):
-- **Revisit D27 (sign other devices out on password change):** chose A only *for now*. *Decide before the API leaves Tailscale or before stage 2, whichever comes first. Leading candidate: `passwordChangedAt` column checked in `createContext`.*
 - **Multi-threaded Stockfish (D14):** single-threaded for now (Harry, 2026-11-24). *Decide when Harry's D38 timing lands: if the 147-check pass is too slow, move the full verdict engine to an `app://` scheme with COOP/COEP (~5× nps at 4 threads, measured).*
 - Deadline: none stated in `system.md`. *Decide if a date matters.*
 
