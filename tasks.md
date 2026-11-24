@@ -77,11 +77,12 @@ Work **▶ Now** top to bottom. Tags: `[🟠 your call: …]` = a design decisio
 - [ ] **T40 · Account deletion (🟠 draft first)** · Done when: a 🟠 block covers what gets deleted (server account, local data, linked accounts), how it's confirmed, and what happens on other devices.
 
 **A2 · Features**
-- [ ] **T41 · Data + third-party audit** · Done when: a list of every piece of data ChessBox stores or sends (where, why, how long), every third-party package that runs at runtime and whether it talks to the network, plus which legal pages a personal, unpublished app actually needs. Sent to A1. Then Harry's feedback items.
+- [x] **T41 · Data + third-party audit** (A2 DOC 2026-11-24: no telemetry or third-party network calls; gaps: no delete-account endpoint, no way to delete imported games, email collected but unused, API request logs kept forever, CSP test leftover in `index.html:9`; legal pages needed: short privacy notice + credits/licences only) · Done when: a list of every piece of data ChessBox stores or sends (where, why, how long), every third-party package that runs at runtime and whether it talks to the network, plus which legal pages a personal, unpublished app actually needs. Sent to A1. Then Harry's feedback items.
 
 **A1 · Lead**
 - [ ] **T42 · README rewrite** · Done when: `documentation/README.md` reads like a professional project page (what it is, features, stack, setup, architecture link, credits), with no made-up stats or claims, and passes the avoid lists.
-- [ ] **T43 · Legal pages text** · Waits on T41: only the pages it says are needed.
+- [ ] **T43 · Privacy notice + credits text** · Done when: a short privacy notice (what's stored where, what's sent, how to delete) and a credits / licences section (Stockfish GPL-3, Flaticon, chessgraph, ts-fsrs, "not affiliated with Chess.com or Lichess") are written from T41's facts; readable in the app later (A3 places it).
+- [ ] **T44 · Delete imported games (🟠 draft, A2)** · Done when: a 🟠 block for deleting one account's imported games locally (new IPC channel, what else it touches: novelty results, weakpoints).
 
 ## 🅿️ Parked (ideas, not agreed work; offered when ▶ Now is empty)
 *Stage 2, from `system.md`:* repertoires on a server (maybe MongoDB, user details stay in Postgres) · email verification · MFA · Google sign-in / sign-up · AI move explanations (theory presets + interpreting Stockfish, no paid API keys) · AI "add suggestions" for repertoires · a private chess-theory knowledge base · multi-reply "acceptable alternatives" so a reasonable non-prep move isn't penalised (D17) · more toolkit tools.
