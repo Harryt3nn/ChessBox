@@ -110,7 +110,6 @@
   cursor: pointer;
   padding: 4px;
   user-select: none;
-  transition: color 0.15s;
 }
 
 .folder-btn-rename {

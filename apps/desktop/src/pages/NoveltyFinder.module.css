@@ -80,7 +80,6 @@
   letter-spacing: 0.03em;
   text-transform: uppercase;
   cursor: pointer;
-  transition: background 0.15s, transform 0.1s;
 }
 
 .importBtn:hover:not(:disabled) {

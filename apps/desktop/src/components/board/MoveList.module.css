@@ -20,7 +20,6 @@
 .move,
 .inline-move {
   cursor: pointer;
-  transition: background 0.1s, color 0.1s;
 }
 
 .move {
