@@ -533,7 +533,7 @@ return (
         <button className={styles.btnSecondary} onClick={() => fileInputRef.current?.click()} title="Open a .pgn file (or a FEN / saved board)">
           <img alt="" src={importIcon} className={iconStyles.icon} /> Import
         </button>
-        <input ref={fileInputRef} aria-label="Import file" type="file" accept=".pgn,.txt,.fen,.json" style={{ display: 'none' }} onChange={importFile} />
+        <input ref={fileInputRef} type="file" accept=".pgn,.txt,.fen,.json" style={{ display: 'none' }} onChange={importFile} />
 
         <button className={styles.btnSecondary} onClick={() => download(pgnFileName(tree), pgnText)} title="Download the game as a .pgn file">
           <img alt="" src={exportIcon} className={iconStyles.icon} /> Export

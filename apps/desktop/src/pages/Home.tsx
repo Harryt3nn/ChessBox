@@ -65,7 +65,8 @@ const Home = ({ setPage, currentUser }: HomeProps) => {
             <span className={styles.tileText}>Play through lines, explore variations, import and export PGN or FEN.</span>
           </button>
 
-          {/* Repertoires, with the most recently edited ones */}
+          {/* Repertoires, with the most recently edited ones. The whole tile takes a mouse click; its title row
+              is the real button, so keyboard users reach it and the tool buttons aren't nested in another button */}
           <div className={`${styles.tile} ${styles.tileWide}`} onClick={() => setPage('repertoires')}>
             <button type="button" className={`${styles.tileHead} ${styles.tileHeadButton}`} onClick={() => setPage('repertoires')}>
               <img alt="" src={repertoiresIcon} className={styles.tileIcon} />
