@@ -75,7 +75,6 @@ Work **▶ Now** top to bottom. Tags: `[🟠 your call: …]` = a design decisio
 - Tighten the CSP before packaging: drop `unsafe-eval` and `ws://localhost:3000` (`index.html`, `forge.config.ts`); keep `'wasm-unsafe-eval'` so Stockfish still loads. Ship Stockfish's full GPL text (`node_modules/stockfish/Copying.txt`) with releases.
 - Case-insensitive usernames (`Harry` and `harry` can both exist).
 - Graceful "server unreachable" UI.
-- Style `ImportModal.tsx` (it uses unstyled global class names).
 - Integration tests on server `auth.ts`.
 - Fix `docker-compose.yml` `Dockerfile` vs. tracked `dockerfile` case.
 - Server `.gitignore`: `apps/api/src/generated/`, `packages/shared/dist/`.
@@ -86,6 +85,7 @@ Work **▶ Now** top to bottom. Tags: `[🟠 your call: …]` = a design decisio
 - Infra: Pi SSD reliability (JMicron enclosure), two-node Pi 5 + Pi 2 load balancer, multi-stage Docker build (the image is ~2.4 GB), Redis rate-limit store if there's ever more than one API instance.
 
 ## ── Archived (superseded, do NOT action) ──
+- Style `ImportModal.tsx`: already done in 3f78ffd (T4). It uses `ImportModal.module.css` with camelCase exports (checked by A2, 2026-11-24).
 
 ## ✅ Done log (newest first)
 - 2026-11-21 00:40 · T21 + T24–T28 WeakPoints and Novelty Finder: FSRS drills (D21–D35), three modes Focused / Mistakes only / Random (D36, D37), opening branch filter (D40), early deviations skipped (D39), random forward drills (D41), automatic deviation verdicts with no Evaluate button (D38), game dates + times and game lists, deviations / novelties in one tabbed panel, board ↔ graph everywhere · `main@cf9f9ee` · 209 desktop tests · checked by Harry in the dev app: drills graded and saved (15 reviews across both repertoires, played moves logged), background check finished 33 of 33 deviations on the 1.e4 Repertoire; Italian's 147 not yet run
