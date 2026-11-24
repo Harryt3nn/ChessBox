@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { restoreAuthToken } from './trpc';
+import { changePassword, restoreAuthToken, setAuthToken, trpc } from './trpc';
 
 const user = { id: 'u1', username: 'harry', email: 'h@example.com', lichessName: null, chesscomName: null };
 
@@ -18,11 +18,12 @@ const serverError = () => new Response(
   { status: 500 },
 );
 
-const storage = { loadAuthToken: vi.fn(), clearAuthToken: vi.fn() };
+const storage = { loadAuthToken: vi.fn(), clearAuthToken: vi.fn(), saveAuthToken: vi.fn() };
 
 beforeEach(() => {
   storage.loadAuthToken.mockResolvedValue('saved-token');
   storage.clearAuthToken.mockReset();
+  storage.saveAuthToken.mockReset();
   vi.stubGlobal('window', { storage });
 });
 afterEach(() => vi.unstubAllGlobals());
@@ -60,5 +61,41 @@ describe('restoreAuthToken', () => {
     vi.stubGlobal('fetch', vi.fn(async () => serverError()));
     expect(await restoreAuthToken()).toEqual({ status: 'unverified' });
     expect(storage.clearAuthToken).not.toHaveBeenCalled();
+  });
+});
+
+describe('changePassword (D43)', () => {
+  const input = { currentPassword: 'correct-horse', newPassword: 'battery-staple' };
+  const changed = () => new Response(JSON.stringify([{ result: { data: { ok: true, token: 'fresh-token' } } }]), { status: 200 });
+  const wrongPassword = () => new Response(
+    JSON.stringify([{ error: { message: 'Current password is incorrect', code: -32001, data: { code: 'UNAUTHORIZED', httpStatus: 401, path: 'user.changePassword' } } }]),
+    { status: 401 },
+  );
+  const sentToken = (fetchMock: ReturnType<typeof vi.fn>, call: number) =>
+    new Headers((fetchMock.mock.calls[call][1] as RequestInit).headers).get('authorization');
+
+  it('swaps in the fresh token for the next request and saves it', async () => {
+    setAuthToken('old-token');
+    const fetchMock = vi.fn(async () => changed());
+    vi.stubGlobal('fetch', fetchMock);
+    await changePassword(input);
+    expect(storage.saveAuthToken).toHaveBeenCalledWith('fresh-token');
+
+    fetchMock.mockImplementation(async () => ok());
+    await trpc.auth.me.query();
+    expect(sentToken(fetchMock, 0)).toBe('Bearer old-token');
+    expect(sentToken(fetchMock, 1)).toBe('Bearer fresh-token');
+  });
+
+  it('keeps the old token when the current password is wrong', async () => {
+    setAuthToken('old-token');
+    const fetchMock = vi.fn(async () => wrongPassword());
+    vi.stubGlobal('fetch', fetchMock);
+    await expect(changePassword(input)).rejects.toMatchObject({ message: 'Current password is incorrect' });
+    expect(storage.saveAuthToken).not.toHaveBeenCalled();
+
+    fetchMock.mockImplementation(async () => ok());
+    await trpc.auth.me.query();
+    expect(sentToken(fetchMock, 1)).toBe('Bearer old-token');
   });
 });

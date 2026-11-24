@@ -1,6 +1,7 @@
 /* apps/desktop/src/trpc.ts */
 
 import type { AppRouter } from '@chessbox/shared/router';
+import type { ChangePasswordInput } from '@chessbox/shared';
 import type { inferRouterOutputs } from '@trpc/server';
 import { createTRPCClient, httpBatchLink, TRPCClientError } from '@trpc/client';
 
@@ -20,6 +21,14 @@ export const trpc = createTRPCClient<AppRouter>({
     }),
   ],
 });
+
+// D43: the change revokes every token, this one included, so the fresh token replaces it in
+// memory and on disk; otherwise the next request (or the next start) would sign this device out
+export async function changePassword(input: ChangePasswordInput) {
+  const { token } = await trpc.user.changePassword.mutate(input);
+  setAuthToken(token);
+  await window.storage.saveAuthToken(token);
+}
 
 export type RestoredSession =
   | { status: 'signedIn'; user: User }
