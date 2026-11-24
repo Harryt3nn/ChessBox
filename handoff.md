@@ -13,6 +13,14 @@ For the next session. One entry per handoff, at most ~15 lines.
 
 ---
 
+## 2026-11-24 18:45 · A1 lead: 2.0 under way, usage limit hit
+- **Done:** lanes D44 (A2 Features, A3 UI, A4 Security). Merged to `main@981958d`: T30 pt1, T31 tests, csp-leftover, T36 accessibility, tidy-after-a11y. Server `main@0c25879` = T29 (D43) + pentest fixes, **not deployed**. Research Passes 2–4. Moodboard: https://claude.ai/artifact/HWpo5fazbStkTH3xZjnGES.
+- **Open branches:** `readme-rewrite@dc4d116` (A2 + A3 approved older shas; needs re-approval from all 3, merge only after the Pi deploy) · `weakpoints-open-in-board@e0db23f` (F1 groundwork, waits on Harry's a/b/c) · `reserved-ids-test` (A4, uncommitted tests, waits on 🟠 9).
+- **Waiting on Harry:** Pi deploy · F1 a/b/c · F2 Stockfish · F3 Google (table) · T40 deletion + backups question · port 3001 binding (A4 rec A) · 🟠 1–9 · moodboard OK · check the local server `.env` (see the incident below).
+- **Next step:** log Harry's picks in decisions.md and route them: F1, 2, 3, 7, 9 → A2; 1, 4, 6, T40, F3, port → A4; moodboard → A3 (T37, token map ready). After the deploy: merge readme, A4 bumps the submodule pointer 0267f60 → 0c25879.
+- **Gotchas:** junction incident (below). Approvals name a sha. A2 relays Harry's answers from its own session.
+- **Commands:** `./ctx.sh sync` · `cd apps/desktop && npm test` · ListAgents (A2 chessbox-80, A3 chessbox-65, A4 chessbox-36).
+
 ## 2026-11-24 18:20 · Incident: main checkout's node_modules + server source deleted (fixed)
 - **What:** A3's `accessibility-pass` worktree had `node_modules` junctioned to the main checkout's (desktop + server). `git worktree remove --force` followed them: main's desktop and server `node_modules` emptied, and through npm's workspace junctions 40 tracked server files (`apps/api`, `packages/shared`) were deleted.
 - **Fixed:** `git checkout -- .` in `vendor/chessbox-server` (deletions only), `npm ci` in both. Desktop 211 + 2 expected fail, type-check clean, server 24 at `0267f60`.
