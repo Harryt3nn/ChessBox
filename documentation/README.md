@@ -142,6 +142,10 @@ The full list is in the Security section of [ARCHITECTURE.md](ARCHITECTURE.md#se
 - Engine: [Stockfish](https://stockfishchess.org) (GPL-3.0), shipped as a separate file with its licence.
 - Spaced repetition: [ts-fsrs](https://github.com/open-spaced-repetition/ts-fsrs).
 
+ChessBox is not affiliated with or endorsed by Chess.com or Lichess. It reads public game data through their published APIs.
+
+What ChessBox stores and sends is described in [PRIVACY.md](PRIVACY.md).
+
 ## License
 
 The code is MIT licensed, see [LICENSE](LICENSE). The icons in `apps/desktop/src/assets/icons/` are Flaticon assets used under a Premium licence and are **not** covered by the MIT licence; see [legal.md](legal.md).
