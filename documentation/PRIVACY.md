@@ -35,7 +35,7 @@ Nothing else leaves your computer. Stockfish runs on your machine.
 
 ## Credits and licences
 
-- Stockfish is free software under the GNU General Public License v3. It is shipped as a separate file with its licence, and its source is available at [github.com/official-stockfish/Stockfish](https://github.com/official-stockfish/Stockfish).
+- Stockfish is free software under the GNU General Public License v3. Its source is available at [github.com/official-stockfish/Stockfish](https://github.com/official-stockfish/Stockfish).
 - The icons are Flaticon assets used under a Flaticon Premium licence. The licence files are in `apps/desktop/src/assets/licenses/`.
 - The repertoire graph model and import format come from [chessgraph.net](https://chessgraph.net).
 - Spaced repetition uses [ts-fsrs](https://github.com/open-spaced-repetition/ts-fsrs) (MIT).

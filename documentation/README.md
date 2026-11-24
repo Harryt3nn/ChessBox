@@ -50,7 +50,7 @@ The graph model comes from [chessgraph.net](https://chessgraph.net), which repre
 
 Analysis runs on your machine. The server only handles accounts, so your repertoires and games stay on disk under `%APPDATA%/ChessBox/ChessBox-data/`.
 
-The API lives in a separate repository, [chessbox-server](https://github.com/Harryt3nn/chessbox-server). It is included here as a git submodule at `vendor/chessbox-server`, so the desktop app gets full tRPC type inference from the server's router.
+The API lives in a separate repository, [ChessBox-Server](https://github.com/Harryt3nn/ChessBox-Server). It is included here as a git submodule at `vendor/chessbox-server`, so the desktop app gets full tRPC type inference from the server's router.
 
 ## Repository layout
 
@@ -108,7 +108,7 @@ Full instructions are in [`vendor/chessbox-server/README.md`](../vendor/chessbox
 
 ```bash
 cd vendor/chessbox-server
-cp apps/api/.env.example apps/api/.env      # then fill in JWT_SECRET and POSTGRES_PASSWORD
+cp apps/api/.env.example apps/api/.env      # then fill in every value
 docker compose --env-file ./apps/api/.env up --build
 ```
 
@@ -130,7 +130,7 @@ Copy-Item -Recurse ..\..\node_modules\electron .\node_modules\electron
 
 - Passwords are hashed with Argon2id, and login takes the same time whether or not the username exists.
 - Sessions are JWTs, stored on disk encrypted by the operating system. Changing your password signs out your other devices.
-- Login and registration are rate-limited, and the API only accepts requests from an allow-list of origins.
+- Login and registration are rate-limited, and browsers can only call the API from an allow-list of origins (CORS).
 - The renderer runs sandboxed, and the main process re-checks everything that arrives over IPC or from an imported file.
 - The API is only reachable over Tailscale, and the database is never exposed outside its Docker network.
 
@@ -139,7 +139,7 @@ The full list is in the Security section of [ARCHITECTURE.md](ARCHITECTURE.md#se
 ## Credits
 
 - Repertoire graph model and import format: [chessgraph.net](https://chessgraph.net).
-- Engine: [Stockfish](https://stockfishchess.org) (GPL-3.0), shipped as a separate file with its licence.
+- Engine: [Stockfish](https://stockfishchess.org) (GPL-3.0). Its licence text will ship with packaged releases.
 - Spaced repetition: [ts-fsrs](https://github.com/open-spaced-repetition/ts-fsrs).
 
 ChessBox is not affiliated with or endorsed by Chess.com or Lichess. It reads public game data through their published APIs.
