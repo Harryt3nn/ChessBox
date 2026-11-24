@@ -94,7 +94,7 @@ const Analytics = () => {
                 <Icon src={s.glyph} size={12} />
                 {s.label}
               </span>
-              <span className={`${shared.statValue} ${shared.statValueEmpty}`}>—</span>
+              <span className={`${shared.statValue} ${shared.statValueEmpty}`}>No data yet</span>
             </div>
           ))}
         </div>

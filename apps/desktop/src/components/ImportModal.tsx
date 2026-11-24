@@ -88,7 +88,7 @@ export function ImportModal({ data, onClose, reloadData }: ImportModalProps) {
             </p>
             {conflicts.map(c => (
               <div key={`${c.repertoireId}:${c.nodeId}`} className={styles.conflict}>
-                <span className={styles.conflictLine}>{c.repertoireName} · {c.line}</span>
+                <span className={styles.conflictLine}>{c.repertoireName}: {c.line}</span>
                 <div className={styles.replies}>
                   {c.replies.map(r => (
                     <label key={r.id} className={styles.reply}>

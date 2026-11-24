@@ -96,6 +96,8 @@
 
 .stat-value-empty {
   color: var(--color-text-faint);
+  font-size: 15px;
+  font-weight: 500;
 }
 
 /* Segmented toggle (matches the BoardView SAN / FEN / PGN switcher) */

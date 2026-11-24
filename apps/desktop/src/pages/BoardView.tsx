@@ -366,7 +366,7 @@ const BoardView = ({ repertoire, focus, onOpenInGraph, onCloseRepertoire }: Boar
     try {
       const { tree: next, gameCount } = importPgn(pgnDraft);
       if (!confirmDiscard()) return;
-      replaceBoard(next, gameCount > 1 ? `That PGN had ${gameCount} games — the first one was imported.` : undefined);
+      replaceBoard(next, gameCount > 1 ? `That PGN had ${gameCount} games, so only the first one was imported.` : undefined);
     } catch (err) {
       setMessage({ kind: 'error', text: errorText(err) });
     }
@@ -475,7 +475,7 @@ return (
       {repertoire && (
         <div className={styles.repertoireBanner}>
           <span>
-            <strong>{repertoire.name}</strong> · plays {repertoire.side} · {unsaved > 0 ? `${unsaved} unsaved` : 'no unsaved moves'}
+            <strong>{repertoire.name}</strong>, plays {repertoire.side}, {unsaved > 0 ? `${unsaved} unsaved` : 'no unsaved moves'}
           </span>
           <div className={styles.bannerActions}>
             <button

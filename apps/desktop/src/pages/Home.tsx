@@ -111,7 +111,7 @@ const Home = ({ setPage, currentUser }: HomeProps) => {
               <img alt="" src={analyticsIcon} className={styles.tileIcon} />
               <span className={styles.tileTitle}>Analytics</span>
             </div>
-            <span className={styles.tileText}>Opening success rates across Chess.com and Lichess.</span>
+            <span className={styles.tileText}>Coming soon: how your openings score on Chess.com and Lichess.</span>
           </button>
 
           {/* Settings, showing which chess accounts are linked */}
