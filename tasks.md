@@ -4,8 +4,8 @@ Work **▶ Now** top to bottom. Tags: `[🟠 your call: …]` = a design decisio
 
 ## 📊 Latest (the only home of volatile facts)
 - **Updated:** 2026-11-21 00:40
-- **`main` at:** cf9f9ee (pushed) · **server `main`:** 1717269 (pushed, deployed to the Pi) · **open branches:** none · **Electron:** 42.11.18
-- **Tests:** desktop 209 passing (23 files) · server 17 passing (1 file, ~26 s) · **Builder:** 888-node Italian renders in ~1.2 s · **Lite engine (live board, D14):** d15 0.2–0.8 s, d20 1.8–7.2 s by position (A3, 2026-11-24) · **Verdict:** full Stockfish (single-threaded) depth 18 in ~4 s per finding · **Novelty run:** "Check all games" on White Aggressive Italian = 4,396 games in 22 s in the dev app (2,627 deviations, 1,757 novelties, 12 in prep) · **Walk alone:** ~3 ms / game · **WeakPoints sync + queue:** Italian ~130 ms, 106 cards on first sync (D30, D33) · **npm audit:** 47, build / dev tooling only
+- **`main` at:** cf9f9ee (pushed) · **server `main`:** 0267f60 (pushed, **not deployed**; Pi on 1717269) · **open branches:** `import-issue-tests` (A2, T31), `keep-fresh-token` (A4, T30) · **Electron:** 42.11.18
+- **Tests:** desktop 209 passing (23 files) · server 24 passing (1 file, ~26 s) · **Builder:** 888-node Italian renders in ~1.2 s · **Lite engine (live board, D14):** d15 0.2–0.8 s, d20 1.8–7.2 s by position (A3, 2026-11-24) · **Verdict:** full Stockfish (single-threaded) depth 18 in ~4 s per finding · **Novelty run:** "Check all games" on White Aggressive Italian = 4,396 games in 22 s in the dev app (2,627 deviations, 1,757 novelties, 12 in prep) · **Walk alone:** ~3 ms / game · **WeakPoints sync + queue:** Italian ~130 ms, 106 cards on first sync (D30, D33) · **npm audit:** 47, build / dev tooling only
 
 ## ▶ Now (ranked): stage-1 MVP from `system.md` (2026-11-18)
 **M1 · Layout**
@@ -53,13 +53,13 @@ Work **▶ Now** top to bottom. Tags: `[🟠 your call: …]` = a design decisio
 - [x] **T6 · Check B8 in the app** (Escape in "New Folder" may still create one).
 
 **Stage 2 · Auth (D43)**
-- [ ] **T29 · Server: token version (A4)** · Done when: migration adds `User.tokenVersion` (default 0); tokens carry `ver`; `createContext` rejects a mismatch and treats a missing `ver` as 0; `changePassword` bumps it and returns `{ok, token}` (shared type updated); server tests cover old token rejected, fresh token accepted, pre-deploy token accepted; reviewed by all 4, merged in ChessBox-Server, deployed to the Pi.
+- [ ] **T29 · Server: token version (A4)** (merged to server `main@0267f60`, pushed; deploy held until T30's token save is approved) · Done when: migration adds `User.tokenVersion` (default 0); tokens carry `ver`; `createContext` rejects a mismatch and treats a missing `ver` as 0; `changePassword` bumps it and returns `{ok, token}` (shared type updated); server tests cover old token rejected, fresh token accepted, pre-deploy token accepted; reviewed by all 4, merged in ChessBox-Server, deployed to the Pi.
 - [ ] **T30 · Desktop: keep the fresh token + sign out on UNAUTHORIZED (A4, Settings look A1)** · Done when: Settings saves the token from `changePassword`; any `UNAUTHORIZED` response clears the session and shows a toast; tested; submodule pointer bumped as its own commit. Waits on T29 deployed.
 
 **Prep for Harry (added 2026-11-24 so every agent has work; drafts only, nothing built until Harry picks)**
-- [ ] **T31 · Two import 🟠s drafted (A2)** · Done when: full 🟠 blocks for (a) orphan nodes piling up in `nodes.json` and (b) a Lichess idle timeout, each with a failing test showing the problem on a branch (not merged until Harry picks).
+- [x] **T31 · Two import 🟠s drafted (A2)** (branch `import-issue-tests` @ 04a2c99, 2 `it.fails` tests; 🟠s with Harry) · Done when: full 🟠 blocks for (a) orphan nodes piling up in `nodes.json` and (b) a Lichess idle timeout, each with a failing test showing the problem on a branch (not merged until Harry picks).
 - [ ] **T32 · Research: Chess.com game-review data for statistics (A2, after T31)** · Done when: a graded `Pass 2` (CLAUDE.md §9) on what Chess.com exposes (public API, PGN annotations, exports) and what per-repertoire stats it could feed, sent to A1.
-- [ ] **T33 · Research: move explanations with no paid API (A3)** · Done when: a graded `Pass 3` on theory presets (opening names / ECO tables) + Stockfish-based explanations + local models, with sizes and speeds from sources, sent to A1.
+- [x] **T33 · Research: move explanations with no paid API (A3)** (`research.md` Pass 3) · Done when: a graded `Pass 3` on theory presets (opening names / ECO tables) + Stockfish-based explanations + local models, with sizes and speeds from sources, sent to A1.
 
 ## 🅿️ Parked (ideas, not agreed work; offered when ▶ Now is empty)
 *Stage 2, from `system.md`:* repertoires on a server (maybe MongoDB, user details stay in Postgres) · email verification · MFA · Google sign-in / sign-up · AI move explanations (theory presets + interpreting Stockfish, no paid API keys) · AI "add suggestions" for repertoires · a private chess-theory knowledge base · multi-reply "acceptable alternatives" so a reasonable non-prep move isn't penalised (D17) · more toolkit tools.
