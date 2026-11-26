@@ -24,6 +24,20 @@ export function childrenOf(node: RawNode): string[] {
   return [];
 }
 
+/** ids reachable from `starts` through child moves, and through transposition links when `transpositions` is set */
+export function reachableIds(starts: string[], nodes: Record<string, Node>, transpositions: boolean): Set<string> {
+  const found = new Set<string>();
+  const stack = [...starts];
+  for (let id = stack.pop(); id !== undefined; id = stack.pop()) {
+    const node = lookup(nodes, id);
+    if (!node || found.has(id)) continue;
+    found.add(id);
+    stack.push(...childrenOf(node));
+    if (transpositions) stack.push(...(node.transpositionEdges ?? []).map(e => e.targetId));
+  }
+  return found;
+}
+
 function play(fen: string, san: string): string | null {
   try {
     const chess = new Chess(fen);

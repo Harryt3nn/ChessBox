@@ -3,7 +3,7 @@
 import { Chess, DEFAULT_POSITION } from 'chess.js';
 import type { Node } from '../types/Node';
 import type { Repertoire } from '../types/Repertoire';
-import { childrenOf } from '../chess/repertoireTree';
+import { childrenOf, reachableIds } from '../chess/repertoireTree';
 import { numberedLine } from '../chess/analysisTree';
 
 // one prepared reply per position on the repertoire's own move (D17). Files from chessgraph can
@@ -88,21 +88,8 @@ export function keepReplies(nodes: Record<string, Node>, repertoires: Repertoire
     out[nodeId] = copy as unknown as Node;
   }
 
-  const walk = (starts: string[], graph: Record<string, Node>, follow: boolean) => {
-    const found = new Set<string>();
-    const stack = [...starts];
-    for (let id = stack.pop(); id !== undefined; id = stack.pop()) {
-      const node = lookup(graph, id);
-      if (!node || found.has(id)) continue;
-      found.add(id);
-      stack.push(...childrenOf(node));
-      if (follow) stack.push(...(node.transpositionEdges ?? []).map(e => e.targetId));
-    }
-    return found;
-  };
-
-  const reachable = walk(repertoires.map(r => r.rootNodeId), out, true);
-  for (const id of walk(dropped, nodes, false)) {
+  const reachable = reachableIds(repertoires.map(r => r.rootNodeId), out, true);
+  for (const id of reachableIds(dropped, nodes, false)) {
     if (!reachable.has(id)) delete out[id];
   }
   return out;
