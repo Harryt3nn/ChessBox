@@ -9,6 +9,7 @@ import { PageHeader } from '../components/PageHeader';
 import shared from './PageShared.module.css';
 import styles from './WeakPoints.module.css';
 import type { Page } from '../types/Page';
+import type { BoardFocus } from './BoardView';
 import type { Repertoire } from '../types/Repertoire';
 import type { Node } from '../types/Node';
 import { branches, randomDrills, type Drill, type DrillSource } from '../weakpoints/lines';
@@ -19,6 +20,7 @@ import { numberedLine } from '../chess/analysisTree';
 
 interface WeakPointsProps {
   setPage: (page: Page) => void;
+  onOpenInBoard: (repertoire: Repertoire, focus: BoardFocus) => void;
 }
 
 type Mode = 'focused' | 'mistakes' | 'random';
@@ -32,9 +34,6 @@ const MODES: { id: Mode; label: string; hint: string }[] = [
 // opponent moves are played after a short pause so you can see them land
 const OPPONENT_DELAY_MS = 450;
 const SHOW_ANSWER_MS = 900;
-// how long the result stays up before the next drill starts by itself
-const NEXT_AFTER_RIGHT_MS = 700;
-const NEXT_AFTER_WRONG_MS = 1800;
 // a card you got wrong comes back in this session if FSRS wants it again within this window
 const SAME_SESSION_MS = 30 * 60_000;
 // (TUNE) D41: drills per Random session, and the length you can pick
@@ -50,7 +49,7 @@ const SOURCE_LABEL: Record<DrillSource, string> = {
 
 interface Session { drills: Drill[]; index: number; right: number; scored: number }
 
-const WeakPoints = ({ setPage }: WeakPointsProps) => {
+const WeakPoints = ({ setPage, onOpenInBoard }: WeakPointsProps) => {
   const storage = useMemo(() => new FileSystemStorageProvider(), []);
   const [repertoires, setRepertoires] = useState<Repertoire[]>([]);
   const [nodes, setNodes] = useState<Record<string, Node>>({});
@@ -125,8 +124,10 @@ const WeakPoints = ({ setPage }: WeakPointsProps) => {
   }
 
   const next = () => setSession(s => s && { ...s, index: s.index + 1 });
+  // D46: leaves the session with no confirm; grades are already saved and Random saves nothing
+  const openInBoard = (nodeId: string) => repertoire && onOpenInBoard(repertoire, { nodeId });
   const current = session?.drills[session.index] ?? null;
-  const drill = useDrill(current, onScored, next);
+  const drill = useDrill(current, onScored);
   const modeInfo = MODES.find(m => m.id === mode);
 
   return (
@@ -209,15 +210,14 @@ const WeakPoints = ({ setPage }: WeakPointsProps) => {
             )}
 
             {current && drill && session && (
-              <>
-                <span className={styles.progress}>
-                  Drill {session.index + 1} of {session.drills.length}, {session.right} of {session.scored} right first time
-                </span>
-                <span className={styles.source}>{SOURCE_LABEL[current.source]}</span>
-                <p className={styles.prompt}>{drill.prompt}</p>
-                {drill.feedback && <p className={drill.feedback.kind === 'right' ? styles.right : styles.wrong}>{drill.feedback.text}</p>}
-                <button className={shared.btnOutline} onClick={() => setSession(null)}>Stop</button>
-              </>
+              <DrillPanel
+                session={session}
+                current={current}
+                drill={drill}
+                onOpenInBoard={openInBoard}
+                onNext={next}
+                onStop={() => setSession(null)}
+              />
             )}
 
             {session && !current && (
@@ -241,6 +241,34 @@ const WeakPoints = ({ setPage }: WeakPointsProps) => {
     </main>
   );
 };
+
+/** the side panel during a drill; the board link only appears once the line is over, so it can't give the move away, and then waits for Next (D46) */
+export function DrillPanel({ session, current, drill, onOpenInBoard, onNext, onStop }: {
+  session: Session;
+  current: Drill;
+  drill: Pick<DrillView, 'prompt' | 'feedback' | 'done'>;
+  onOpenInBoard: (nodeId: string) => void;
+  onNext: () => void;
+  onStop: () => void;
+}) {
+  return (
+    <>
+      <span className={styles.progress}>
+        Drill {session.index + 1} of {session.drills.length}, {session.right} of {session.scored} right first time
+      </span>
+      <span className={styles.source}>{SOURCE_LABEL[current.source]}</span>
+      <p className={styles.prompt}>{drill.prompt}</p>
+      {drill.feedback && <p className={drill.feedback.kind === 'right' ? styles.right : styles.wrong}>{drill.feedback.text}</p>}
+      {drill.done && (
+        <div className={styles.drillActions}>
+          <button className={shared.btnOutline} onClick={() => onOpenInBoard(current.boardNodeId)}>Open in board</button>
+          <button className={shared.btnPrimary} onClick={onNext} autoFocus>Next</button>
+        </div>
+      )}
+      <button className={shared.btnOutline} onClick={onStop}>Stop</button>
+    </>
+  );
+}
 
 /** the board fills the right-hand column without pushing the page past the bottom of the window */
 function FittedBoard({ fen, orientation, onPieceDrop, draggable, squareStyles }: {
@@ -286,13 +314,14 @@ function FittedBoard({ fen, orientation, onPieceDrop, draggable, squareStyles }:
 }
 
 type Feedback = { kind: 'right' | 'wrong'; text: string } | null;
+type DrillView = NonNullable<ReturnType<typeof useDrill>>;
 
 /**
  * plays a drill out: the moves before `from` are set up silently, opponent moves are played for you,
  * your moves before `scoredFrom` are a forgiven lead-in, and each later one is reported to `onScored`.
- * A wrong move shows the right one, which is then played. When the line ends, the next drill starts by itself.
+ * A wrong move shows the right one, which is then played. When the line ends it reports `done` and waits.
  */
-function useDrill(drill: Drill | null, onScored: (drill: Drill, correct: boolean, played: string) => void, onDone: () => void) {
+function useDrill(drill: Drill | null, onScored: (drill: Drill, correct: boolean, played: string) => void) {
   const [state, setState] = useState<{ drill: Drill; chess: Chess; ply: number } | null>(null);
   const [fen, setFen] = useState('');
   const [feedback, setFeedback] = useState<Feedback>(null);
@@ -331,13 +360,6 @@ function useDrill(drill: Drill | null, onScored: (drill: Drill, correct: boolean
     return () => clearTimeout(timer);
   }, [ready, done, yourTurn, busy]);
 
-  // the line is over: move on once the result has been seen
-  useEffect(() => {
-    if (!done) return;
-    const timer = setTimeout(onDone, feedback?.kind === 'wrong' ? NEXT_AFTER_WRONG_MS : NEXT_AFTER_RIGHT_MS);
-    return () => clearTimeout(timer);
-  }, [done]);
-
   if (!ready) return null;
 
   function onPieceDrop(from: Square, to: Square, piece: string): boolean {
@@ -372,6 +394,7 @@ function useDrill(drill: Drill | null, onScored: (drill: Drill, correct: boolean
   return {
     fen,
     feedback,
+    done,
     onPieceDrop,
     draggable: yourTurn && !busy,
     prompt: done ? 'Drill complete.' : yourTurn ? (scored ? 'Your move: this one counts.' : 'Your move (warm-up).') : 'Opponent to move…',

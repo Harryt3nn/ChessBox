@@ -22,6 +22,7 @@ export interface Drill {
   line: string[]; // SAN from the repertoire's start: set-up moves, then the moves played out
   from: number; // moves before this index are set up silently
   scoredFrom: number; // your moves at or after this index count; earlier ones are a forgiven lead-in
+  boardNodeId: string; // the repertoire position at `scoredFrom`, where "Open in board" lands
 }
 
 export const has = (record: Record<string, unknown>, id: string) => Object.prototype.hasOwnProperty.call(record, id);
@@ -134,6 +135,7 @@ export function cardDrill(nodeId: string, source: DrillSource, pos: YourPosition
     line: [...pos.moves, pos.answer],
     from: Math.max(0, firstYours - 1),
     scoredFrom: pos.moves.length,
+    boardNodeId: nodeId,
   };
 }
 
@@ -191,6 +193,7 @@ export function randomDrills(
       line: [...start.moves, ...played],
       from: Math.max(0, start.moves.length - 1),
       scoredFrom: start.moves.length,
+      boardNodeId: startId,
     });
   }
   return drills;

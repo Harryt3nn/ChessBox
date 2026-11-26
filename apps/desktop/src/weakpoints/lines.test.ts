@@ -2,7 +2,9 @@ import { describe, expect, it } from 'vitest';
 import { DEFAULT_POSITION, Chess } from 'chess.js';
 import type { Node } from '../types/Node';
 import type { Repertoire } from '../types/Repertoire';
-import { branches, inBranch, randomDrills } from './lines';
+import { branches, cardDrill, inBranch, lineReader, randomDrills, type Drill } from './lines';
+import { repertoireToTree } from '../chess/repertoireTree';
+import { getNodeAtPath, pathToNode } from '../chess/analysisTree';
 
 const n = (id: string, parentId: string | null, move: string | null, kids: string[] = [], extra: Partial<Node> = {}): Node =>
   ({ id, parentId, move, childIDs: kids, ...extra });
@@ -92,5 +94,49 @@ describe('randomDrills', () => {
 
   it('gives nothing for an empty repertoire', () => {
     expect(randomDrills(rep, {}, { count: 5, yourMoves: 5, branchId: null })).toEqual([]);
+  });
+});
+
+// F1: "Open in board" must land on the position where the drill's counted moves start
+describe('boardNodeId', () => {
+  // what the analysis board shows when opened at the drill's node (T25's entry point)
+  const boardAt = (graphNodes: Record<string, Node>, d: Drill) => {
+    const { tree } = repertoireToTree(rep.rootNodeId, graphNodes);
+    const path = pathToNode(tree.root, d.boardNodeId);
+    return path && { plies: path.length, fen: getNodeAtPath(tree.root, path).fen };
+  };
+  const drillAt = (d: Drill) => {
+    const chess = new Chess(d.startFen);
+    for (const san of d.line.slice(0, d.scoredFrom)) chess.move(san);
+    return { plies: d.scoredFrom, fen: chess.fen() };
+  };
+
+  it('is the card itself for a scheduled drill', () => {
+    const pos = lineReader(rep, nodes).position('Nc6');
+    if (!pos) throw new Error('Nc6 should be a position you answer');
+    const d = cardDrill('Nc6', 'deviation', pos, 'white');
+    expect(d.boardNodeId).toBe('Nc6');
+    expect(boardAt(nodes, d)).toEqual(drillAt(d));
+  });
+
+  it('is the starting position of every random drill', () => {
+    const drills = randomDrills(rep, nodes, { count: 10, yourMoves: 3, branchId: null }, seq(0.3, 0.7, 0.1));
+    expect(drills.length).toBeGreaterThan(1);
+    for (const d of drills) expect(boardAt(nodes, d)).toEqual(drillAt(d));
+  });
+
+  it('opens a position also reached by a transposition on its own line, not the transposed one', () => {
+    // 1.Nf3 Nc6 2.e4 e5 transposes into 2...Nc6 of the main line
+    const withTransposition = {
+      ...nodes,
+      root: { ...nodes.root, childIDs: ['e4', 'tNf3'] },
+      tNf3: n('tNf3', 'root', 'Nf3', ['tNc6']), tNc6: n('tNc6', 'tNf3', 'Nc6', ['te4']),
+      te4: n('te4', 'tNc6', 'e4', [], { transpositionEdges: [{ targetId: 'Nc6', move: 'e5' }] }),
+    };
+    const drills = randomDrills(rep, withTransposition, { count: 20, yourMoves: 1, branchId: null }, seq(0));
+    const atNc6 = drills.find(d => d.boardNodeId === 'Nc6');
+    if (!atNc6) throw new Error('a random drill should start at Nc6');
+    expect(boardAt(withTransposition, atNc6)).toEqual(drillAt(atNc6));
+    expect(atNc6.line.slice(0, atNc6.scoredFrom)).toEqual(['e4', 'e5', 'Nf3', 'Nc6']);
   });
 });

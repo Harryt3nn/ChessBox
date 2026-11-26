@@ -82,3 +82,9 @@
   border-color: var(--color-danger-text);
   background: rgba(var(--color-coral-rgb), 0.18);
 }
+
+.drillActions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
