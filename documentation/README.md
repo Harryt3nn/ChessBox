@@ -66,7 +66,7 @@ See [ARCHITECTURE.md](ARCHITECTURE.md) for how the pieces fit together and [CHES
 
 ## Getting started
 
-### 1. Clone with the submodule
+### Clone with the submodule
 
 ```bash
 git clone --recurse-submodules https://github.com/Harryt3nn/ChessBox.git
@@ -74,7 +74,7 @@ git clone --recurse-submodules https://github.com/Harryt3nn/ChessBox.git
 git submodule update --init
 ```
 
-### 2. Install dependencies
+### Install dependencies
 
 The desktop app compiles the shared schemas straight from the submodule, so both need installing:
 
@@ -83,7 +83,7 @@ cd vendor/chessbox-server && npm install
 cd ../../apps/desktop && npm install
 ```
 
-### 3. Run the desktop app
+### Run the desktop app
 
 ```bash
 cd apps/desktop
@@ -94,7 +94,7 @@ The window opens once the console shows `[ForkTsCheckerWebpackPlugin] No errors 
 
 The app talks to the API at the address in `apps/desktop/src/trpc.ts`. Signing in needs that API running and reachable on the tailnet.
 
-### 4. Run the tests
+### Run the tests
 
 ```bash
 cd apps/desktop && npm test                               # desktop
@@ -102,7 +102,7 @@ cd vendor/chessbox-server/apps/api && npm test            # API
 npx --prefix apps/desktop tsc --noEmit -p tsconfig.json   # type-check, from the repository root
 ```
 
-### 5. Run the API
+### Run the API
 
 Full instructions are in [`vendor/chessbox-server/README.md`](../vendor/chessbox-server/README.md). In short:
 
