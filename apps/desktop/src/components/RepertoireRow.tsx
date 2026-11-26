@@ -3,7 +3,6 @@
 import React, { useState, useRef } from "react";
 import type { Repertoire } from "../types/Repertoire";
 import styles from './repertoireRow.module.css';
-import boardIcon from '../assets/icons/021-chess board.png';
 
 // small UI component for individual graphs inside an opened folder
 // returns raw html
@@ -30,9 +29,6 @@ const RepertoireRow: React.FC<Props> = ({ rep, onRename, onOpen, onBuild }) => {
   //render
   return (
     <div className={styles.repRow}>
-
-      <img alt="" src={boardIcon} className={styles.repRowIcon} />
-
       {editing ? (
         <input
           aria-label="Repertoire name"

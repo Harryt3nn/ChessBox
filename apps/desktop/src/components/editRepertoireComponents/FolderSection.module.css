@@ -1,139 +1,62 @@
-/*apps/desktop/src/components/editRepertoireComponents/FolderSelection.module.css*/
+/*apps/desktop/src/components/editRepertoireComponents/FolderSection.module.css*/
 
-/* Folder container */
+/* each folder sits on the brass double rule, like the sections on the other pages */
 .folder-section {
   margin-bottom: 28px;
-  user-select: none;
+  padding-top: 14px;
+  border-top: 3px double var(--color-rule);
 }
 
-.folder-section-header {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  margin-bottom: 14px;
-  color: var(--color-text-tertiary);
-  user-select: none;
-}
-
-.folder-chevron {
-  background: none;
-  border: none;
-  cursor: pointer;
-  color: var(--color-text-tertiary);
-  padding: 0;
-  display: flex;
-  align-items: center;
-  transition: transform 0.2s;
-  user-select: none;
-}
-
-.folder-chevron.collapsed {
-  transform: rotate(-90deg);
-  user-select: none;
-}
-
-.folder-chevron-icon {
-  font-size: 11px;
-  user-select: none;
-}
-
-.folder-toggle {
-  display: flex;
-  padding: 0;
-  background: none;
-  border: 0;
-  cursor: pointer;
-}
-
-.folder-icon {
-  width: 20px;
-  height: 20px;
-  cursor: pointer;
-  user-select: none;
-}
-
-.folder-section-title {
-  font-weight: 600;
-  font-size: 14px;
-  color: var(--color-text-secondary);
-  user-select: none;
-}
-
-.folder-section-count {
-  font-size: 12px;
-  margin-left: 2px;
-  color: var(--color-text-faint);
-  user-select: none;
-}
-
-.folder-section-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: 12px;
-  user-select: none;
-}
-
-.folder-section-empty {
-  color: var(--color-text-faint);
-  font-size: 13px;
-  padding: 8px 4px;
-  user-select: none;
-}
-
-/* Folder rows */
 .folder-header {
   display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 6px 0;
-  user-select: none;
+  align-items: baseline;
+  gap: 14px;
+  padding: 2px 0 8px;
 }
 
 .folder-name {
-  color: var(--color-text-primary);
-  font-size: 15px;
-  user-select: none;
+  color: var(--color-amber);
+  font-family: var(--font-display);
+  font-size: 22px;
+  letter-spacing: 0.04em;
 }
 
 .folder-input {
   background: none;
-  border: 1px solid rgba(var(--color-cream-rgb), 0.2);
-  border-radius: 4px;
-  padding: 2px 6px;
+  border: 1px solid var(--color-border);
+  padding: 4px 8px;
   color: var(--color-text-primary);
-  font-size: 14px;
-  user-select: none;
+  font-family: inherit;
+  font-size: 15px;
 }
 
 .folder-input-error {
   border-color: var(--color-danger-text);
-  user-select: none;
 }
 
+/* Show / Hide, Rename and Delete read as small tracked-capital text buttons */
+.folder-toggle,
 .folder-btn {
-  display: flex;
-  align-items: center;
+  padding: 4px 2px;
   background: none;
   border: none;
-  cursor: pointer;
-  padding: 4px;
-  user-select: none;
-}
-
-.folder-btn-rename {
-  color: var(--color-text-faint);
+  color: var(--color-text-tertiary);
+  font-family: inherit;
   font-size: 11px;
   font-weight: 600;
-  letter-spacing: 0.06em;
+  letter-spacing: 0.12em;
   text-transform: uppercase;
+  cursor: pointer;
 }
 
+.folder-toggle {
+  min-width: 3.5em;
+  text-align: left;
+}
+
+.folder-toggle:hover,
 .folder-btn-rename:hover {
   color: var(--color-amber);
-}
-
-.folder-btn-delete {
-  color: var(--color-text-faint);
 }
 
 .folder-btn-delete:hover {
@@ -141,16 +64,13 @@
 }
 
 .repertoire-list {
-  margin-left: 26px;
-  margin-top: 6px;
+  margin-left: calc(3.5em + 14px);
   display: flex;
   flex-direction: column;
-  gap: 6px;
-  user-select: none;
 }
 
 .repertoire-empty {
-  color: var(--color-text-faint);
+  padding: 8px 0;
+  color: var(--color-text-tertiary);
   font-size: 13px;
-  user-select: none;
 }

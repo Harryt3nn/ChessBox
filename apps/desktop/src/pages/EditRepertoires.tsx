@@ -12,12 +12,6 @@ import styles from './EditRepertoires.module.css';
 import FolderSelection from "../components/editRepertoireComponents/FolderSelection";
 import { UNCATEGORISED_ID, storedFolders, withUncategorised } from "../components/editRepertoireComponents/uncategorised";
 import { newRepertoire } from "../builder/graph";
-import { Icon } from "../components/Icon";
-import folderPlusIcon from "../assets/icons/213-folder-3.png";
-import folderIcon from "../assets/icons/096-folder-29.png";
-import plusGlyph from "../assets/icons/018-plus.png";
-import importGlyph from "../assets/icons/015-download.png";
-import searchGlyph from "../assets/icons/032-search.png";
 
 
 
@@ -187,15 +181,12 @@ return (
       <h1>Your Repertoires</h1>
       <div className={styles.topbarActions}>
         <button className={styles.btnOutline} onClick={() => setCreatingFolder(true)}>
-          <img alt="" src={folderPlusIcon} className={styles.btnImg} />
           New Folder
         </button>
         <button className={styles.btnPrimary} onClick={() => setCreatingGraph(true)}>
-          <Icon src={plusGlyph} size={14} />
           New Graph
         </button>
         <button className={styles.btnOutline} onClick={handleImportClick}>
-          <Icon src={importGlyph} size={14} />
           Import JSON
         </button>
       </div>
@@ -205,13 +196,12 @@ return (
     {/* Search */}
     <div className={styles.searchContainer}>
       <div className={styles.searchWrapper}>
-        <Icon src={searchGlyph} size={14} className={styles.searchIcon} />
         <input
           aria-label="Search repertoires"
           className={styles.searchInput}
           value={search}
           onChange={e => setSearch(e.target.value)}
-          placeholder="Search repertoires..."/>
+          placeholder="Search repertoires"/>
       </div>
     </div>
 
@@ -244,7 +234,6 @@ return (
     {creatingFolder && (
       <div className={styles.newFolderContainer}>
         <div className={styles.newFolderInput}>
-          <img alt="" src={folderIcon} className={styles.btnImg} />
           <input
             aria-label="New folder name"
             ref={newFolderRef}

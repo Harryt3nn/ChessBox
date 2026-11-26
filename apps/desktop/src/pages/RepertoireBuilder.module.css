@@ -12,14 +12,16 @@
   align-items: center;
   gap: 16px;
   padding: 14px 24px;
-  border-bottom: 1px solid var(--color-border);
+  border-bottom: 3px double var(--color-rule);
   flex-shrink: 0;
 }
 
 .title {
   color: var(--color-amber);
-  font-size: 20px;
-  letter-spacing: 0.02em;
+  font-family: var(--font-display);
+  font-size: 26px;
+  font-weight: 400;
+  letter-spacing: 0.04em;
 }
 
 .meta {
@@ -50,10 +52,10 @@
 /* React Flow's own chrome (zoom buttons, grid, edge labels) in the app palette, not its white defaults */
 .canvas :global(.react-flow) {
   --xy-background-color: var(--color-void);
-  --xy-background-pattern-color: var(--color-surface-3);
-  --xy-controls-button-background-color: var(--color-surface-2);
-  --xy-controls-button-background-color-hover: var(--color-surface-3);
-  --xy-controls-button-color: var(--color-text-secondary);
+  --xy-background-pattern-color: var(--color-rule);
+  --xy-controls-button-background-color: var(--color-void);
+  --xy-controls-button-background-color-hover: var(--color-surface-1);
+  --xy-controls-button-color: var(--color-amber);
   --xy-controls-button-color-hover: var(--color-amber);
   --xy-controls-button-border-color: var(--color-border);
   --xy-controls-box-shadow: none;
@@ -76,17 +78,19 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: var(--color-surface-2);
-  border: 1px solid var(--color-border-strong);
+  background: var(--color-surface-1);
+  border: 1px solid var(--color-border);
   color: var(--color-text-primary);
+  font-family: var(--font-mono);
   font-size: 13px;
-  font-weight: 600;
+  font-weight: 500;
   cursor: pointer;
 }
 
 .node-selected {
-  border-color: var(--color-amber);
-  box-shadow: 0 0 0 2px rgba(var(--color-amber-rgb), 0.4);
+  background: var(--color-surface-2);
+  outline: 2px solid var(--color-amber-hover);
+  outline-offset: 2px;
 }
 
 .comment-dot {
@@ -108,9 +112,9 @@
   height: 16px;
   padding: 0 4px;
   background: var(--color-surface-1);
-  border: 1px solid var(--color-border-strong);
+  border: 1px solid var(--color-border);
   color: var(--color-text-tertiary);
-  font-family: inherit;
+  font-family: var(--font-mono);
   font-size: 10px;
   font-weight: 700;
   line-height: 14px;
@@ -136,7 +140,7 @@
 }
 
 .edge :global(.react-flow__edge-path) {
-  stroke: var(--color-border-strong);
+  stroke: var(--color-border);
 }
 
 .transposition :global(.react-flow__edge-path) {
@@ -153,14 +157,15 @@
   gap: 10px;
   padding: 20px 24px;
   background: var(--color-surface-1);
-  border-left: 1px solid var(--color-border);
+  border-left: 1px solid var(--color-rule);
   overflow-y: auto;
 }
 
 .panel-title {
-  color: var(--color-text-primary);
-  font-size: 15px;
-  font-weight: 700;
+  color: var(--color-amber);
+  font-family: var(--font-mono);
+  font-size: 16px;
+  font-weight: 500;
 }
 
 .hint {
@@ -171,7 +176,7 @@
 .comment {
   min-height: 90px;
   padding: 8px 10px;
-  background: var(--color-surface-2);
+  background: var(--color-void);
   border: 1px solid var(--color-border);
   color: var(--color-text-primary);
   font-family: inherit;
@@ -192,26 +197,26 @@
 }
 
 .btn {
-  padding: 7px 12px;
+  padding: 8px 12px;
   background: none;
-  border: 1px solid var(--color-border-strong);
-  color: var(--color-text-secondary);
+  border: 1px solid var(--color-border);
+  color: var(--color-amber-hover);
   font-family: inherit;
   font-size: 12px;
-  font-weight: 700;
-  letter-spacing: 0.04em;
+  font-weight: 600;
+  letter-spacing: 0.12em;
   text-transform: uppercase;
   cursor: pointer;
 }
 
 .btn:disabled {
-  opacity: 0.4;
+  border-color: var(--color-rule);
+  color: var(--color-text-tertiary);
   cursor: default;
 }
 
 .btn:hover:not(:disabled) {
-  color: var(--color-amber);
-  border-color: var(--color-amber);
+  background: var(--color-surface-2);
 }
 
 .danger:hover {

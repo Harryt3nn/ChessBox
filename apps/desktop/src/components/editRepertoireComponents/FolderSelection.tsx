@@ -5,10 +5,6 @@ import type { Folder } from "../../types/Folder";
 import type { Repertoire } from "../../types/Repertoire";
 import RepertoireRow from "../RepertoireRow";
 import styles from "./FolderSection.module.css";
-import { Icon } from "../Icon";
-import folderClosedIcon from "../../assets/icons/096-folder-29.png";
-import folderOpenIcon from "../../assets/icons/196-folder-8.png";
-import removeGlyph from "../../assets/icons/031-remove.png";
 import { UNCATEGORISED_ID } from "./uncategorised";
 
 // UI component to display available 'folders' (JSON objects)
@@ -73,9 +69,9 @@ const FolderSelection: React.FC<FolderSelectionProps> = ({folder, repertoires, o
           className={styles.folderToggle}
           onClick={() => onToggle(folder.id)}
           aria-expanded={!folder.collapsed}
-          aria-label={`${folder.collapsed ? 'Open' : 'Close'} folder ${folder.name}`}
+          aria-label={`${folder.collapsed ? 'Show' : 'Hide'} folder ${folder.name}`}
         >
-          <img alt="" src={folder.collapsed ? folderClosedIcon : folderOpenIcon} className={styles.folderIcon} />
+          {folder.collapsed ? 'Show' : 'Hide'}
         </button>
 
         {/* Folder Name or Input */}
@@ -117,7 +113,7 @@ const FolderSelection: React.FC<FolderSelectionProps> = ({folder, repertoires, o
             className={`${styles.folderBtn} ${styles.folderBtnDelete}`}
             title="Delete folder"
           >
-            <Icon src={removeGlyph} size={14} />
+            Delete
           </button>
         )}
       </div>
