@@ -36,6 +36,24 @@ describe('sanitiseImport', () => {
     expect(result.nodes.root.childIDs).toEqual(['a']);
   });
 
+  // chessgraph files carry both childIds and children, often with one of them empty; childrenOf
+  // reads the first non-empty list, so the sanitiser must too or a re-save drops the children
+  it('takes children when childIds is empty', () => {
+    const result = sanitiseImport({
+      repertoires: [rep()],
+      nodes: [{ id: 'root', move: null, childIds: [], children: ['a'] }, node('a')],
+    });
+    expect(result.nodes.root.childIDs).toEqual(['a']);
+  });
+
+  it('gives no children when every list is empty', () => {
+    const result = sanitiseImport({
+      repertoires: [rep()],
+      nodes: [{ id: 'root', move: null, childIDs: [], childIds: [], children: [] }],
+    });
+    expect(result.nodes.root.childIDs).toEqual([]);
+  });
+
   it.each(['../evil', '..\\evil', 'a/b', '', 'x'.repeat(65)])('rejects the unsafe id %j', id => {
     const result = sanitiseImport({ repertoires: [rep(), rep({ id })], nodes: [node('root')] });
     expect(result.repertoires.map(r => r.id)).toEqual(['rep1']);

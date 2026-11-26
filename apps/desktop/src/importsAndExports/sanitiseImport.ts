@@ -122,8 +122,9 @@ export function sanitiseRepertoire(r: unknown, now = Date.now()): Repertoire | n
 export function sanitiseNode(n: Record<string, unknown>): Node | null {
   if (!isSafeId(n.id)) return null;
 
-  // chessgraph exports have used childIds / children for the same list
-  const rawChildren = Array.isArray(n.childIDs) ? n.childIDs : Array.isArray(n.childIds) ? n.childIds : Array.isArray(n.children) ? n.children : [];
+  // chessgraph exports have used childIds / children for the same list, often with one left empty;
+  // first non-empty wins, as in childrenOf (repertoireTree.ts)
+  const rawChildren = [n.childIDs, n.childIds, n.children].find((list): list is unknown[] => Array.isArray(list) && list.length > 0) ?? [];
   const childIDs = [...new Set(rawChildren.filter(isSafeId))].slice(0, IMPORT_LIMITS.maxChildren);
 
   const move = cleanString(n.move, IMPORT_LIMITS.maxMoveLength);
