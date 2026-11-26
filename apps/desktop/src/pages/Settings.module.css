@@ -15,9 +15,10 @@
   width: 100%;
   max-width: 560px;
   color: var(--color-amber);
-  font-size: 22px;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
+  font-family: var(--font-display);
+  font-size: 32px;
+  font-weight: 400;
+  letter-spacing: 0.05em;
 }
 
 .section {
@@ -26,21 +27,20 @@
   display: flex;
   flex-direction: column;
   gap: 12px;
-  padding: 20px 24px;
-  background: var(--color-surface-1);
-  border: 1px solid var(--color-border);
+  padding: 18px 0 8px;
+  border-top: 3px double var(--color-rule);
 }
 
 .heading {
-  color: var(--color-text-tertiary);
+  color: var(--color-text-secondary);
   font-size: 12px;
-  font-weight: 700;
-  letter-spacing: 0.08em;
+  font-weight: 600;
+  letter-spacing: 0.14em;
   text-transform: uppercase;
 }
 
 .hint {
-  color: var(--color-text-faint);
+  color: var(--color-text-tertiary);
   font-size: 12px;
   line-height: 1.5;
 }
@@ -58,16 +58,18 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: var(--color-amber);
-  color: var(--color-ink);
-  font-size: 20px;
-  font-weight: 700;
+  border: 1px solid var(--color-border);
+  outline: 1px solid var(--color-rule);
+  outline-offset: -5px;
+  color: var(--color-amber);
+  font-family: var(--font-display);
+  font-size: 22px;
 }
 
 .name {
   color: var(--color-text-primary);
   font-size: 17px;
-  font-weight: 700;
+  font-weight: 600;
 }
 
 .push {
@@ -81,7 +83,7 @@
   align-items: center;
   gap: 4px 12px;
   padding: 10px 0;
-  border-top: 1px solid var(--color-border);
+  border-top: 1px solid var(--color-rule);
 }
 
 .site-row > p {
@@ -132,7 +134,7 @@
 
 .input {
   padding: 8px 10px;
-  background: var(--color-surface-2);
+  background: transparent;
   border: 1px solid var(--color-border);
   color: var(--color-text-primary);
   font-family: inherit;
@@ -151,32 +153,43 @@
 }
 
 .btn {
-  padding: 7px 12px;
+  padding: 8px 14px;
   background: none;
-  border: 1px solid var(--color-border-strong);
-  color: var(--color-text-secondary);
+  border: 1px solid var(--color-border);
+  color: var(--color-amber-hover);
   font-family: inherit;
   font-size: 12px;
-  font-weight: 700;
-  letter-spacing: 0.04em;
+  font-weight: 600;
+  letter-spacing: 0.12em;
   text-transform: uppercase;
+  white-space: nowrap;
   cursor: pointer;
 }
 
 .btn:hover:not(:disabled) {
-  color: var(--color-amber);
-  border-color: var(--color-amber);
+  background: var(--color-surface-1);
 }
 
 .btn:disabled {
-  opacity: 0.4;
+  border-color: var(--color-rule);
+  color: var(--color-text-tertiary);
   cursor: default;
 }
 
+/* stepped brass, like the shared primary button */
 .primary {
   background: var(--color-amber);
   border-color: var(--color-amber);
   color: var(--color-ink);
+  clip-path: polygon(6px 0, calc(100% - 6px) 0, 100% 6px, 100% calc(100% - 6px), calc(100% - 6px) 100%, 6px 100%, 0 calc(100% - 6px), 0 6px);
+}
+
+.primary:focus-visible {
+  clip-path: none;
+}
+
+.primary:disabled {
+  background: var(--color-surface-1);
 }
 
 .primary:hover:not(:disabled) {

@@ -6,7 +6,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: rgba(23, 32, 26, 0.7);
+  background: rgba(15, 18, 17, 0.85);
   z-index: 100;
 }
 
@@ -16,18 +16,24 @@
   gap: 14px;
   width: min(560px, calc(100vw - 32px));
   max-height: calc(100vh - 64px);
-  padding: 24px 28px;
-  background: var(--color-surface-1);
-  border: 1px solid var(--color-border-strong);
-  clip-path: polygon(14px 0, 100% 0, 100% calc(100% - 14px), calc(100% - 14px) 100%, 0 100%, 0 14px);
+  padding: 32px 36px;
+  /* the one bracketed panel on screen while it is open */
+  --bracket: linear-gradient(var(--color-amber), var(--color-amber));
+  background:
+    var(--bracket) top 8px left 8px / 24px 1px no-repeat,
+    var(--bracket) top 8px left 8px / 1px 24px no-repeat,
+    var(--bracket) bottom 8px right 8px / 24px 1px no-repeat,
+    var(--bracket) bottom 8px right 8px / 1px 24px no-repeat,
+    var(--color-surface-1);
   overflow-y: auto;
 }
 
 .title {
   color: var(--color-amber);
-  font-size: 18px;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
+  font-family: var(--font-display);
+  font-size: 28px;
+  font-weight: 400;
+  letter-spacing: 0.05em;
 }
 
 .hint {
@@ -59,8 +65,8 @@
 .group-name {
   color: var(--color-text-secondary);
   font-size: 11px;
-  font-weight: 700;
-  letter-spacing: 0.08em;
+  font-weight: 600;
+  letter-spacing: 0.14em;
   text-transform: uppercase;
 }
 
@@ -75,7 +81,7 @@
 }
 
 .side {
-  color: var(--color-text-faint);
+  color: var(--color-text-tertiary);
   font-size: 11px;
   text-transform: uppercase;
   letter-spacing: 0.06em;
@@ -86,13 +92,13 @@
   align-items: center;
   justify-content: space-between;
   gap: 12px;
-  padding: 8px 10px;
-  background: var(--color-surface-2);
-  border: 1px solid var(--color-border);
+  padding: 8px 0;
+  border-bottom: 1px solid var(--color-rule);
 }
 
 .conflict-line {
   color: var(--color-text-secondary);
+  font-family: var(--font-mono);
   font-size: 12px;
 }
 
@@ -109,13 +115,14 @@
   margin-top: 4px;
 }
 
+/* the same pair as PageShared: stepped brass primary, brass double-line outline */
 .btn-primary,
 .btn-outline {
-  padding: 9px 16px;
+  padding: 10px 18px;
   font-family: inherit;
   font-size: 12px;
-  font-weight: 700;
-  letter-spacing: 0.04em;
+  font-weight: 600;
+  letter-spacing: 0.14em;
   text-transform: uppercase;
   cursor: pointer;
 }
@@ -123,21 +130,36 @@
 .btn-primary {
   background: var(--color-amber);
   color: var(--color-ink);
-  border: 1px solid var(--color-amber);
+  border: none;
+  clip-path: polygon(6px 0, calc(100% - 6px) 0, 100% 6px, 100% calc(100% - 6px), calc(100% - 6px) 100%, 6px 100%, 0 calc(100% - 6px), 0 6px);
+}
+
+.btn-primary:focus-visible {
+  clip-path: none;
+}
+
+.btn-primary:hover:not(:disabled) {
+  background: var(--color-amber-hover);
 }
 
 .btn-primary:disabled {
-  opacity: 0.45;
+  background: var(--color-surface-2);
+  color: var(--color-text-tertiary);
   cursor: not-allowed;
 }
 
 .btn-outline {
   background: transparent;
-  color: var(--color-text-secondary);
-  border: 1px solid var(--color-border-strong);
+  color: var(--color-amber-hover);
+  border: 1px solid var(--color-border);
+  outline: 1px solid var(--color-border);
+  outline-offset: -4px;
+}
+
+.btn-outline:focus-visible {
+  outline-offset: 2px;
 }
 
 .btn-outline:hover {
-  color: var(--color-amber);
-  border-color: var(--color-amber);
+  background: var(--color-surface-2);
 }

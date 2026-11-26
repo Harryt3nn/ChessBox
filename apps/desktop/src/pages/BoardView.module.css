@@ -345,3 +345,10 @@
   gap: 8px;
   flex-shrink: 0;
 }
+
+/* tracked capitals wrap onto two lines in the banner's narrow buttons, so keep each on one line */
+.bannerActions .btnSecondary {
+  flex: none;
+  white-space: nowrap;
+  letter-spacing: 0.08em;
+}
