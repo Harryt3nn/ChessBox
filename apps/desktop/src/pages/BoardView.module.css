@@ -10,8 +10,13 @@
   align-items: flex-start;
 }
 
+/* the board sits in a brass double frame, like the Home tiles */
 .boardContainer {
   flex-shrink: 0;
+  padding: 10px;
+  border: 1px solid var(--color-border);
+  outline: 1px solid var(--color-rule);
+  outline-offset: -5px;
 }
 
 /* eval bar + board */
@@ -30,17 +35,13 @@
   min-width: 0;
 }
 
-/* TOGGLE — FEN / PGN switcher */
+/* FEN / PGN switcher */
 
 .toggleWrapper {
   display: flex;
-  background: var(--color-surface-2);
-  border: 1px solid var(--color-border-strong);
-  clip-path: polygon(8px 0, 100% 0, 100% calc(100% - 8px), calc(100% - 8px) 100%, 0 100%, 0 8px);
-  overflow: hidden;
+  border: 1px solid var(--color-border);
 }
 
-.sanToggleBtn,
 .fenToggleBtn,
 .pgnToggleBtn {
   flex: 1;
@@ -49,44 +50,57 @@
   color: var(--color-text-secondary);
   border: none;
   cursor: pointer;
-  font-size: 13px;
+  font-family: inherit;
+  font-size: 12px;
   font-weight: 600;
-  letter-spacing: 0.04em;
+  letter-spacing: 0.14em;
   text-transform: uppercase;
   text-align: center;
 }
 
-.fenToggleBtn,
 .pgnToggleBtn {
-  border-left: 1px solid var(--color-border-strong);
+  border-left: 1px solid var(--color-border);
 }
 
-.sanToggleBtn:hover,
 .fenToggleBtn:hover,
 .pgnToggleBtn:hover {
   color: var(--color-amber);
 }
 
-.sanToggleBtn.toggleActive,
 .fenToggleBtn.toggleActive,
 .pgnToggleBtn.toggleActive {
   background: var(--color-amber);
   color: var(--color-ink);
 }
 
-/* Move list panel */
-.moveHistory,
+/* Move list and FEN / PGN boxes: baize panels marked by two brass corner brackets.
+   The brackets are backgrounds, not pseudo-elements, so they stay put while the list scrolls */
+.moveListScroll,
 .fenDisplay,
 .pgnDisplay {
-  background: var(--color-surface-2);
-  border: 1px solid var(--color-border);
-  clip-path: polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px);
-  padding: 12px 16px;
+  --bracket: linear-gradient(var(--color-amber), var(--color-amber));
+  background:
+    var(--bracket) top 5px left 5px / 18px 1px no-repeat,
+    var(--bracket) top 5px left 5px / 1px 18px no-repeat,
+    var(--bracket) bottom 5px right 5px / 18px 1px no-repeat,
+    var(--bracket) bottom 5px right 5px / 1px 18px no-repeat,
+    var(--color-surface-1);
+  padding: 14px 18px;
   color: var(--color-text-secondary);
   font-size: 14px;
   line-height: 1.8;
   flex: 1;
   overflow-y: auto;
+}
+
+.moveListScroll {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  min-height: 140px;
+}
+
+.fenDisplay,
+.pgnDisplay {
   min-height: 0;
 }
 
@@ -117,24 +131,24 @@
   color: var(--color-text-primary);
 }
 
+.moveListScroll::-webkit-scrollbar,
 .pgnDisplay::-webkit-scrollbar {
   width: 6px;
 }
 
+.moveListScroll::-webkit-scrollbar-track,
 .pgnDisplay::-webkit-scrollbar-track {
   background: transparent;
 }
 
+.moveListScroll::-webkit-scrollbar-thumb,
 .pgnDisplay::-webkit-scrollbar-thumb {
-  background: var(--color-surface-3);
+  background: var(--color-rule);
 }
 
+.moveListScroll::-webkit-scrollbar-thumb:hover,
 .pgnDisplay::-webkit-scrollbar-thumb:hover {
-  background: var(--color-border-strong);
-}
-
-.pgnDisplayEmpty {
-  color: var(--color-text-faint);
+  background: var(--color-border);
 }
 
 /* Navigation arrow buttons */
@@ -142,75 +156,86 @@
   display: flex;
   gap: 8px;
   justify-content: center;
-  flex-shrink: 0;
 }
 
 .navArrow {
+  display: flex;
+  align-items: center;
   background: none;
   border: 1px solid var(--color-border);
   padding: 8px 14px;
   cursor: pointer;
-  color: inherit;
-  font-size: 14px;
+  color: var(--color-amber);
 }
 
 .navArrow:hover:not(:disabled) {
-  border-color: var(--color-amber);
-  color: var(--color-amber);
+  background: var(--color-surface-1);
+  color: var(--color-amber-hover);
 }
 
 .navArrow:disabled {
-  opacity: 0.3;
+  border-color: var(--color-rule);
+  color: var(--color-rule);
   cursor: not-allowed;
 }
 
-/* Save / Load / Reset row */
+/* Import / Export / Flip / Reset row */
 .boardPanelActions {
   display: flex;
   gap: 8px;
-  flex-shrink: 0;
 }
 
+/* the brass double line of the outline button */
 .btnSecondary {
   flex: 1;
-  padding: 8px 10px;
+  padding: 9px 10px;
   background: none;
-  border: 1px solid var(--color-border-strong);
+  border: 1px solid var(--color-border);
+  outline: 1px solid var(--color-border);
+  outline-offset: -4px;
   cursor: pointer;
-  color: var(--color-text-secondary);
+  color: var(--color-amber-hover);
   font-family: var(--font-body);
-  font-size: 13px;
+  font-size: 12px;
   font-weight: 600;
-  letter-spacing: 0.03em;
+  letter-spacing: 0.12em;
   text-transform: uppercase;
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 6px;
+}
+
+.btnSecondary:focus-visible {
+  outline-offset: 2px;
 }
 
 .btnSecondary:hover {
-  border-color: var(--color-amber);
-  color: var(--color-amber);
+  background: var(--color-surface-1);
 }
 
+/* stepped brass, like the primary button */
 .btnReset {
   flex: 1;
-  padding: 8px 10px;
+  padding: 9px 10px;
   border: none;
-  clip-path: polygon(6px 0, 100% 0, 100% calc(100% - 6px), calc(100% - 6px) 100%, 0 100%, 0 6px);
+  clip-path: polygon(6px 0, calc(100% - 6px) 0, 100% 6px, 100% calc(100% - 6px), calc(100% - 6px) 100%, 6px 100%, 0 calc(100% - 6px), 0 6px);
   background: var(--color-amber);
   color: var(--color-ink);
   font-family: var(--font-body);
-  font-size: 13px;
-  font-weight: 700;
-  letter-spacing: 0.03em;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
   text-transform: uppercase;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 6px;
+}
+
+.btnReset:focus-visible {
+  clip-path: none;
 }
 
 .btnReset:hover {
@@ -223,12 +248,13 @@
   justify-content: space-between;
   align-items: baseline;
   gap: 12px;
-  flex-shrink: 0;
-  padding: 0 2px;
+  padding: 0 2px 6px;
+  border-bottom: 3px double var(--color-rule);
   color: var(--color-text-secondary);
-  font-size: 13px;
+  font-size: 12px;
   font-weight: 600;
-  letter-spacing: 0.03em;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
 }
 
 .statusOver {
@@ -238,6 +264,8 @@
 .players {
   color: var(--color-text-tertiary);
   font-weight: 400;
+  letter-spacing: normal;
+  text-transform: none;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -251,6 +279,7 @@
 .btnPrimarySmall {
   background: var(--color-amber);
   border-color: var(--color-amber);
+  outline: none;
   color: var(--color-ink);
 }
 
@@ -274,36 +303,6 @@
   color: var(--color-text-tertiary);
 }
 
-/* Scrollable move list only — no longer contains nav/actions/FEN/PGN */
-.moveListScroll {
-  background: var(--color-surface-2);
-  border: 1px solid var(--color-border);
-  clip-path: polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px);
-  padding: 12px 16px;
-  color: var(--color-text-secondary);
-  font-size: 14px;
-  line-height: 1.8;
-  flex: 1;
-  overflow-y: auto;
-  min-height: 140px;
-}
-
-.moveListScroll::-webkit-scrollbar {
-  width: 6px;
-}
-
-.moveListScroll::-webkit-scrollbar-track {
-  background: transparent;
-}
-
-.moveListScroll::-webkit-scrollbar-thumb {
-  background: var(--color-surface-3);
-}
-
-.moveListScroll::-webkit-scrollbar-thumb:hover {
-  background: var(--color-border-strong);
-}
-
 /* Always-visible FEN/PGN box, pinned at the bottom of the panel */
 .dataPanel {
   /* gives way first when the panel is crowded (repertoire banner + engine), the move list matters more */
@@ -314,25 +313,6 @@
   gap: 8px;
 }
 
-.fenDisplay,
-.pgnDisplay {
-  background: var(--color-surface-2);
-  border: 1px solid var(--color-border);
-  clip-path: polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px);
-  padding: 12px 16px;
-  color: var(--color-text-secondary);
-  font-size: 14px;
-  line-height: 1.8;
-  flex: 1;
-  overflow-y: auto;
-  min-height: 0;
-}
-
-.boardPanelActions {
-  display: flex;
-  gap: 8px;
-  flex-shrink: 0;
-}
 /* shown while a repertoire is open in the board */
 .repertoireBanner {
   display: flex;
@@ -340,22 +320,23 @@
   justify-content: space-between;
   gap: 12px;
   padding: 8px 12px;
-  background: rgba(var(--color-amber-rgb), 0.12);
-  border: 1px solid rgba(var(--color-amber-rgb), 0.5);
+  background: var(--color-surface-2);
+  border: 1px solid var(--color-border);
   color: var(--color-text-secondary);
   font-size: 13px;
-  flex-shrink: 0;
 }
 
 .repertoireBanner strong {
   color: var(--color-amber);
+  font-weight: 500;
 }
 
 /* fixed rows in the side panel never shrink; only the move list and the FEN/PGN box flex */
 .statusBar,
 .moveNav,
 .boardPanelActions,
-.toggleWrapper {
+.toggleWrapper,
+.repertoireBanner {
   flex-shrink: 0;
 }
 

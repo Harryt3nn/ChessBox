@@ -24,7 +24,6 @@
 
 .move {
   padding: 2px 6px;
-  border-left: 2px solid transparent;
 }
 
 .move:hover,
@@ -37,19 +36,19 @@
   color: var(--color-text-faint);
 }
 
+/* the current move: raised baize inside a brass hairline (moodboard), no coloured left border */
 .active,
 .active:hover {
-  background: rgba(var(--color-amber-rgb), 0.16);
-  border-left-color: var(--color-amber);
-  color: var(--color-amber);
-  font-weight: 600;
+  background: var(--color-surface-2);
+  outline: 1px solid var(--color-amber);
+  outline-offset: -1px;
+  color: var(--color-amber-hover);
 }
 
 /* full-width break in the main line for comments and variations */
 .block {
   margin: 4px 0 6px 2.5rem;
   padding: 4px 10px;
-  border-left: 2px solid var(--color-border);
   font-size: 13px;
   line-height: 1.7;
 }
@@ -90,7 +89,7 @@
 
 .comment {
   color: var(--color-text-faint);
-  font-style: italic;
+  font-family: var(--font-body);
   padding: 0 4px;
 }
 
