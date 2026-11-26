@@ -54,16 +54,17 @@ export async function importLichess(username: string): Promise<LichessImportResu
         { headers: { Accept: "application/x-ndjson" }, signal: abort.signal }
       );
       connected = true;
-      if (!res.ok) return `Lichess returned ${res.status} for ${perf} games${keptNote()}`;
+      if (!res.ok) return `Lichess had an error (${res.status}) fetching ${perf} games${keptNote()}`;
 
       restartTimer(IDLE_TIMEOUT_MS);
       await processStream(res, () => restartTimer(IDLE_TIMEOUT_MS));
       return null;
     } catch (err) {
       if (!abort.signal.aborted) throw err;
-      return connected
+      if (!connected) return `Lichess didn't answer within ${CONNECT_TIMEOUT_MS / 1000} seconds${keptNote()}`;
+      return gamesImported > 0
         ? `Lichess stopped responding after ${games(gamesImported)}; run it again to fetch the rest`
-        : `Lichess didn't answer within ${CONNECT_TIMEOUT_MS / 1000} seconds${keptNote()}`;
+        : "Lichess stopped sending before the first game arrived; run it again";
     } finally {
       clearTimeout(timer);
     }
