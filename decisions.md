@@ -425,6 +425,7 @@ The record of design choices, the features added and dropped, and the reasons. R
 - **Trade-off / risk:** some buttons become text-only. Deco ornaments drawn in CSS (rules, frames, corner brackets) are decoration, not icons; A3 lists any glyph-like ornament (sunburst, chevron band) for Harry before building it.
 - **Revisit if:** a control is unclear without an icon in Harry's testing.
 - **Evidence:** n/a.
+- **Amended 2026-11-26 14:30:** Harry: "i like the sunburst. it doesn't need to be minimalist at all". The sunburst and chevron band stay at full strength; the look can be rich, and only the icon rule limits it.
 - **One-liner:** Deco look as on the moodboard, with Harry's own icons or none.
 
 ### D46 · training · WeakPoints "Open in board" sits under the drill text after you answer; the drill pauses there: Status: Planned · Updated: 2026-11-26 13:50
@@ -435,3 +436,21 @@ The record of design choices, the features added and dropped, and the reasons. R
 - **Revisit if:** the extra click feels slow in Harry's testing (a keyboard shortcut for Next is the cheap fix).
 - **Evidence:** groundwork `weakpoints-open-in-board@999ca8c` (A2): `Drill.boardNodeId`, `openDrillInBoard()`.
 - **One-liner:** Answer, then choose Next or Open in board.
+
+### D47 · data · An import saves only the nodes reachable from the repertoires you ticked (T31 a): Status: Planned · Updated: 2026-11-26 14:30
+- **Decision:** Harry (2026-11-26, "choose an agent to fix the import bugs", taking A2's recommendation B): `importRepertoires` in main keeps only nodes reachable from the imported repertoires' roots (childIDs + transpositionEdges) after sanitising. `storage:importRepertoires` keeps its arguments, and its promise becomes "saves only reachable nodes". No start-up sweep.
+- **Why:** D8, the rule lives at the trust boundary; the failing test `ImportService.test.ts:27` already checks it; Harry's data has 0 orphans (1,082 nodes, measured 2026-11-24), so a sweep has nothing to do.
+- **Alternatives rejected:** filter in the renderer (the guarantee sits at the untrusted end); B + a sweep on load (startup code that deletes data, for 0 orphans); leave it.
+- **Trade-off / risk:** ~15 lines in main; a wrong walk would drop real nodes, so the tests cover transpositions.
+- **Revisit if:** orphans ever show up (the same walk can sweep).
+- **Evidence:** TBD (the it.fails test turns green).
+- **One-liner:** Importing some repertoires from a file saves only their moves.
+
+### D48 · failure modes · Lichess imports give up after 30 s connect / 60 s idle and keep what arrived (T31 b): Status: Planned · Updated: 2026-11-26 14:30
+- **Decision:** Harry (2026-11-26, same message, taking A2's recommendation C): 30 s (TUNE) for Lichess to start answering, then abort if no data arrives for 60 s (TUNE), through an AbortController on the fetch. Games already saved are kept, and the result is `ok: false` plus the count saved ("Lichess stopped responding after N games; run it again to fetch the rest"). The same fix reports the count when blitz succeeds and rapid fails.
+- **Why:** a stream can be long and healthy, so a total timeout would cut big accounts short; each saved file is complete and a re-run skips existing files.
+- **Alternatives rejected:** a total timeout (cuts big imports); idle only (no separate "can't reach Lichess" error).
+- **Trade-off / risk:** two numbers to tune.
+- **Revisit if:** real imports hit the idle limit while healthy.
+- **Evidence:** TBD (the it.fails test `LichessImporter.test.ts:25` turns green).
+- **One-liner:** A stalled Lichess import stops within a minute and tells you how many games it got.

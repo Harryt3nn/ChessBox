@@ -64,6 +64,8 @@ Work **▶ Now** top to bottom. Tags: `[🟠 your call: …]` = a design decisio
 ## ▶ Now · 2.0 "Less AI-like: UI + security" (from `system.md`, 2026-11-24; lanes per D44)
 **Feedback from Harry's manual testing** (A1 logs each item, routes it; overflow → A1)
 - [ ] **F1 · WeakPoints: open each drill in the analysis board (A2, D46: under the drill text after you answer, drill pauses for Next, no confirm on leaving)** · Harry 2026-11-24: "a link to the analysis board for every drill sequence". Done when: every drill, once answered, has an Open in board button that loads the drill's line at its target position; it isn't shown before you answer, so it can't give the move away (UI call, A1); tested.
+- [ ] **T45 · Fix the two import bugs (A4, D47 + D48; A2 reviews closely, its files)** · branch `import-fixes` · Done when: `ImportService.test.ts:27` and `LichessImporter.test.ts:25` pass as normal tests (no `it.fails`); reachable-only import covers transposition edges; Lichess 30 s connect / 60 s idle via AbortController, partial games kept, count reported (incl. blitz ok + rapid failed); tested.
+- **Server work paused (Harry 2026-11-26: not connected to the server, frontend first).** T38 local-server tests, T39, F3, T40 and the Pi deploy wait.
 - [ ] **F2 · Strongest Stockfish (🟠, Harry is picky: options first, nothing built)** · Harry: "if there is any way to get the strongest version of stockfish, either a link to a web page. run this by me first".
 - [ ] **F3 · Google sign-in instead of email verification (🟠, A4 drafts)** · Harry: "no email verification, I would ideally like to sign in with google to save on all of this stuff".
 
