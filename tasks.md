@@ -83,7 +83,7 @@ Work **▶ Now** top to bottom. Tags: `[🟠 your call: …]` = a design decisio
 
 **A1 · Lead**
 - [ ] **T42 · README rewrite** · Done when: `documentation/README.md` reads like a professional project page (what it is, features, stack, setup, architecture link, credits), with no made-up stats or claims, and passes the avoid lists.
-- [ ] **T43 · Privacy notice + credits text** · Done when: a short privacy notice (what's stored where, what's sent, how to delete) and a credits / licences section (Stockfish GPL-3, Flaticon, chessgraph, ts-fsrs, "not affiliated with Chess.com or Lichess") are written from T41's facts; readable in the app later (A3 places it).
+- [ ] **T43 · Privacy notice + credits text** (drafted on `readme-rewrite` as `documentation/PRIVACY.md`; claims checked against the code by A1 2026-11-26; merge with T42 after the Pi deploy) · Done when: a short privacy notice (what's stored where, what's sent, how to delete) and a credits / licences section (Stockfish GPL-3, Flaticon, chessgraph, ts-fsrs, "not affiliated with Chess.com or Lichess") are written from T41's facts; readable in the app later (A3 places it).
 - [ ] **T44 · Delete imported games (🟠 draft, A2)** · Done when: a 🟠 block for deleting one account's imported games locally (new IPC channel, what else it touches: novelty results, weakpoints).
 
 ## 🅿️ Parked (ideas, not agreed work; offered when ▶ Now is empty)

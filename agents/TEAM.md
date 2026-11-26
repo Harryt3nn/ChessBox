@@ -5,12 +5,12 @@ Harry runs four Claude Code sessions at once. `CLAUDE.md` still rules: Harry own
 ## Who's who
 | Agent | Session name | Lane (what it owns) | Brief |
 |---|---|---|---|
-| **A1 · Lead** | `chessbox-1f` | Plans, takes Harry's testing feedback and routes it, owns the plan docs, merges to `main`. Overflow coding when every agent is busy; README + legal text | `agent-1.md` |
-| **A2 · Features** | `chessbox-80` | Feature refining from Harry's testing. All feature logic: repertoires, builder, Novelty Finder, WeakPoints, board + engine, storage + IPC | `agent-2.md` |
-| **A3 · UI** | `chessbox-65` | Look and feel of every page (art deco / Casino Royale), CSS, assets, copy, accessibility | `agent-3.md` |
-| **A4 · Security** | `chessbox-36` | Pen testing + security checks, server submodule, accounts / auth, test lead | `agent-4.md` |
+| **A1 · Lead** | `chessbox-4c` | Plans, takes Harry's testing feedback and routes it, owns the plan docs, merges to `main`. Overflow coding when every agent is busy; README + legal text | `agent-1.md` |
+| **A2 · Features** | `chessbox-ed` | Feature refining from Harry's testing. All feature logic: repertoires, builder, Novelty Finder, WeakPoints, board + engine, storage + IPC | `agent-2.md` |
+| **A3 · UI** | `chessbox-e6` | Look and feel of every page (art deco / Casino Royale), CSS, assets, copy, accessibility | `agent-3.md` |
+| **A4 · Security** | `chessbox-0f` | Pen testing + security checks, server submodule, accounts / auth, test lead | `agent-4.md` |
 
-Lanes changed on 2026-11-24 to Harry's suggested split (D44). Session names are from `ListAgents` on 2026-11-24; numbers follow what Harry told each session. If a name changes, A1 updates this table. Message a peer with `SendMessage({to: "<name>", message: "..."})`.
+Lanes changed on 2026-11-24 to Harry's suggested split (D44). Session names are from `ListAgents` on 2026-11-26 (A3 not yet confirmed); numbers follow what Harry told each session. If a name changes, A1 updates this table. Message a peer with `SendMessage({to: "<name>", message: "..."})`.
 
 ## The 6 rules
 1. **One task, one branch, one worktree.** A1 hands you a task from `tasks.md` ▶ Now. Work on branch `<what-it-does>` in your own worktree: `git worktree add ../ChessBox-wt/<branch> -b <branch> main`, then `git submodule update --init` and `npm install` in both `vendor/chessbox-server` and `apps/desktop` (an empty submodule breaks `forms.test.ts` and the type-check). Never code in the main checkout; that's where the plan docs live. **Never link a worktree's `node_modules` to another checkout (`mklink /J`, symlinks): removing the worktree follows the link and deletes the target, which wiped the main checkout's packages and server source on 2026-11-24.** Before `git worktree remove`, list links with PowerShell `Get-ChildItem <wt> -Recurse -Depth 6 -Force -Attributes ReparsePoint` and `rmdir` any that point outside the worktree.
