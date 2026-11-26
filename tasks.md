@@ -68,10 +68,10 @@ Work **▶ Now** top to bottom. Tags: `[🟠 your call: …]` = a design decisio
 - [ ] **F3 · Google sign-in instead of email verification (🟠, A4 drafts)** · Harry: "no email verification, I would ideally like to sign in with google to save on all of this stuff".
 
 **A3 · UI**
-- [ ] **T34 · Moodboard: art deco / Casino Royale** · Done when: a moodboard (palette with hex codes, type pairing with licences, ornament / border motifs, button and card treatments, 6–10 references with links) matched to `src/assets/icons/`, checked against both avoid lists in `system.md`, sent to A1 for Harry. Harry may change it a lot.
+- [x] **T34 · Moodboard: art deco / Casino Royale** · Done when: a moodboard (palette with hex codes, type pairing with licences, ornament / border motifs, button and card treatments, 6–10 references with links) matched to `src/assets/icons/`, checked against both avoid lists in `system.md`, sent to A1 for Harry. Harry may change it a lot.
 - [x] **T35 · UI audit against the avoid lists** (A3, 2026-11-24: biggest hits are low-contrast errors and faint text, button fades, coloured left borders, everything in cards, 30 images without alt, Home tiles not keyboard-reachable) · Done when: every page is checked against the "avoid" and "DO NOT have" lists (em dashes in copy, gradients, Inter, cards, fades, …), and the findings are listed per page with `file:line`.
 - [x] **T36 · Accessibility + avoid-list fixes that don't need the moodboard (A3, branch `accessibility-pass`)** · Done when: colour contrast measured (WCAG AA), keyboard navigation works on every page, every image has `alt`; fixes on a branch.
-- [ ] **T37 · Restyle to the agreed moodboard** · Waits on Harry's OK of T34.
+- [ ] **T37 · Restyle to the agreed moodboard** (Harry OK 2026-11-26, D45: his Flaticon icons or none, no emoji or symbol icons; A3, branch `restyle-moodboard`)
 
 **A4 · Security**
 - [ ] **T38 · Pen-test triage** (batch 1 2026-11-24: JWT accepted HS384/512, fixed by pinning HS256 on server branch `pentest-checks`; spoofed IP, batching, timing, limits, ReDoS, smuggling, HTTP/2 all pass; `__proto__` ids silently drop nodes locally, so A2 fixes isSafeId) · Done when: every item on `system.md`'s PEN TEST list is marked relevant / not relevant with a one-line reason; the relevant ones are tested against a local server; each real hole has a failing test and a 🟠 or a fix.

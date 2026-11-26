@@ -45,6 +45,7 @@ A bare § means this file. `tasks.md` holds the ranked work; `decisions.md` hold
 - D40: Drills can be limited to one branch ("1.e4 e6") or Everything; queue takes `mode` + `branchNodeId`.
 - D41: Random drills: random your-move position, play your next N (default 5) moves forward.
 - D44: Lanes are A1 Lead, A2 Features, A3 UI, A4 Security (Harry's 2.0 split); D42's review rules stay.
+- D45 (Planned): Moodboard approved; only Harry's Flaticon icons, otherwise no icon; no emoji or symbol icons.
 - D43 (Planned): A password change signs out other devices via `User.tokenVersion`; the changing device gets a fresh token; any UNAUTHORIZED signs the desktop out; old tokens count as version 0.
 - D42: Four agents work in parallel (A1 lead + GUI, A2 repertoires, A3 board, A4 server + QA); all 4 review every branch, only A1 merges and writes plan docs (`agents/TEAM.md`).
 - D13: A saved session is cleared only when the server answers `UNAUTHORIZED` or `NOT_FOUND` (deleted account); unreachable / erroring server → stay signed in, toast, local features keep working.

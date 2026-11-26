@@ -417,3 +417,12 @@ The record of design choices, the features added and dropped, and the reasons. R
 - **Revisit if:** one lane runs dry while another queues.
 - **Evidence:** n/a.
 - **One-liner:** One agent each for features, looks and security, plus a lead.
+
+### D45 · UI · Moodboard approved; only Harry's licensed Flaticon icons, else no icons: Status: Planned · Updated: 2026-11-26
+- **Decision:** Harry approved the T34 art deco / Casino Royale moodboard (https://claude.ai/artifact/HWpo5fazbStkTH3xZjnGES), including A3's token map on `restyle-moodboard` and the 3 OFL fonts (Limelight, Jost, DM Mono) bundled as font files with their licences. His rule: no emoji and no icon-like symbols that "look too AI". The only icons are his licensed Flaticon set in `src/assets/icons/`. Where they don't fit the style, use no icon at all; an icon stays only where it's needed.
+- **Why:** generic symbols are on his avoid lists (sparkles, arrows on every button, lucide everywhere); he picked and licensed the Flaticon set to avoid that.
+- **Alternatives rejected:** a new icon library, Unicode glyphs or emoji as icons.
+- **Trade-off / risk:** some buttons become text-only. Deco ornaments drawn in CSS (rules, frames, corner brackets) are decoration, not icons; A3 lists any glyph-like ornament (sunburst, chevron band) for Harry before building it.
+- **Revisit if:** a control is unclear without an icon in Harry's testing.
+- **Evidence:** n/a.
+- **One-liner:** Deco look as on the moodboard, with Harry's own icons or none.
