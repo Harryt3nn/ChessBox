@@ -63,7 +63,7 @@ Work **▶ Now** top to bottom. Tags: `[🟠 your call: …]` = a design decisio
 
 ## ▶ Now · 2.0 "Less AI-like: UI + security" (from `system.md`, 2026-11-24; lanes per D44)
 **Feedback from Harry's manual testing** (A1 logs each item, routes it; overflow → A1)
-- [ ] **F1 · WeakPoints: open each drill in the analysis board (A2)** · Harry 2026-11-24: "a link to the analysis board for every drill sequence". Done when: every drill, once answered, has an Open in board button that loads the drill's line at its target position; it isn't shown before you answer, so it can't give the move away (UI call, A1); tested.
+- [ ] **F1 · WeakPoints: open each drill in the analysis board (A2, D46: under the drill text after you answer, drill pauses for Next, no confirm on leaving)** · Harry 2026-11-24: "a link to the analysis board for every drill sequence". Done when: every drill, once answered, has an Open in board button that loads the drill's line at its target position; it isn't shown before you answer, so it can't give the move away (UI call, A1); tested.
 - [ ] **F2 · Strongest Stockfish (🟠, Harry is picky: options first, nothing built)** · Harry: "if there is any way to get the strongest version of stockfish, either a link to a web page. run this by me first".
 - [ ] **F3 · Google sign-in instead of email verification (🟠, A4 drafts)** · Harry: "no email verification, I would ideally like to sign in with google to save on all of this stuff".
 
@@ -84,7 +84,7 @@ Work **▶ Now** top to bottom. Tags: `[🟠 your call: …]` = a design decisio
 **A1 · Lead**
 - [ ] **T42 · README rewrite** · Done when: `documentation/README.md` reads like a professional project page (what it is, features, stack, setup, architecture link, credits), with no made-up stats or claims, and passes the avoid lists.
 - [ ] **T43 · Privacy notice + credits text** (drafted on `readme-rewrite` as `documentation/PRIVACY.md`; claims checked against the code by A1 2026-11-26; merge with T42 after the Pi deploy) · Done when: a short privacy notice (what's stored where, what's sent, how to delete) and a credits / licences section (Stockfish GPL-3, Flaticon, chessgraph, ts-fsrs, "not affiliated with Chess.com or Lichess") are written from T41's facts; readable in the app later (A3 places it).
-- [ ] **T44 · Delete imported games (🟠 draft, A2)** · Done when: a 🟠 block for deleting one account's imported games locally (new IPC channel, what else it touches: novelty results, weakpoints).
+- [ ] **T44 · Delete imported games (🟠 draft, A2)** · Harry 2026-11-26: "deleting can be done per game and on mass", so the 🟠 is being re-drafted for per-game + bulk delete · Done when: a 🟠 block for deleting one account's imported games locally (new IPC channel, what else it touches: novelty results, weakpoints).
 
 ## 🅿️ Parked (ideas, not agreed work; offered when ▶ Now is empty)
 *Stage 2, from `system.md`:* repertoires on a server (maybe MongoDB, user details stay in Postgres) · email verification · MFA · Google sign-in / sign-up · AI move explanations (theory presets + interpreting Stockfish, no paid API keys) · AI "add suggestions" for repertoires · a private chess-theory knowledge base · multi-reply "acceptable alternatives" so a reasonable non-prep move isn't penalised (D17) · more toolkit tools.

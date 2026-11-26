@@ -426,3 +426,12 @@ The record of design choices, the features added and dropped, and the reasons. R
 - **Revisit if:** a control is unclear without an icon in Harry's testing.
 - **Evidence:** n/a.
 - **One-liner:** Deco look as on the moodboard, with Harry's own icons or none.
+
+### D46 · training · WeakPoints "Open in board" sits under the drill text after you answer; the drill pauses there: Status: Planned · Updated: 2026-11-26 13:50
+- **Decision:** Harry (F1, 2026-11-26): every drill gets an Open in board button below its text. It appears only once you've answered, and the drill then waits for a Next click instead of auto-advancing. Opening the board ends the drill session with no confirm step (grades are already saved). Amends the 2026-11-21 auto-advance feedback (0.7 s right / 1.8 s wrong): the pause replaces it.
+- **Why:** before an answer the board's engine would give the move away; with auto-advance the button would vanish in under 2 s.
+- **Alternatives rejected:** keep auto-advance with the button flashing up; always visible (spoils the answer); a "last drill" link in the side panel; a list on the Done screen.
+- **Trade-off / risk:** one extra click per drill.
+- **Revisit if:** the extra click feels slow in Harry's testing (a keyboard shortcut for Next is the cheap fix).
+- **Evidence:** groundwork `weakpoints-open-in-board@999ca8c` (A2): `Drill.boardNodeId`, `openDrillInBoard()`.
+- **One-liner:** Answer, then choose Next or Open in board.
