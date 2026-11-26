@@ -111,6 +111,11 @@ textarea {
   user-select: text !important;
 }
 
+/* native checkboxes, radios and range thumbs in brass rather than the browser's blue / purple */
+:root {
+  accent-color: var(--color-amber);
+}
+
 body {
   background: var(--color-void);
   color: var(--color-text-secondary);
