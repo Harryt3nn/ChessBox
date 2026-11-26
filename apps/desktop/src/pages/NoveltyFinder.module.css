@@ -3,8 +3,7 @@
 .modalBackdrop {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.55);
-  backdrop-filter: blur(4px);
+  background: rgba(15, 18, 17, 0.85);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -12,10 +11,15 @@
   user-select: none;
 }
 
+/* the progress window: baize with the moodboard's brass corner brackets */
 .modalWindow {
-  background: var(--color-surface-1);
-  border: 1px solid var(--color-border-strong);
-  clip-path: polygon(14px 0, 100% 0, 100% calc(100% - 14px), calc(100% - 14px) 100%, 0 100%, 0 14px);
+  --bracket: linear-gradient(var(--color-amber), var(--color-amber));
+  background:
+    var(--bracket) top 8px left 8px / 24px 1px no-repeat,
+    var(--bracket) top 8px left 8px / 1px 24px no-repeat,
+    var(--bracket) bottom 8px right 8px / 24px 1px no-repeat,
+    var(--bracket) bottom 8px right 8px / 1px 24px no-repeat,
+    var(--color-surface-1);
   padding: 40px 48px;
   width: 360px;
   display: flex;
@@ -27,10 +31,10 @@
 
 .modalWindow h2 {
   color: var(--color-amber);
-  font-size: 18px;
-  font-weight: 700;
-  letter-spacing: 0.03em;
-  text-transform: uppercase;
+  font-family: var(--font-display);
+  font-size: 26px;
+  font-weight: 400;
+  letter-spacing: 0.04em;
   margin-bottom: 20px;
 }
 
@@ -53,8 +57,7 @@
   font-size: 13px;
 }
 
-/* Import panel — brand colours follow the Settings connect buttons:
-   sage is reserved for Chess.com, cream for Lichess */
+/* Import panel: each site keeps a colour of its own (jade for Chess.com, ivory for Lichess), cut like the primary button */
 
 .importHint {
   color: var(--color-text-tertiary);
@@ -73,11 +76,12 @@
   gap: 10px;
   padding: 11px 18px;
   border: none;
-  clip-path: polygon(6px 0, 100% 0, 100% calc(100% - 6px), calc(100% - 6px) 100%, 0 100%, 0 6px);
+  clip-path: polygon(6px 0, calc(100% - 6px) 0, 100% 6px, 100% calc(100% - 6px), calc(100% - 6px) 100%, 6px 100%, 0 calc(100% - 6px), 0 6px);
   color: var(--color-ink);
-  font-size: 13px;
-  font-weight: 700;
-  letter-spacing: 0.03em;
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.14em;
   text-transform: uppercase;
   cursor: pointer;
 }
@@ -86,8 +90,13 @@
   transform: translateY(-2px);
 }
 
+.importBtn:focus-visible {
+  clip-path: none;
+}
+
 .importBtn:disabled {
-  opacity: 0.5;
+  background: var(--color-surface-1);
+  color: var(--color-text-tertiary);
   cursor: not-allowed;
 }
 
@@ -115,8 +124,8 @@
 .select {
   min-width: 240px;
   padding: 8px 10px;
-  background: var(--color-surface-2);
-  border: 1px solid var(--color-border-strong);
+  background: var(--color-void);
+  border: 1px solid var(--color-border);
   color: var(--color-text-primary);
   font-family: inherit;
   font-size: 13px;
@@ -132,34 +141,36 @@
   padding: 3px 8px;
   background: none;
   border: 1px solid var(--color-border);
-  color: var(--color-text-tertiary);
+  color: var(--color-amber-hover);
   font-family: inherit;
   font-size: 11px;
   font-weight: 600;
-  letter-spacing: 0.04em;
+  letter-spacing: 0.12em;
   text-transform: uppercase;
   cursor: pointer;
 }
 
 .rowBtn:hover:not(:disabled) {
-  color: var(--color-amber);
-  border-color: var(--color-amber);
+  background: var(--color-surface-1);
 }
 
 .rowBtn:disabled {
-  opacity: 0.5;
+  border-color: var(--color-rule);
+  color: var(--color-text-tertiary);
   cursor: wait;
 }
 
 .verdict {
   margin-right: 6px;
   color: var(--color-text-primary);
+  font-family: var(--font-mono);
   font-size: 12px;
-  font-weight: 600;
+  font-weight: 500;
 }
 
+/* dismissed rows step back to smoke instead of fading, so they still pass AA (7.66:1) */
 .dismissed td {
-  opacity: 0.45;
+  color: var(--color-text-tertiary);
 }
 
 /* which imported accounts count (D19) */
@@ -186,6 +197,8 @@
   padding: 0;
   color: var(--color-amber);
   font: inherit;
+  text-decoration: underline;
+  text-underline-offset: 4px;
   cursor: pointer;
 }
 

@@ -258,7 +258,7 @@ export function DrillPanel({ session, current, drill, onOpenInBoard, onNext, onS
       </span>
       <span className={styles.source}>{SOURCE_LABEL[current.source]}</span>
       <p className={styles.prompt}>{drill.prompt}</p>
-      {drill.feedback && <p className={drill.feedback.kind === 'right' ? styles.right : styles.wrong}>{drill.feedback.text}</p>}
+      {drill.feedback && <p role="status" className={drill.feedback.kind === 'right' ? styles.right : styles.wrong}>{drill.feedback.text}</p>}
       {drill.done && (
         <div className={styles.drillActions}>
           <button className={shared.btnOutline} onClick={() => onOpenInBoard(current.boardNodeId)}>Open in board</button>

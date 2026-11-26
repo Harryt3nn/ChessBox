@@ -23,8 +23,8 @@
 .select {
   width: 100%;
   padding: 8px 10px;
-  background: var(--color-surface-2);
-  border: 1px solid var(--color-border-strong);
+  background: var(--color-void);
+  border: 1px solid var(--color-border);
   color: var(--color-text-primary);
   font-family: inherit;
   font-size: 13px;
@@ -52,38 +52,39 @@
 .source {
   color: var(--color-amber);
   font-size: 11px;
-  font-weight: 700;
-  letter-spacing: 0.08em;
+  font-weight: 600;
+  letter-spacing: 0.14em;
   text-transform: uppercase;
 }
 
 .prompt {
   color: var(--color-text-primary);
-  font-size: 16px;
+  font-family: var(--font-display);
+  font-size: 22px;
+  letter-spacing: 0.03em;
   margin: 0;
 }
 
+/* the result is boxed on all four sides: jade for right, claret for wrong (no coloured left bar) */
 .right,
 .wrong {
   font-size: 14px;
   margin: 0;
   padding: 8px 12px;
-  border-left: 3px solid;
+  border: 1px solid;
+  color: var(--color-text-primary);
 }
 
 .right {
-  color: var(--color-amber-hover);
-  border-color: var(--color-amber);
-  background: rgba(var(--color-amber-rgb), 0.1);
+  border-color: var(--color-sage);
 }
 
 .wrong {
-  color: var(--color-text-primary);
   border-color: var(--color-danger-text);
   background: rgba(var(--color-coral-rgb), 0.18);
 }
 
-.drillActions {
+.drill-actions {
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
