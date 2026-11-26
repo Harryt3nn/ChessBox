@@ -142,10 +142,10 @@ One `Pass n` per research question (CLAUDE.md §9). Grep by pass number; never r
 - **API rules**: one request at a time; after a 429, wait 1 minute; a missing User-Agent "may be rejected or rate limited". `/player` streams ndjson, indexes new games at most once a minute, and returns 503 when its queue is full. Tablebase endpoints have `security: []` (no auth). https://raw.githubusercontent.com/lichess-org/api/master/doc/specs/lichess-api.yaml
 - **Lichess tablebase server**: AGPL-3, Syzygy, 7-piece complete. https://github.com/lichess-org/lila-tablebase
 - **Syzygy files** "may be freely redistributed". Sizes: ≤5 pieces ~0.9 GB, 6-piece ~150 GB. The generator is GPL-2. https://github.com/syzygy1/tb
+- **No token needed today (measured 2026-11-26, A2, one GET each, UA "ChessBox-dev")**: `explorer.lichess.ovh/masters` start FEN → 200 with real counts, no WWW-Authenticate; `tablebase.lichess.ovh/standard` KPvK → 200, win, dtz 9, dtm 43. No rate-limit headers. The spec's `security: OAuth2` reads as optional; the spec names host explorer.lichess.org, .ovh still answers.
 - **Fathom** (C probing code) is MIT, based on de Man's tbprobe, "released for unrestricted distribution and use". https://github.com/jdart1/Fathom
 
 ### WEAK
-- Every explorer endpoint in the spec lists `security: OAuth2` with no scopes, while the examples are unauthenticated, so the explorer may now need a Lichess token. Test one call before designing around it. If a token is needed, that's a 🟠 trust item.
 - The broadcast (over-the-board) dump of 1.3 M games: its licence (CC BY-SA 4.0) was read from a summary only.
 
 ### Not read (blocked)

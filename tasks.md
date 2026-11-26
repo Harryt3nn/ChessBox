@@ -3,8 +3,8 @@
 Work **▶ Now** top to bottom. Tags: `[🟠 your call: …]` = a design decision for the builder (CLAUDE.md §1) · `[⏸ waits on: …]` = blocked.
 
 ## 📊 Latest (the only home of volatile facts)
-- **Updated:** 2026-11-21 00:40
-- **`main` at:** 981958d (pushed) · **server `main`:** 0c25879 (pushed, **not deployed**; Pi on 1717269; brings T29 + pentest fixes) · **open branches:** none · **Electron:** 42.11.18
+- **Updated:** 2026-11-26 13:15
+- **`main` at:** 50124ba (pushed) · **server `main`:** 0c25879 (pushed, **not deployed**; Pi on 1717269; brings T29 + pentest fixes) · **open branches:** readme-rewrite@0b0ffb6 (3 approvals pending A4, waits on the Pi deploy), restyle-moodboard (A3, T37), weakpoints-open-in-board (A2, waits on F1), reserved-ids-test (A4, waits on 🟠 9) · **Electron:** 42.11.18
 - **Tests:** desktop 211 passing + 2 expected fails (T31 bugs) (25 files) · server 38 passing (3 files) · **Builder:** 888-node Italian renders in ~1.2 s · **Lite engine (live board, D14):** d15 0.2–0.8 s, d20 1.8–7.2 s by position (A3, 2026-11-24) · **Verdict:** full Stockfish (single-threaded) depth 18 in ~4 s per finding · **Novelty run:** "Check all games" on White Aggressive Italian = 4,396 games in 22 s in the dev app (2,627 deviations, 1,757 novelties, 12 in prep) · **Walk alone:** ~3 ms / game · **WeakPoints sync + queue:** Italian ~130 ms, 106 cards on first sync (D30, D33) · **npm audit (2026-11-24, A4):** desktop 47, build / dev only (0 with `--omit=dev`) · server 8, all in the image, none reachable from requests today (zod is the nearest) · server base image `node:20` is end-of-life
 
 ## ▶ Now (ranked): stage-1 MVP from `system.md` (2026-11-18)
@@ -122,6 +122,7 @@ Work **▶ Now** top to bottom. Tags: `[🟠 your call: …]` = a design decisio
 - Style `ImportModal.tsx`: already done in 3f78ffd (T4). It uses `ImportModal.module.css` with camelCase exports (checked by A2, 2026-11-24).
 
 ## ✅ Done log (newest first)
+- 2026-11-26 13:15 · contrast fixes (A3, 🟢 from T35): chess.com button ivory on sage 5.31:1 (was ink 2.61:1), 4 coral error borders → danger-text ≥4.51:1 (were 1.13–2.24:1), unused sage-hover / coral-hover tokens removed · `main@50124ba` · 211 desktop tests + 2 expected fails · approved A1, A2, A4
 - 2026-11-21 00:40 · T21 + T24–T28 WeakPoints and Novelty Finder: FSRS drills (D21–D35), three modes Focused / Mistakes only / Random (D36, D37), opening branch filter (D40), early deviations skipped (D39), random forward drills (D41), automatic deviation verdicts with no Evaluate button (D38), game dates + times and game lists, deviations / novelties in one tabbed panel, board ↔ graph everywhere · `main@cf9f9ee` · 209 desktop tests · checked by Harry in the dev app: drills graded and saved (15 reviews across both repertoires, played moves logged), background check finished 33 of 33 deviations on the 1.e4 Repertoire; Italian's 147 not yet run
 - 2026-11-20 20:30 · T18 one settings page (account, linked sites inline, change username / password, Retry when the Pi is unreachable; replaces the profile card) · `main@bfa85b4` · 6 tests · verified by Harry in the app on a new `dev` account: linked Chess.com + Lichess, changed username and password, signed back in
 - 2026-11-20 20:30 · T19 server: change password / username (D28), login + register limits (D26), Vitest on the server (D29) · server `1717269`, deployed; checked from the desktop: health `{"ok":true}`, `user.changePassword` routed (401 signed out), foreign Origin gets no CORS allow header; Harry's live test as T18 · 17 server tests
