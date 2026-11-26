@@ -26,7 +26,7 @@ The graph model comes from [chessgraph.net](https://chessgraph.net), which repre
 **Novelty Finder**
 - Checks one game or every imported game against the repertoire you pick, using the accounts you choose.
 - Reports where you deviated from your prep and where the opponent played something your repertoire doesn't cover, following transpositions.
-- Checks each deviation with a full-strength Stockfish search in the background, and lets you add a move to the repertoire or open it on the board.
+- Checks each deviation in the background with a deeper Stockfish search (the full build, not the lite one used on the live board), and lets you add a move to the repertoire or open it on the board.
 
 **WeakPoints**
 - Drills positions from your deviations, from lines you rarely reach and from lines you know well, as short move sequences on a board with no analysis.

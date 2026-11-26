@@ -6,7 +6,7 @@ ChessBox is a personal project run by Harry Tennant. It is not a business and is
 
 Everything you create in ChessBox stays on your computer, in `%APPDATA%/ChessBox/ChessBox-data/`:
 
-- **Repertoires, folders and moves** (`folders.json`, `repertoires/`, `nodes.json`). Kept until you delete them. Deleting a repertoire also deletes its Novelty Finder results and WeakPoints history.
+- **Repertoires, folders and moves** (`folders.json`, `repertoires/`, `nodes.json`). Kept until you delete them. An import bug can leave moves from repertoires you didn't pick in `nodes.json`; they will be cleaned up once it is fixed. Deleting a repertoire also deletes its Novelty Finder results and WeakPoints history.
 - **Imported games** (`games/<site>/<username>/`). Copies of public games from Lichess and Chess.com, including your opponents' usernames, ratings and the date each game was played. Kept until you delete the folder. There is no delete button for these yet.
 - **Novelty Finder results and WeakPoints history** (`novelty/`, `weakpoints/`). Worked out from your games and repertoires. Novelty Finder results include each game's players (your opponents' usernames), result and date; WeakPoints keeps every drill you have answered.
 - **Your sign-in token** (`auth.token`), encrypted by Windows. It lasts 3 days and is deleted when you sign out.
