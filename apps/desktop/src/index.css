@@ -2,48 +2,57 @@
 
 
 /* ============================================================
-   ART DECO — custom palette
-   Black lacquer + brass void, with a jewel-tone accent system:
-   brass/gold (primary actions) and garnet (emphasis / alerts).
-   Emerald is reserved exclusively for chess.com connect/success states.
+   ART DECO / CASINO ROYALE palette (moodboard T34)
+   Black lacquer ground, card-table baize panels, brass for lines,
+   icons and primary actions. Ivory is text only, never a background.
+   Token names are kept from the old palette so pages change colour
+   without edits; the per-page restyle (T37) renames where it helps.
    ============================================================ */
 :root {
-  /* Surfaces — lighter charcoal-emerald ramp */
   /* WCAG AA: every text token below is >= 4.5:1 on surface-3, the lightest surface it can sit on,
      and borders are >= 3:1 there. Measure again after changing any of these. */
-  --color-void: #28302b;
-  --color-surface-1: #303933;
-  --color-surface-2: #38423b;
-  --color-surface-3: #414a42;
+  --color-void: #0f1211;       /* lacquer */
+  --color-surface-1: #15302a;  /* baize */
+  --color-surface-2: #1d3d35;  /* baize, raised / selected */
+  --color-surface-3: #1f4037;  /* one step above raised: tertiary text is 4.62:1 here, so it can't go lighter */
 
-  --color-border: #8c968c;
-  --color-border-strong: #96a297;
+  --color-border: #c9a45c;         /* brass: the edge of a control (4.85:1 on surface-3) */
+  --color-border-strong: #e6cb8e;  /* polished brass */
+  /* hairline for dividers only (2.31:1 on void): never the only edge of a control */
+  --color-rule: #5a4e33;
 
-  --color-text-primary: #f2e9d8;
-  --color-text-secondary: #d6cbb5;
-  --color-text-tertiary: #bdb5a1;
+  --color-text-primary: #eee6d3;   /* ivory */
+  --color-text-secondary: #d8d0bc;
+  --color-text-tertiary: #aba593;  /* smoke */
   /* faint can't get any fainter than tertiary and still pass AA; size and weight carry the difference */
   --color-text-faint: var(--color-text-tertiary);
 
-  --color-amber: #d2b26a;
-  --color-amber-hover: #d9b562;
-  --color-amber-rgb: 210, 178, 106;
+  --color-amber: #c9a45c;        /* brass */
+  --color-amber-hover: #e6cb8e;  /* polished brass, also the focus ring */
+  --color-amber-rgb: 201, 164, 92;
 
-  /* coral is a button fill (ivory on it is 6.75:1); as text on the dark surfaces it needs the lighter danger tone */
+  /* coral is a button fill (ivory on it is 6.55:1); as text, or as a border on the dark surfaces
+     (coral is only 1.73:1 on surface-1), use the claret danger tone */
   --color-coral: #8c2f39;
   --color-coral-hover: #a83f4a;
   --color-coral-rgb: 140, 47, 57;
-  --color-danger-text: #eea1a7;
+  --color-danger-text: #ef8c80;  /* claret, nudged lighter than the moodboard's #ec8578 to pass 4.5:1 on surface-3 */
 
-  --color-piece-light: #f2e9d8;
-  --color-piece-dark: #3c4a44;
-  --color-piece-dark-rgb: 60, 74, 68;
+  --color-piece-light: #e4d6b4;  /* board light square */
+  --color-piece-dark: #3d6656;   /* board dark square */
+  --color-piece-dark-rgb: 61, 102, 86;
 
-  --color-sage: #1f6b52;
-  --color-sage-hover: #2c8265;
+  /* jade fills carry ink text (8.58:1); the old sage was too dark for that */
+  --color-sage: #6fbf95;
+  --color-sage-hover: #8fd0ac;
 
-  --color-cream-rgb: 242, 233, 216;
-  --color-ink: #17201a;
+  --color-cream-rgb: 238, 230, 211;
+  --color-ink: #0f1211;
+
+  /* the OFL font files land in assets/fonts with T37; until then each stack falls back to what the app uses today */
+  --font-display: 'Limelight', 'Poiret One', Georgia, serif;
+  --font-body: 'Jost', 'Segoe UI', sans-serif;
+  --font-mono: 'DM Mono', 'Cascadia Mono', Consolas, monospace;
 
   --highlight-selected: rgba(var(--color-amber-rgb), 0.25);
   --highlight-dot: radial-gradient(circle, rgba(0, 0, 0, 0.3) 20%, transparent 21%);
