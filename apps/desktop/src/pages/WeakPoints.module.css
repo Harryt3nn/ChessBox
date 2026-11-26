@@ -79,6 +79,6 @@
 
 .wrong {
   color: var(--color-text-primary);
-  border-color: var(--color-coral);
+  border-color: var(--color-danger-text);
   background: rgba(var(--color-coral-rgb), 0.18);
 }

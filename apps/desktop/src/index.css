@@ -31,7 +31,6 @@
 
   /* coral is a button fill (ivory on it is 6.75:1); as text on the dark surfaces it needs the lighter danger tone */
   --color-coral: #8c2f39;
-  --color-coral-hover: #a83f4a;
   --color-coral-rgb: 140, 47, 57;
   --color-danger-text: #eea1a7;
 
@@ -40,7 +39,6 @@
   --color-piece-dark-rgb: 60, 74, 68;
 
   --color-sage: #1f6b52;
-  --color-sage-hover: #2c8265;
 
   --color-cream-rgb: 242, 233, 216;
   --color-ink: #17201a;
