@@ -17,7 +17,6 @@ import { Engine } from '../engine/Engine';
 import { createFullWorker } from '../engine/stockfishWorker';
 import { formatScore, sideCentipawns, uciToSan, whiteScore, type EngineLine } from '../engine/uci';
 
-import noveltyIcon from '../assets/icons/020-chess.png';
 import deviationsIcon from '../assets/icons/204-folder-6.png';
 import ideaIcon from '../assets/icons/009-idea.png';
 import downloadGlyph from '../assets/icons/007-download.png';
@@ -296,7 +295,6 @@ const NoveltyFinder = ({ currentUser, onOpenInBoard, onOpenInGraph }: NoveltyFin
     <main className="main-content">
       <div className={shared.page}>
         <PageHeader
-          icon={noveltyIcon}
           title="Novelty Finder"
           subtitle="Walk your games through your repertoires and catch where they leave your prep."
         />

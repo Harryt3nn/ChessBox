@@ -8,13 +8,6 @@ import type { Repertoire } from '../types/Repertoire';
 import type { Folder } from '../types/Folder';
 import { FileSystemStorageProvider } from '../Storage/FileSystemStorageProvider';
 
-import boardIcon from '../assets/icons/021-chess board.png';
-import repertoiresIcon from '../assets/icons/015-chess.png';
-import toolsIcon from '../assets/icons/007-king.png';
-import noveltyIcon from '../assets/icons/020-chess.png';
-import weakPointsIcon from '../assets/icons/041-checkmate.png';
-import analyticsIcon from '../assets/icons/029-strategy.png';
-import settingsIcon from '../assets/icons/003-chess.png';
 
 // the hub: every section is a tile, filled with whatever real data it already has
 
@@ -60,7 +53,6 @@ const Home = ({ setPage, currentUser }: HomeProps) => {
         <section className={styles.grid}>
           {/* Analysis board: the biggest tile */}
           <button className={`${styles.tile} ${styles.tileFeature}`} onClick={() => setPage('board')}>
-            <img alt="" src={boardIcon} className={styles.featureIcon} />
             <span className={styles.tileTitle}>Analysis Board</span>
             <span className={styles.tileText}>Play through lines, explore variations, import and export PGN or FEN.</span>
           </button>
@@ -69,7 +61,6 @@ const Home = ({ setPage, currentUser }: HomeProps) => {
               is the real button, so keyboard users reach it and the tool buttons aren't nested in another button */}
           <div className={`${styles.tile} ${styles.tileWide}`} onClick={() => setPage('repertoires')}>
             <button type="button" className={`${styles.tileHead} ${styles.tileHeadButton}`} onClick={() => setPage('repertoires')}>
-              <img alt="" src={repertoiresIcon} className={styles.tileIcon} />
               <span className={styles.tileTitle}>Repertoires</span>
               <span className={styles.count}>
                 {repertoires.length} repertoire{repertoires.length === 1 ? '' : 's'}, {folders.length} folder{folders.length === 1 ? '' : 's'}
@@ -79,8 +70,8 @@ const Home = ({ setPage, currentUser }: HomeProps) => {
               <ul className={styles.list}>
                 {recent.map(r => (
                   <li key={r.id} className={styles.listItem}>
-                    <span className={r.side === 'white' ? styles.sideWhite : styles.sideBlack} title={`Plays ${r.side}`} />
-                    {r.name}
+                    <span className={styles.repName}>{r.name}</span>
+                    <span className={styles.side}>{r.side === 'white' ? 'White' : 'Black'}</span>
                   </li>
                 ))}
               </ul>
@@ -92,16 +83,13 @@ const Home = ({ setPage, currentUser }: HomeProps) => {
           {/* Toolkit and its tools */}
           <div className={`${styles.tile} ${styles.tileWide}`} onClick={() => setPage('tools')}>
             <button type="button" className={`${styles.tileHead} ${styles.tileHeadButton}`} onClick={() => setPage('tools')}>
-              <img alt="" src={toolsIcon} className={styles.tileIcon} />
               <span className={styles.tileTitle}>Toolkit</span>
             </button>
             <div className={styles.toolRow}>
               <button className={styles.tool} onClick={e => { e.stopPropagation(); setPage('novelty'); }}>
-                <img alt="" src={noveltyIcon} className={styles.toolIcon} />
                 <span>Novelty Finder</span>
               </button>
               <button className={styles.tool} onClick={e => { e.stopPropagation(); setPage('weakpoints'); }}>
-                <img alt="" src={weakPointsIcon} className={styles.toolIcon} />
                 <span>WeakPoints</span>
               </button>
             </div>
@@ -109,7 +97,6 @@ const Home = ({ setPage, currentUser }: HomeProps) => {
 
           <button className={styles.tile} onClick={() => setPage('analytics')}>
             <div className={styles.tileHead}>
-              <img alt="" src={analyticsIcon} className={styles.tileIcon} />
               <span className={styles.tileTitle}>Analytics</span>
             </div>
             <span className={styles.tileText}>Coming soon: how your openings score on Chess.com and Lichess.</span>
@@ -118,7 +105,6 @@ const Home = ({ setPage, currentUser }: HomeProps) => {
           {/* Settings, showing which chess accounts are linked */}
           <button className={styles.tile} onClick={() => setPage('settings')}>
             <div className={styles.tileHead}>
-              <img alt="" src={settingsIcon} className={styles.tileIcon} />
               <span className={styles.tileTitle}>Settings</span>
             </div>
             <span className={styles.account}>

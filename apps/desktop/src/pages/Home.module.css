@@ -10,9 +10,10 @@
 
 .greeting {
   color: var(--color-amber);
-  font-size: 28px;
-  font-weight: 700;
-  letter-spacing: 0.02em;
+  font-family: var(--font-display);
+  font-size: 34px;
+  font-weight: 400;
+  letter-spacing: 0.04em;
 }
 
 .tagline {
@@ -34,15 +35,17 @@
   gap: 16px;
 }
 
+/* tiles are framed like the outline button: a brass line with a hairline 5px inside it */
 .tile {
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  gap: 10px;
-  padding: 20px;
-  background: var(--color-surface-1);
-  border: 1px solid var(--color-border-strong);
-  clip-path: polygon(12px 0, 100% 0, 100% calc(100% - 12px), calc(100% - 12px) 100%, 0 100%, 0 12px);
+  gap: 12px;
+  padding: 22px;
+  background: transparent;
+  border: 1px solid var(--color-border);
+  outline: 1px solid var(--color-rule);
+  outline-offset: -6px;
   color: inherit;
   font-family: inherit;
   text-align: left;
@@ -51,8 +54,11 @@
 }
 
 .tile:hover {
-  background: var(--color-surface-2);
-  border-color: var(--color-amber);
+  background: var(--color-surface-1);
+}
+
+.tile:focus-visible {
+  outline-offset: 2px;
 }
 
 .tile-feature {
@@ -83,26 +89,16 @@
   cursor: pointer;
 }
 
-.tile-icon {
-  width: 30px;
-  height: 30px;
-}
-
-.feature-icon {
-  width: 96px;
-  height: 96px;
-  margin-bottom: auto;
-}
-
 .tile-title {
-  color: var(--color-text-primary);
-  font-size: 15px;
-  font-weight: 700;
-  letter-spacing: 0.02em;
+  color: var(--color-amber);
+  font-family: var(--font-display);
+  font-size: 22px;
+  font-weight: 400;
+  letter-spacing: 0.04em;
 }
 
 .tile-feature .tile-title {
-  font-size: 22px;
+  font-size: 34px;
 }
 
 .tile-text {
@@ -123,36 +119,33 @@
   list-style: none;
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 6px 16px;
+  column-gap: 24px;
   width: 100%;
 }
 
 .list-item {
   display: flex;
-  align-items: center;
+  align-items: baseline;
   gap: 8px;
+  padding: 6px 0;
+  border-bottom: 1px solid var(--color-rule);
   color: var(--color-text-secondary);
   font-size: 13px;
+}
+
+.rep-name {
+  flex: 1;
+  min-width: 0;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 
-.side-white,
-.side-black {
-  width: 10px;
-  height: 10px;
-  flex-shrink: 0;
-  border: 1px solid var(--color-border-strong);
-  transform: rotate(45deg);
-}
-
-.side-white {
-  background: var(--color-piece-light);
-}
-
-.side-black {
-  background: var(--color-ink);
+.side {
+  color: var(--color-text-tertiary);
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
 }
 
 .tool-row {
@@ -163,27 +156,21 @@
 
 .tool {
   flex: 1;
-  display: flex;
-  align-items: center;
-  gap: 10px;
   padding: 12px 14px;
-  background: var(--color-surface-2);
+  background: transparent;
   border: 1px solid var(--color-border);
-  color: var(--color-text-secondary);
+  color: var(--color-amber-hover);
   font-family: inherit;
-  font-size: 13px;
+  font-size: 12px;
   font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  text-align: left;
   cursor: pointer;
 }
 
 .tool:hover {
-  border-color: var(--color-amber);
-  color: var(--color-amber);
-}
-
-.tool-icon {
-  width: 24px;
-  height: 24px;
+  background: var(--color-surface-1);
 }
 
 .account {

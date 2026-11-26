@@ -2,17 +2,8 @@
 
 import { useState } from 'react';
 import { PageHeader } from '../components/PageHeader';
-import { Icon } from '../components/Icon';
 import shared from './PageShared.module.css';
 
-import analyticsIcon from '../assets/icons/029-strategy.png';
-import checkmateIcon from '../assets/icons/041-checkmate.png';
-import trophyIcon from '../assets/icons/006-trophy.png';
-import refreshGlyph from '../assets/icons/019-refresh.png';
-import gamesGlyph from '../assets/icons/006-dashboard.png';
-import chartGlyph from '../assets/icons/019-line chart.png';
-import repertoireGlyph from '../assets/icons/001-bookmark.png';
-import deviationGlyph from '../assets/icons/009-exclamation.png';
 
 // layout only for now — the stats are filled in once game processing exists (TODO #4)
 // toggles already hold state so they can drive the data queries later
@@ -33,12 +24,7 @@ const PERIODS: { id: Period; label: string }[] = [
   { id: 'all', label: 'All Time' },
 ];
 
-const STATS = [
-  { label: 'Games', glyph: gamesGlyph },
-  { label: 'Win Rate', glyph: chartGlyph },
-  { label: 'In Repertoire', glyph: repertoireGlyph },
-  { label: 'Deviations', glyph: deviationGlyph },
-];
+const STATS = ['Games', 'Win Rate', 'In Repertoire', 'Deviations'];
 
 const Analytics = () => {
   const [source, setSource] = useState<Source>('combined');
@@ -48,12 +34,10 @@ const Analytics = () => {
     <main className="main-content">
       <div className={shared.page}>
         <PageHeader
-          icon={analyticsIcon}
           title="Analytics"
           subtitle="Opening performance across your connected accounts."
           actions={
             <button className={shared.btnOutline} disabled title="Coming soon">
-              <Icon src={refreshGlyph} size={14} />
               Refresh
             </button>
           }
@@ -88,12 +72,9 @@ const Analytics = () => {
 
         {/* Headline stats */}
         <div className={shared.statRow}>
-          {STATS.map(s => (
-            <div key={s.label} className={shared.statTile}>
-              <span className={shared.statLabel}>
-                <Icon src={s.glyph} size={12} />
-                {s.label}
-              </span>
+          {STATS.map(label => (
+            <div key={label} className={shared.statTile}>
+              <span className={shared.statLabel}>{label}</span>
               <span className={`${shared.statValue} ${shared.statValueEmpty}`}>No data yet</span>
             </div>
           ))}
@@ -120,7 +101,6 @@ const Analytics = () => {
             </table>
 
             <div className={shared.emptyState}>
-              <img alt="" src={checkmateIcon} className={shared.emptyIcon} />
               <span className={shared.emptyTitle}>No games analysed yet</span>
               <span className={shared.emptyHint}>
                 Import your games from the Novelty Finder, then your most played openings
@@ -137,7 +117,6 @@ const Analytics = () => {
             </div>
 
             <div className={shared.emptyState}>
-              <img alt="" src={trophyIcon} className={shared.emptyIcon} />
               <span className={shared.emptyTitle}>Nothing to compare yet</span>
               <span className={shared.emptyHint}>
                 See how often your games stay inside your saved repertoires, and how

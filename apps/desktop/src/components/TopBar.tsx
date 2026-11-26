@@ -3,7 +3,6 @@
 import type { Page } from '../types/Page';
 import styles from './TopBar.module.css';
 import knightIcon from '../assets/icons/044-knight.png';
-import gearGlyph from '../assets/icons/012-gear.png';
 import { Icon } from './Icon';
 
 // slim navigation bar shown above every page; Home is the hub, so this only carries the main sections
@@ -29,7 +28,7 @@ export function TopBar({ page, setPage }: TopBarProps) {
   return (
     <header className={styles.bar}>
       <button className={styles.brand} onClick={() => setPage('home')} title="Home">
-        <img alt="" src={knightIcon} className={styles.brandIcon} />
+        <Icon src={knightIcon} size={24} />
         ChessBox
       </button>
 
@@ -46,11 +45,10 @@ export function TopBar({ page, setPage }: TopBarProps) {
       </nav>
 
       <button
-        className={`${styles.iconButton} ${active === 'settings' ? styles.linkActive : ''}`}
+        className={`${styles.link} ${active === 'settings' ? styles.linkActive : ''}`}
         onClick={() => setPage('settings')}
-        title="Settings"
       >
-        <Icon src={gearGlyph} size={20} />
+        Settings
       </button>
     </header>
   );

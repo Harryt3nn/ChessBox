@@ -15,7 +15,6 @@ import type { WeakPointsQueue } from '../Storage/WeakPoints';
 import { FileSystemStorageProvider } from '../Storage/FileSystemStorageProvider';
 import { numberedLine } from '../chess/analysisTree';
 
-import weakPointsIcon from '../assets/icons/041-checkmate.png';
 
 interface WeakPointsProps {
   setPage: (page: Page) => void;
@@ -133,7 +132,6 @@ const WeakPoints = ({ setPage }: WeakPointsProps) => {
     <main className="main-content">
       <div className={shared.page}>
         <PageHeader
-          icon={weakPointsIcon}
           title="WeakPoints"
           subtitle="Drill the lines you get wrong, revisit the ones you rarely reach, keep the strong ones fresh."
         />
