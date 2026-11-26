@@ -47,7 +47,7 @@ A bare § means this file. `tasks.md` holds the ranked work; `decisions.md` hold
 - D44: Lanes are A1 Lead, A2 Features, A3 UI, A4 Security (Harry's 2.0 split); D42's review rules stay.
 - D47 (Planned): An import saves only nodes reachable from the ticked repertoires, enforced in main.
 - D48 (Planned): Lichess imports: 30 s connect, 60 s idle (TUNE), keep saved games, report the count.
-- D46 (Planned): WeakPoints Open in board sits under the drill text after you answer; the drill pauses for Next (replaces auto-advance).
+- D46 (Verified): WeakPoints Open in board sits under the drill text after you answer; the drill pauses for Next (replaces auto-advance).
 - D45 (Planned): Moodboard approved, rich not minimal (sunburst + chevron band stay); only Harry's Flaticon icons, otherwise no icon; no emoji or symbol icons.
 - D43 (Planned): A password change signs out other devices via `User.tokenVersion`; the changing device gets a fresh token; any UNAUTHORIZED signs the desktop out; old tokens count as version 0.
 - D42: Four agents work in parallel (A1 lead + GUI, A2 repertoires, A3 board, A4 server + QA); all 4 review every branch, only A1 merges and writes plan docs (`agents/TEAM.md`).
