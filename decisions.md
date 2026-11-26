@@ -437,20 +437,74 @@ The record of design choices, the features added and dropped, and the reasons. R
 - **Evidence:** merged `main@e19237f`; 3 DrillPanel tests (no button before the answer, Next waits for a click, opens at `boardNodeId`); Harry clicked through in the dev app 2026-11-26: "i like open in board".
 - **One-liner:** Answer, then choose Next or Open in board.
 
-### D47 · data · An import saves only the nodes reachable from the repertoires you ticked (T31 a): Status: Planned · Updated: 2026-11-26 14:30
+### D47 · data · An import saves only the nodes reachable from the repertoires you ticked (T31 a): Status: Built · Updated: 2026-11-26 15:40
 - **Decision:** Harry (2026-11-26, "choose an agent to fix the import bugs", taking A2's recommendation B): `importRepertoires` in main keeps only nodes reachable from the imported repertoires' roots (childIDs + transpositionEdges) after sanitising. `storage:importRepertoires` keeps its arguments, and its promise becomes "saves only reachable nodes". No start-up sweep.
 - **Why:** D8, the rule lives at the trust boundary; the failing test `ImportService.test.ts:27` already checks it; Harry's data has 0 orphans (1,082 nodes, measured 2026-11-24), so a sweep has nothing to do.
 - **Alternatives rejected:** filter in the renderer (the guarantee sits at the untrusted end); B + a sweep on load (startup code that deletes data, for 0 orphans); leave it.
 - **Trade-off / risk:** ~15 lines in main; a wrong walk would drop real nodes, so the tests cover transpositions.
 - **Revisit if:** orphans ever show up (the same walk can sweep).
-- **Evidence:** TBD (the it.fails test turns green).
+- **Evidence:** merged `main@8e30cfe` (A4, T45): `ImportService.test.ts:27` green, transposition case tested; 229 desktop tests. Narrower orphan (A2 review): a node reached only via a transposition into an unticked repertoire keeps that repertoire's id, so deleteRepertoire never removes it; Harry's data has 7 transposition edges, 0 cross-repertoire (2026-11-26). Not handled; a 🟠 data rule if it ever matters.
 - **One-liner:** Importing some repertoires from a file saves only their moves.
 
-### D48 · failure modes · Lichess imports give up after 30 s connect / 60 s idle and keep what arrived (T31 b): Status: Planned · Updated: 2026-11-26 14:30
+### D48 · failure modes · Lichess imports give up after 30 s connect / 60 s idle and keep what arrived (T31 b): Status: Built · Updated: 2026-11-26 15:40
 - **Decision:** Harry (2026-11-26, same message, taking A2's recommendation C): 30 s (TUNE) for Lichess to start answering, then abort if no data arrives for 60 s (TUNE), through an AbortController on the fetch. Games already saved are kept, and the result is `ok: false` plus the count saved ("Lichess stopped responding after N games; run it again to fetch the rest"). The same fix reports the count when blitz succeeds and rapid fails.
 - **Why:** a stream can be long and healthy, so a total timeout would cut big accounts short; each saved file is complete and a re-run skips existing files.
 - **Alternatives rejected:** a total timeout (cuts big imports); idle only (no separate "can't reach Lichess" error).
 - **Trade-off / risk:** two numbers to tune.
 - **Revisit if:** real imports hit the idle limit while healthy.
-- **Evidence:** TBD (the it.fails test `LichessImporter.test.ts:25` turns green).
+- **Evidence:** merged `main@8e30cfe` (A4, T45): `LichessImporter.test.ts` green incl. connect timeout, idle timeout with count, stall before the first game, blitz ok / rapid failed. Not yet tried on a real import by Harry.
 - **One-liner:** A stalled Lichess import stops within a minute and tells you how many games it got.
+
+### D49 · data · Deleting imported games: per game, selected, or a whole account: Status: Planned · Updated: 2026-11-26 15:40
+- **Decision:** Harry (T44, 2026-11-26, took every recommendation). (a) Separate IPC channels: `games:deleteGames(keys[])` (each key `^(lichess|chesscom):[A-Za-z0-9_-]{1,64}$`, max 10,000 per call (TUNE), any bad key → throws "Invalid game" and nothing is touched, returns `{deleted, notFound}`), `games:deleteAccount(account)` (`^(lichess|chesscom)/[A-Za-z0-9_-]{1,50}$`, path checked inside `games/`, returns `{deleted}`), read-only `games:accounts()` and `games:list(account)`. Both deletes refuse while a Novelty run or an import is running. (a2) A per-game delete removes every copy of that game key; an account delete removes only that folder. (b) Novelty results are scrubbed first (keys removed, account dropped from `accounts`, findings rebuilt with `buildResults`, verdicts and dismissals kept where other games still produce them), then files are deleted. (c) WeakPoints cards are kept. (d) An "Imported games" section in Settings: account rows with counts and "Delete all…", a game list 50 per page (TUNE) with checkboxes, per-game Delete and "Delete selected (n)"; confirmations name exactly what goes, Cancel has default focus. A Delete in the Novelty Finder's game lists is a small follow-up.
+- **Why:** each call means one thing, so input can't escalate a small delete into a big one; deleted means deleted, including derived data; scrub-then-delete means a crash leaves only a re-runnable gap.
+- **Alternatives rejected:** one combined channel; per-game only; delete only this account's copy; leave novelty results until the next run; wipe all novelty files; drop WeakPoints cards.
+- **Trade-off / risk:** 4 channels; `games:list` reads PGN headers (4,396 files: TBD, measure while building).
+- **Revisit if:** the list is slow on large accounts.
+- **Evidence:** TBD (A2 builds).
+- **One-liner:** Delete one game, a selection, or a whole account, and the Novelty Finder forgets them too.
+
+### D50 · engine · Strongest Stockfish = your own native download, plus "Open on Lichess": Status: Planned · Updated: 2026-11-26 15:40
+- **Decision:** Harry (F2, 2026-11-26): Settings points at a native Stockfish he downloads from stockfishchess.org. Main runs it as a separate process and talks UCI over stdin/stdout; it's used for Novelty Finder verdicts and deep board analysis. If the file is missing or broken, the built-in engine is used. Plus an "Open on Lichess" button that opens the current position in Lichess's analysis page (the position is sent to Lichess). The live eval bar keeps the lite WASM engine (D14).
+- **Why:** only native uses every core at full speed; his own download keeps an ~80 MB GPL-3 binary out of the app and is upgraded by swapping the file.
+- **Alternatives rejected:** ship stockfish.exe with the app; multi-threaded WASM (cross-origin headers on every page, still slower per thread); only a Lichess link.
+- **Trade-off / risk:** a new IPC contract + a path setting (A2 sends the contract as a 🟠 before building); spawning a process from main; `shell.openExternal` needs an https allow-list (A4's Electron check).
+- **Revisit if:** the native process is unreliable on Windows.
+- **Evidence:** TBD (measure nps on Harry's PC once built).
+- **One-liner:** Point ChessBox at a real Stockfish for full strength.
+
+### D51 · auth · An UNAUTHORIZED answer is double-checked before signing out: Status: Planned · Updated: 2026-11-26 15:40
+- **Decision:** Harry (2026-11-26): on an UNAUTHORIZED, the desktop calls `auth.me` once and signs out only if that is refused too (UNAUTHORIZED / NOT_FOUND, as D13). A wrong current password just shows the form error. Server unreachable during the check → stay signed in. Sign-out message: "Your session ended. Please sign in again."
+- **Why:** the server uses UNAUTHORIZED for both a dead login and a wrong current password; no server change while Harry isn't connected; one "logged out" rule everywhere.
+- **Alternatives rejected:** any UNAUTHORIZED signs out (a typo kicks you out); server answers FORBIDDEN (a D28 contract change + deploy; still possible later); reading error text (fragile).
+- **Trade-off / risk:** one extra request, only after an UNAUTHORIZED.
+- **Revisit if:** the server moves to FORBIDDEN for wrong passwords.
+- **Evidence:** TBD (A4 builds).
+- **One-liner:** A wrong password never signs you out; a dead login does.
+
+### D52 · failure modes · Server said yes but the token couldn't be saved: tell the truth: Status: Planned · Updated: 2026-11-26 15:40
+- **Decision:** Harry (2026-11-26): login, register and change password treat the server step as done when only the local save fails, and show a warning toast (wording A1's: "Signed in, but this device couldn't save your sign-in, so you'll need to sign in again next time ChessBox opens."). Change password also clears the stale token from disk (best effort). One helper, `adoptToken(token) → {saved}`.
+- **Why:** the server step can't be undone, so the only honest answer is partial success; register was telling people their own new username was taken.
+- **Alternatives rejected:** leave it; retry the save first; save the token unencrypted (reopens D7).
+- **Trade-off / risk:** you sign in again at the next start (you're told).
+- **Revisit if:** saving fails often in practice.
+- **Evidence:** TBD (A4 builds).
+- **One-liner:** If the PC can't remember your sign-in, it says so instead of claiming the sign-in failed.
+
+### D53 · security · Ids `__proto__`, `constructor`, `prototype` are refused at import (reverses B1): Status: Planned · Updated: 2026-11-26 15:40
+- **Decision:** Harry (🟠 9, 2026-11-26) chose to reverse his earlier B1 decision: `isSafeId` rejects these three ids, so the node is dropped with a warning at the trust boundary (D8).
+- **Why:** one rule at the boundary protects every plain-object write by id, now and later; chessgraph ids are random strings, so the cost is close to nothing.
+- **Alternatives rejected:** keep B1 and fix the 3 writes (`MainStorage.ts:195`, `replyConflicts.ts:88`, `cards.ts:110`) with null-prototype objects (the next `obj[id] =` would reopen it).
+- **Trade-off / risk:** a real file using those ids loses those nodes.
+- **Revisit if:** a real export ever uses one.
+- **Evidence:** TBD (A4's failing tests in `reserved-ids-test` turn green).
+- **One-liner:** Ids that would break JavaScript objects are refused on import.
+
+### D54 · security · Electron permissions allow-list + IPC sender check: Status: Planned · Updated: 2026-11-26 15:40
+- **Decision:** Harry (2026-11-26): `setPermissionRequestHandler` + `setPermissionCheckHandler` allow only clipboard write (Copy FEN / PGN; exact permission name confirmed on the branch) and deny everything else; every IPC handler checks that the sender frame's URL is the app's own page.
+- **Why:** Electron approves every permission by default; least privilege stops an injected script becoming camera / mic / location access. Electron's security guide recommends both.
+- **Alternatives rejected:** allow-list without the sender check; deny everything (breaks copy); leave it.
+- **Trade-off / risk:** a future feature that needs a permission must add it to the list.
+- **Revisit if:** a feature needs a new permission.
+- **Evidence:** A4's Electron audit 2026-11-26 (sandbox, contextIsolation, navigation guards and fuses already pass).
+- **One-liner:** The app gets only the browser permissions it uses.

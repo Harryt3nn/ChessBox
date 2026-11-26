@@ -45,8 +45,14 @@ A bare § means this file. `tasks.md` holds the ranked work; `decisions.md` hold
 - D40: Drills can be limited to one branch ("1.e4 e6") or Everything; queue takes `mode` + `branchNodeId`.
 - D41: Random drills: random your-move position, play your next N (default 5) moves forward.
 - D44: Lanes are A1 Lead, A2 Features, A3 UI, A4 Security (Harry's 2.0 split); D42's review rules stay.
-- D47 (Planned): An import saves only nodes reachable from the ticked repertoires, enforced in main.
-- D48 (Planned): Lichess imports: 30 s connect, 60 s idle (TUNE), keep saved games, report the count.
+- D54 (Planned): Electron permissions allow-list (clipboard write only) + IPC sender check.
+- D53 (Planned): Ids __proto__ / constructor / prototype refused at import (reverses B1).
+- D52 (Planned): Server yes + token not saved → action counts as done, warning toast.
+- D51 (Planned): UNAUTHORIZED double-checked with auth.me before signing out.
+- D50 (Planned): Strongest Stockfish = native download set in Settings (fallback built-in) + Open on Lichess.
+- D49 (Planned): Delete imported games per game / selected / account; novelty scrubbed; Settings section.
+- D47 (Built): An import saves only nodes reachable from the ticked repertoires, enforced in main.
+- D48 (Built): Lichess imports: 30 s connect, 60 s idle (TUNE), keep saved games, report the count.
 - D46 (Verified): WeakPoints Open in board sits under the drill text after you answer; the drill pauses for Next (replaces auto-advance).
 - D45 (Planned): Moodboard approved, rich not minimal (sunburst + chevron band stay); only Harry's Flaticon icons, otherwise no icon; no emoji or symbol icons.
 - D43 (Planned): A password change signs out other devices via `User.tokenVersion`; the changing device gets a fresh token; any UNAUTHORIZED signs the desktop out; old tokens count as version 0.
