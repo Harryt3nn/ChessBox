@@ -132,3 +132,21 @@ One `Pass n` per research question (CLAUDE.md §9). Grep by pass number; never r
 
 ### DO NOT USE
 - The web-fetch tool's model summary of RFC 8252's unread tail: it wrongly claimed §7.3 was missing while the verbatim text contained it. Use the verbatim text only.
+
+## Pass 5 · 2026-11-26 · Are the Lichess player / masters databases and endgame tablebases open and free to use? (A2, for system.md's toolkit ideas)
+**Recommendation:** all three can be used free from a personal app through the Lichess API. Only the Lichess game dumps are open data (CC0). The masters data has no dump. For tablebases, call Lichess's API rather than shipping files (6-piece alone is ~150 GB). Every claim rests on one primary source, its own docs or repo: no second independent source.
+
+### KEEP
+- **Lichess game dumps are CC0**: "Use them for research, commercial purpose, publication, anything you like." https://database.lichess.org/
+- **Explorer server is AGPL-3**. It serves `/masters`, `/lichess` and `/player`, and has no source or download for the masters data. https://github.com/lichess-org/lila-openingexplorer
+- **API rules**: one request at a time; after a 429, wait 1 minute; a missing User-Agent "may be rejected or rate limited". `/player` streams ndjson, indexes new games at most once a minute, and returns 503 when its queue is full. Tablebase endpoints have `security: []` (no auth). https://raw.githubusercontent.com/lichess-org/api/master/doc/specs/lichess-api.yaml
+- **Lichess tablebase server**: AGPL-3, Syzygy, 7-piece complete. https://github.com/lichess-org/lila-tablebase
+- **Syzygy files** "may be freely redistributed". Sizes: ≤5 pieces ~0.9 GB, 6-piece ~150 GB. The generator is GPL-2. https://github.com/syzygy1/tb
+- **Fathom** (C probing code) is MIT, based on de Man's tbprobe, "released for unrestricted distribution and use". https://github.com/jdart1/Fathom
+
+### WEAK
+- Every explorer endpoint in the spec lists `security: OAuth2` with no scopes, while the examples are unauthenticated, so the explorer may now need a Lichess token. Test one call before designing around it. If a token is needed, that's a 🟠 trust item.
+- The broadcast (over-the-board) dump of 1.3 M games: its licence (CC BY-SA 4.0) was read from a summary only.
+
+### Not read (blocked)
+- lichess.org/api and lichess.org/terms-of-service returned 403, and syzygy-tables.info returned a bot check. Still unknown: a ToS clause on automated use, and the official 7-piece size.
