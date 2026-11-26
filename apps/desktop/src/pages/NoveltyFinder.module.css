@@ -91,12 +91,10 @@
   cursor: not-allowed;
 }
 
+/* ink on sage is only 2.61:1, ivory is 5.31:1. No hover colour: ivory on a lighter sage drops under 4.5:1, so the lift is the hover cue */
 .chesscomBtn {
   background: var(--color-sage);
-}
-
-.chesscomBtn:hover:not(:disabled) {
-  background: var(--color-sage-hover);
+  color: var(--color-text-primary);
 }
 
 .lichessBtn {
