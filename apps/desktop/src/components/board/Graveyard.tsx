@@ -37,7 +37,7 @@ export function Graveyard({ pieces, pieceColor, lead }: GraveyardProps) {
   return (
     <div className={styles.graveyard}>
       {groups.length > 0 && (
-        <span className={`${styles.pieces} ${pieceColor === 'w' ? styles.white : styles.black}`} role="img" aria-label={capturedLabel(groups)}>
+        <span className={pieceColor === 'w' ? styles.white : styles.black} role="img" aria-label={capturedLabel(groups)}>
           {groups.map(g => `${g.count > 1 ? g.count : ''}${LETTER[g.piece]}`).join(' ')}
         </span>
       )}
