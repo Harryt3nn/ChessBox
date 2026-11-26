@@ -38,7 +38,7 @@
 
 .warnings {
   padding: 8px 12px 8px 28px;
-  border: 1px solid rgba(var(--color-coral-rgb), 0.6);
+  border: 1px solid var(--color-danger-text);
   color: var(--color-text-secondary);
   font-size: 12px;
 }

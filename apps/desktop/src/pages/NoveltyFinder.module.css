@@ -91,12 +91,9 @@
   cursor: not-allowed;
 }
 
+/* ink text from .importBtn (8.58:1 on jade). No hover colour, the lift is the hover cue */
 .chesscomBtn {
   background: var(--color-sage);
-}
-
-.chesscomBtn:hover:not(:disabled) {
-  background: var(--color-sage-hover);
 }
 
 .lichessBtn {

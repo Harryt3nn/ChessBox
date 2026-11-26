@@ -34,7 +34,6 @@
   /* coral is a button fill (ivory on it is 6.55:1); as text, or as a border on the dark surfaces
      (coral is only 1.73:1 on surface-1), use the claret danger tone */
   --color-coral: #8c2f39;
-  --color-coral-hover: #a83f4a;
   --color-coral-rgb: 140, 47, 57;
   --color-danger-text: #ef8c80;  /* claret, nudged lighter than the moodboard's #ec8578 to pass 4.5:1 on surface-3 */
 
@@ -42,9 +41,8 @@
   --color-piece-dark: #3d6656;   /* board dark square */
   --color-piece-dark-rgb: 61, 102, 86;
 
-  /* jade fills carry ink text (8.58:1); the old sage was too dark for that */
+  /* jade fills carry ink text (8.58:1); ivory on jade is only 1.77:1 */
   --color-sage: #6fbf95;
-  --color-sage-hover: #8fd0ac;
 
   --color-cream-rgb: 238, 230, 211;
   --color-ink: #0f1211;
