@@ -29,11 +29,11 @@ The record of design choices, the features added and dropped, and the reasons. R
 - **Evidence:** `sanitiseImport.ts` cuts cycles with an iterative DFS.
 - **One-liner:** Transpositions are first-class edges, so one position is one node.
 
-### D2 · data format · chessgraph.net v3 compatible import: Status: Built · Updated: 2026-11-18 17:20
+### D2 · data format · chessgraph.net v3 compatible import: Status: Built · Updated: 2026-11-26 13:40
 - **Decision:** Accept chessgraph exports (nodes as an array, `childIds` / `children`), normalised to `childIDs` in a `Record<id, Node>`.
 - **Why:** Harry's existing repertoires were built in chessgraph; no native builder exists yet.
 - **Alternatives rejected:** a custom-only format (would strand existing data).
-- **Trade-off / risk:** older saved nodes keep `childIds` / `children` until that node is next saved; re-importing doesn't replace them (existing nodes win, `ImportService.ts`). Readers go through `childrenOf`, so every spelling works. Checked 2026-11-24 (A2): all 1,082 of Harry's nodes predate the sanitiser (file last written 18 Jul 2026); nothing broken.
+- **Trade-off / risk:** older saved nodes keep `childIds` / `children` until that node is next saved; re-importing doesn't replace them (existing nodes win, `ImportService.ts`). Readers go through `childrenOf`, so every spelling works. Checked 2026-11-24 (A2): all 1,082 of Harry's nodes predate the sanitiser (file last written 18 Jul 2026); nothing broken. Re-checked 2026-11-26 (A2): every write path (import, `saveNodePatch`, new roots) writes `childIDs`. Latent edge: `sanitiseNode` (`sanitiseImport.ts:126`) takes the first *array* while `childrenOf` takes the first *non-empty* one, so `childIds: [], children: [x]` would lose its child on re-sanitise (0 such nodes in Harry's data); 🟢 one-line fix, A2.
 - **Revisit if:** the native graph builder lands (export in the same format is Parked).
 - **Evidence:** sanitiser + `validateChessGraphExport.ts`.
 - **One-liner:** ChessBox reads chessgraph files natively.
