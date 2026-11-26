@@ -76,7 +76,7 @@ const App = () => {
     if (page === 'tools') return <TrainingToolkit page={page} setPage={setPage} />;
     if (page === 'settings') return <Settings onLogout={handleLogout} onUserChange={setCurrentUser} />;
     if (page === 'board') return <BoardView repertoire={boardRepertoire} focus={boardFocus} onOpenInGraph={openBuilder} onCloseRepertoire={() => { setBoardRepertoire(null); setBoardFocus(null); }} />;
-    if (page === 'weakpoints') return <WeakPoints setPage={setPage} />;
+    if (page === 'weakpoints') return <WeakPoints setPage={setPage} onOpenInBoard={openInBoard} />;
     if (page === 'novelty') return <NoveltyFinder page={page} currentUser={currentUser} onOpenInBoard={openInBoard} onOpenInGraph={openBuilder} />;
 
     return <Home setPage={setPage} currentUser={currentUser} />;
