@@ -9,6 +9,12 @@ import { isSafeId } from "../importsAndExports/sanitiseImport";
 
 // a single game's PGN is a few KB; anything far larger isn't a real game
 const MAX_PGN_BYTES = 200_000;
+// D48 (TUNE): how long Lichess has to start answering, then how long the stream may go quiet.
+// No total limit: a big account streams for minutes while healthy
+const CONNECT_TIMEOUT_MS = 30_000;
+const IDLE_TIMEOUT_MS = 60_000;
+
+const games = (n: number) => `${n} game${n === 1 ? "" : "s"}`;
 
 export interface LichessImportResult {
   ok: boolean;
@@ -27,11 +33,53 @@ export async function importLichess(username: string): Promise<LichessImportResu
   fs.mkdirSync(userDir, { recursive: true });
 
   let gamesImported = 0;
+  // saved games are complete files and a re-run skips them, so every failure says what was kept
+  const keptNote = () => gamesImported > 0 ? `, after saving ${games(gamesImported)}; run it again to fetch the rest` : "";
 
-  async function processStream(res: Response): Promise<void> {
+  // one fetch per game type, returning an error message or null. A timeout aborts the fetch, which
+  // also errors its body and so ends the read loop (res.body.cancel() rejects instead, agent-2.md)
+  async function importPerf(perf: "blitz" | "rapid"): Promise<string | null> {
+    const abort = new AbortController();
+    let timer: ReturnType<typeof setTimeout> | undefined;
+    const restartTimer = (ms: number) => {
+      clearTimeout(timer);
+      timer = setTimeout(() => abort.abort(), ms);
+    };
+    let connected = false;
+
+    restartTimer(CONNECT_TIMEOUT_MS);
+    try {
+      const res = await fetch(
+        `https://lichess.org/api/games/user/${username}?perfType=${perf}&pgnInJson=true`,
+        { headers: { Accept: "application/x-ndjson" }, signal: abort.signal }
+      );
+      connected = true;
+      if (!res.ok) return `Lichess had an error (${res.status}) fetching ${perf} games${keptNote()}`;
+
+      restartTimer(IDLE_TIMEOUT_MS);
+      await processStream(res, () => restartTimer(IDLE_TIMEOUT_MS));
+      return null;
+    } catch (err) {
+      if (!abort.signal.aborted) throw err;
+      if (!connected) return `Lichess didn't answer within ${CONNECT_TIMEOUT_MS / 1000} seconds${keptNote()}`;
+      return gamesImported > 0
+        ? `Lichess stopped responding after ${games(gamesImported)}; run it again to fetch the rest`
+        : "Lichess stopped sending before the first game arrived; run it again";
+    } finally {
+      clearTimeout(timer);
+    }
+  }
+
+  async function processStream(res: Response, onChunk: () => void): Promise<void> {
     if (!res.body) return;
 
-    const nodeStream = Readable.from(res.body as unknown as AsyncIterable<any>);
+    const body = res.body;
+    const nodeStream = Readable.from((async function* () {
+      for await (const chunk of body) {
+        onChunk();
+        yield chunk;
+      }
+    })());
     const rl = readline.createInterface({ input: nodeStream });
 
     for await (const line of rl) {
@@ -59,31 +107,11 @@ export async function importLichess(username: string): Promise<LichessImportResu
     }
   }
 
+  let error: string | null;
   try {
-    const blitzRes = await fetch(
-      `https://lichess.org/api/games/user/${username}?perfType=blitz&pgnInJson=true`,
-      { headers: { Accept: "application/x-ndjson" } }
-    );
-
-    if (!blitzRes.ok) {
-      return { ok: false, error: `Lichess returned ${blitzRes.status} for blitz games` };
-    }
-
-    await processStream(blitzRes);
-
-    const rapidRes = await fetch(
-      `https://lichess.org/api/games/user/${username}?perfType=rapid&pgnInJson=true`,
-      { headers: { Accept: "application/x-ndjson" } }
-    );
-
-    if (!rapidRes.ok) {
-      return { ok: false, error: `Lichess returned ${rapidRes.status} for rapid games` };
-    }
-
-    await processStream(rapidRes);
-
-    return { ok: true, gamesImported };
+    error = (await importPerf("blitz")) ?? (await importPerf("rapid"));
   } catch (err) {
-    return { ok: false, error: err instanceof Error ? err.message : "Unknown error during import" };
+    error = (err instanceof Error ? err.message : "Unknown error during import") + keptNote();
   }
+  return error ? { ok: false, error, gamesImported } : { ok: true, gamesImported };
 }

@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { DEFAULT_POSITION } from 'chess.js';
 import type { Node } from '../types/Node';
 import type { MoveNode } from '../types/moveNode';
-import { childrenOf, repertoireToTree } from './repertoireTree';
+import { childrenOf, reachableIds, repertoireToTree } from './repertoireTree';
 
 // a node as saved on disk; older files use chessgraph's childIds / children instead of childIDs
 const n = (id: string, move: string | null, kids: string[] = [], extra: Partial<Node> & Record<string, unknown> = {}): Node =>
@@ -17,6 +17,29 @@ describe('childrenOf', () => {
     expect(childrenOf({ id: 'a', childIds: ['y'], children: [] })).toEqual(['y']);
     expect(childrenOf({ id: 'a', childIDs: [], children: ['z'] })).toEqual(['z']);
     expect(childrenOf({ id: 'a' })).toEqual([]);
+  });
+});
+
+describe('reachableIds', () => {
+  // repairGraph only cuts childIDs cycles, so a transposition can still point back up the line
+  const nodes = graph(
+    n('root', null, ['a']),
+    n('a', 'e4', ['b']),
+    n('b', 'e5', [], { transpositionEdges: [{ targetId: 'root', move: 'Nf3' }, { targetId: 'other', move: 'd4' }] }),
+    n('other', 'd4', ['missing']),
+    n('unlinked', 'c4'),
+  );
+
+  it('follows transpositions through a cycle and stops, skipping ids with no node', () => {
+    expect([...reachableIds(['root'], nodes, true)].sort()).toEqual(['a', 'b', 'other', 'root']);
+  });
+
+  it('follows child moves only when transpositions are off', () => {
+    expect([...reachableIds(['root'], nodes, false)].sort()).toEqual(['a', 'b', 'root']);
+  });
+
+  it('never finds an inherited key such as constructor', () => {
+    expect([...reachableIds(['constructor', '__proto__'], nodes, true)]).toEqual([]);
   });
 });
 
