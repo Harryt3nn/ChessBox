@@ -13,6 +13,7 @@ import type { Folder } from "../types/Folder";
 import type { Repertoire } from "../types/Repertoire";
 import type { Node } from "../types/Node";
 import { sanitiseImport } from "../importsAndExports/sanitiseImport";
+import { reachableIds } from "../chess/repertoireTree";
 
 function mergeFolders(existing: Folder[], incoming: Folder[]): Folder[] {
   const map = new Map(existing.map(f => [f.id, f]));
@@ -32,7 +33,10 @@ function mergeRepertoires(existing: Repertoire[], incoming: Repertoire[]): Reper
 
 // payload arrives over IPC from the renderer, so it is sanitised again here rather than trusted
 export async function importRepertoires(payload: unknown): Promise<{ success: true }> {
-  const { folders, repertoires, nodes } = sanitiseImport(payload);
+  const { folders, repertoires, nodes: fileNodes } = sanitiseImport(payload);
+  // D47: the import window sends every node in the file, ticked repertoire or not
+  const kept = reachableIds(repertoires.map(r => r.rootNodeId), fileNodes, true);
+  const nodes = Object.fromEntries(Object.entries(fileNodes).filter(([id]) => kept.has(id)));
 
   const existingFolders = await loadFolders();
   const existingRepertoires = await loadRepertoires();
