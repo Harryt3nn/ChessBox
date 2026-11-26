@@ -1,6 +1,8 @@
 /*apps/desktop/src/components/TopBar.module.css*/
 
 .bar {
+  position: relative;
+  margin-bottom: 8px;
   display: flex;
   align-items: center;
   gap: 24px;
@@ -9,6 +11,20 @@
   background: var(--color-surface-1);
   border-bottom: 1px solid var(--color-border);
   flex-shrink: 0;
+}
+
+/* the chevron band: the app's only repeating pattern (moodboard T34), hard-stop stripes, no blend */
+.bar::after {
+  content: "";
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  height: 8px;
+  background:
+    linear-gradient(135deg, var(--color-amber) 25%, transparent 25%) -8px 0 / 16px 16px,
+    linear-gradient(225deg, var(--color-amber) 25%, transparent 25%) -8px 0 / 16px 16px;
+  opacity: 0.7;
 }
 
 .brand {

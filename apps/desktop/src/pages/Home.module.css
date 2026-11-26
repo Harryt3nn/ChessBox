@@ -1,11 +1,26 @@
 /*apps/desktop/src/pages/Home.module.css*/
 
 .hero {
+  position: relative;
   display: flex;
   align-items: flex-end;
   justify-content: space-between;
   gap: 24px;
   flex-wrap: wrap;
+  padding-top: 72px;
+  isolation: isolate;
+}
+
+/* line-drawn sunburst behind the greeting, a mask so the colour stays a token; text over it keeps full contrast */
+.hero::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: var(--color-amber);
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 900 300'%3E%3Cpath d='M450 300L1450 300M450 300L1428 92M450 300L1364 -107M450 300L1259 -288M450 300L1119 -443M450 300L950 -566M450 300L759 -651M450 300L555 -695M450 300L345 -695M450 300L141 -651M450 300L-50 -566M450 300L-219 -443M450 300L-359 -288M450 300L-464 -107M450 300L-528 92M450 300L-550 300M340 300A110 110 0 0 1 560 300M290 300A160 160 0 0 1 610 300M240 300A210 210 0 0 1 660 300' fill='none' stroke='black' stroke-width='1'/%3E%3C/svg%3E") center bottom / 900px 300px no-repeat;
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 900 300'%3E%3Cpath d='M450 300L1450 300M450 300L1428 92M450 300L1364 -107M450 300L1259 -288M450 300L1119 -443M450 300L950 -566M450 300L759 -651M450 300L555 -695M450 300L345 -695M450 300L141 -651M450 300L-50 -566M450 300L-219 -443M450 300L-359 -288M450 300L-464 -107M450 300L-528 92M450 300L-550 300M340 300A110 110 0 0 1 560 300M290 300A160 160 0 0 1 610 300M240 300A210 210 0 0 1 660 300' fill='none' stroke='black' stroke-width='1'/%3E%3C/svg%3E") center bottom / 900px 300px no-repeat;
+  opacity: 0.3;
 }
 
 .greeting {
