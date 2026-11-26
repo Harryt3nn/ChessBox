@@ -106,7 +106,7 @@
 }
 
 .folder-input-error {
-  border-color: var(--color-coral);
+  border-color: var(--color-danger-text);
   user-select: none;
 }
 
