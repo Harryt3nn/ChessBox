@@ -47,8 +47,7 @@
   --color-cream-rgb: 238, 230, 211;
   --color-ink: #0f1211;
 
-  /* the OFL font files land in assets/fonts with T37; until then each stack falls back to what the app uses today */
-  --font-display: 'Limelight', 'Poiret One', Georgia, serif;
+  --font-display: 'Limelight', Georgia, serif;
   --font-body: 'Jost', 'Segoe UI', sans-serif;
   --font-mono: 'DM Mono', 'Cascadia Mono', Consolas, monospace;
 
@@ -56,6 +55,32 @@
   --highlight-dot: radial-gradient(circle, rgba(0, 0, 0, 0.3) 20%, transparent 21%);
 }
 
+
+/* SIL OFL 1.1 font files, licences in assets/licenses */
+@font-face {
+  font-family: 'Limelight';
+  src: url('./assets/fonts/Limelight-Regular.ttf') format('truetype');
+  font-weight: 400;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Jost';
+  src: url('./assets/fonts/Jost-VariableFont_wght.ttf') format('truetype');
+  font-weight: 100 900;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'DM Mono';
+  src: url('./assets/fonts/DMMono-Regular.ttf') format('truetype');
+  font-weight: 400;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'DM Mono';
+  src: url('./assets/fonts/DMMono-Medium.ttf') format('truetype');
+  font-weight: 500;
+  font-display: swap;
+}
 
 /* the eval bar, switch knob, folder chevron and loading spinner are the only animations left */
 @media (prefers-reduced-motion: reduce) {
@@ -89,7 +114,7 @@ textarea {
 body {
   background: var(--color-void);
   color: var(--color-text-secondary);
-  font-family: 'Segoe UI', sans-serif;
+  font-family: var(--font-body);
   height: 100vh;
   overflow: hidden;
   user-select: none;

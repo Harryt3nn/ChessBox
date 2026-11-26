@@ -48,7 +48,7 @@
   border: 1px solid var(--color-border);
   color: var(--color-text-primary);
   font-size: 14px;
-  font-family: 'Segoe UI', sans-serif;
+  font-family: var(--font-body);
   outline: none;
   user-select: text;
 }
