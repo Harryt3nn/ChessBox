@@ -1,7 +1,8 @@
 /*apps/desktop/src/pages/PageShared.module.css*/
 
-/* building blocks shared by the Home, Analytics, Training and Novelty pages
-   same art deco language as the profile card / modals: clipped corners, brass accents */
+/* building blocks shared by the Home, Analytics, Training, Novelty and WeakPoints pages.
+   Deco rules (moodboard T34): sections sit on a brass double rule instead of in boxes,
+   buttons swap colour instantly on hover, never fade */
 
 .page {
   display: flex;
@@ -14,10 +15,8 @@
 /* Panels */
 
 .panel {
-  background: var(--color-surface-1);
-  border: 1px solid var(--color-border-strong);
-  clip-path: polygon(12px 0, 100% 0, 100% calc(100% - 12px), calc(100% - 12px) 100%, 0 100%, 0 12px);
-  padding: 20px 24px;
+  border-top: 3px double var(--color-rule);
+  padding: 18px 0 8px;
   display: flex;
   flex-direction: column;
   gap: 16px;
@@ -67,10 +66,8 @@
 }
 
 .stat-tile {
-  background: var(--color-surface-2);
-  border: 1px solid var(--color-border);
-  clip-path: polygon(8px 0, 100% 0, 100% calc(100% - 8px), calc(100% - 8px) 100%, 0 100%, 0 8px);
-  padding: 14px 16px;
+  border-bottom: 1px solid var(--color-rule);
+  padding: 4px 0 12px;
   display: flex;
   flex-direction: column;
   gap: 6px;
@@ -89,9 +86,10 @@
 
 .stat-value {
   color: var(--color-amber);
+  font-family: var(--font-mono);
   font-size: 26px;
-  font-weight: 700;
-  letter-spacing: 0.02em;
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
 }
 
 .stat-value-empty {
@@ -104,9 +102,7 @@
 
 .toggle {
   display: inline-flex;
-  background: var(--color-surface-2);
-  border: 1px solid var(--color-border-strong);
-  clip-path: polygon(8px 0, 100% 0, 100% calc(100% - 8px), calc(100% - 8px) 100%, 0 100%, 0 8px);
+  border: 1px solid var(--color-border);
 }
 
 .toggle-btn {
@@ -117,12 +113,12 @@
   cursor: pointer;
   font-size: 12px;
   font-weight: 600;
-  letter-spacing: 0.04em;
+  letter-spacing: 0.12em;
   text-transform: uppercase;
 }
 
 .toggle-btn + .toggle-btn {
-  border-left: 1px solid var(--color-border-strong);
+  border-left: 1px solid var(--color-border);
 }
 
 .toggle-btn:hover {
@@ -135,7 +131,8 @@
   color: var(--color-ink);
 }
 
-/* Buttons */
+/* Buttons: primary is brass with all four corners cut (the Chrysler step),
+   outline is a brass double line: the border plus an outline pulled 4px inside, so the gap shows whatever surface it sits on */
 
 .btn-primary,
 .btn-outline {
@@ -143,45 +140,62 @@
   align-items: center;
   justify-content: center;
   gap: 8px;
-  padding: 9px 16px;
+  padding: 10px 18px;
+  border: none;
+  font-family: inherit;
   font-size: 12px;
-  font-weight: 700;
-  letter-spacing: 0.04em;
+  font-weight: 600;
+  letter-spacing: 0.14em;
   text-transform: uppercase;
   cursor: pointer;
-  clip-path: polygon(6px 0, 100% 0, 100% calc(100% - 6px), calc(100% - 6px) 100%, 0 100%, 0 6px);
 }
 
 .btn-primary {
   background: var(--color-amber);
   color: var(--color-ink);
-  border: 1px solid var(--color-amber);
+  clip-path: polygon(6px 0, calc(100% - 6px) 0, 100% 6px, 100% calc(100% - 6px), calc(100% - 6px) 100%, 6px 100%, 0 calc(100% - 6px), 0 6px);
+}
+
+/* clip-path would cut off the focus ring */
+.btn-primary:focus-visible {
+  clip-path: none;
 }
 
 .btn-primary:hover {
   background: var(--color-amber-hover);
 }
 
+.btn-primary:active {
+  background: var(--color-text-primary);
+}
+
 .btn-outline {
   background: transparent;
-  color: var(--color-text-secondary);
-  border: 1px solid var(--color-border-strong);
+  color: var(--color-amber-hover);
+  border: 1px solid var(--color-border);
+  outline: 1px solid var(--color-border);
+  outline-offset: -4px;
+}
+
+/* the global focus ring replaces the inner line, so push it back outside */
+.btn-outline:focus-visible {
+  outline-offset: 2px;
 }
 
 .btn-outline:hover {
-  color: var(--color-amber);
-  border-color: var(--color-amber);
+  background: var(--color-surface-1);
 }
 
+/* disabled text is exempt from AA, but smoke on baize still reads at 5.74:1 */
 .btn-primary:disabled,
-.btn-outline:disabled {
-  opacity: 0.45;
-  cursor: not-allowed;
-}
-
+.btn-outline:disabled,
+.btn-primary:disabled:hover,
 .btn-outline:disabled:hover {
-  color: var(--color-text-secondary);
-  border-color: var(--color-border-strong);
+  background: var(--color-surface-1);
+  color: var(--color-text-tertiary);
+  border-color: transparent;
+  outline: none;
+  cursor: not-allowed;
 }
 
 /* Empty states — shown wherever a feature has its design but not its data yet */
@@ -304,17 +318,17 @@
 
 .table th {
   padding: 8px 10px;
+  border-bottom: 1px solid var(--color-border);
   color: var(--color-text-tertiary);
   font-size: 11px;
   font-weight: 600;
   letter-spacing: 0.06em;
   text-transform: uppercase;
   text-align: left;
-  border-bottom: 1px solid var(--color-border);
 }
 
 .table td {
   padding: 10px;
   color: var(--color-text-secondary);
-  border-bottom: 1px solid rgba(var(--color-cream-rgb), 0.06);
+  border-bottom: 1px solid var(--color-rule);
 }
