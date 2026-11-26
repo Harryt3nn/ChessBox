@@ -126,6 +126,19 @@ describe('importLichess timeouts (D48)', () => {
     expect(fs.readdirSync(`${dataDir}/ChessBox-data/games/lichess/goesQuiet`).sort()).toEqual(['quiet1.pgn', 'quiet2.pgn']);
   });
 
+  it('says so when the stream goes quiet before the first game', async () => {
+    const stream = lichessStream();
+    vi.stubGlobal('fetch', vi.fn(async (_url: string, init?: RequestInit) => stream.respond(init)));
+    vi.useFakeTimers({ toFake: ['setTimeout', 'clearTimeout'] });
+
+    let result: Awaited<ReturnType<typeof importLichess>> | undefined;
+    const run = importLichess('neverSends').then(r => { result = r; });
+    await vi.advanceTimersByTimeAsync(60_000);
+    await settle(run);
+
+    expect(result).toEqual({ ok: false, error: 'Lichess stopped sending before the first game arrived; run it again', gamesImported: 0 });
+  });
+
   it('reports the blitz games it saved when rapid then fails', async () => {
     vi.stubGlobal('fetch', vi.fn(async (url: string) => url.includes('perfType=blitz')
       ? new Response(new Blob([game('blitz1')]).stream(), { status: 200 })
@@ -133,7 +146,7 @@ describe('importLichess timeouts (D48)', () => {
 
     expect(await importLichess('rapidFails')).toEqual({
       ok: false,
-      error: 'Lichess returned 500 for rapid games, after saving 1 game; run it again to fetch the rest',
+      error: 'Lichess had an error (500) fetching rapid games, after saving 1 game; run it again to fetch the rest',
       gamesImported: 1,
     });
   });
