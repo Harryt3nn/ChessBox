@@ -4,6 +4,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Background, Controls, Handle, Position, ReactFlow, type NodeProps } from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
 import { Chessboard } from 'react-chessboard';
+import { BOARD_SQUARES } from '../components/board/boardSquares';
 import type { Square } from 'chess.js';
 import type { Node } from '../types/Node';
 import type { Repertoire } from '../types/Repertoire';
@@ -244,6 +245,7 @@ const RepertoireBuilder = ({ repertoire, focusNodeId, onOpenInBoard, onBack }: R
                 setFrom(from ? null : to);
               }}
               customSquareStyles={from ? { [from]: { backgroundColor: 'var(--highlight-selected)' } } : {}}
+              {...BOARD_SQUARES}
             />
             <span className={styles.hint}>Drag a piece, or click it and then its square, to add a move from this position.</span>
 

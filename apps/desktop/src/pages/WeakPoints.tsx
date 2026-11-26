@@ -3,6 +3,7 @@
 import { useEffect, useLayoutEffect, useMemo, useRef, useState, type CSSProperties } from 'react';
 import { Chess, DEFAULT_POSITION, type Square } from 'chess.js';
 import { Chessboard } from 'react-chessboard';
+import { BOARD_SQUARES } from '../components/board/boardSquares';
 import toast from 'react-hot-toast';
 import { PageHeader } from '../components/PageHeader';
 import shared from './PageShared.module.css';
@@ -277,6 +278,7 @@ function FittedBoard({ fen, orientation, onPieceDrop, draggable, squareStyles }:
         onPieceDrop={onPieceDrop}
         arePiecesDraggable={draggable}
         customSquareStyles={squareStyles}
+        {...BOARD_SQUARES}
         boardWidth={width}
       />
     </div>

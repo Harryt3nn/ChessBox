@@ -203,13 +203,6 @@
   flex: 1;
 }
 
-.empty-icon {
-  width: 52px;
-  height: 52px;
-  opacity: 0.85;
-  margin-bottom: 4px;
-}
-
 .empty-title {
   color: var(--color-text-secondary);
   font-size: 14px;

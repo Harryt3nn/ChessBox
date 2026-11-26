@@ -3,7 +3,6 @@
 import { Fragment, useEffect, useMemo, useRef, useState } from 'react';
 import { DEFAULT_POSITION } from 'chess.js';
 import { PageHeader } from '../components/PageHeader';
-import { Icon } from '../components/Icon';
 import styles from './NoveltyFinder.module.css';
 import shared from './PageShared.module.css';
 import type { Page } from '../types/Page';
@@ -17,9 +16,6 @@ import { Engine } from '../engine/Engine';
 import { createFullWorker } from '../engine/stockfishWorker';
 import { formatScore, sideCentipawns, uciToSan, whiteScore, type EngineLine } from '../engine/uci';
 
-import deviationsIcon from '../assets/icons/204-folder-6.png';
-import ideaIcon from '../assets/icons/009-idea.png';
-import downloadGlyph from '../assets/icons/007-download.png';
 
 interface NoveltyFinderProps {
   page: Page;
@@ -201,8 +197,8 @@ const NoveltyFinder = ({ currentUser, onOpenInBoard, onOpenInGraph }: NoveltyFin
   };
   const timesCell = (f: Finding) => (
     <td>
-      <button className={styles.linkBtn} onClick={() => setOpenRow(r => (r === keyOf(f) ? null : keyOf(f)))} title="Show the games">
-        {f.count} {openRow === keyOf(f) ? '▾' : '▸'}
+      <button className={styles.linkBtn} onClick={() => setOpenRow(r => (r === keyOf(f) ? null : keyOf(f)))} aria-expanded={openRow === keyOf(f)}>
+        {openRow === keyOf(f) ? 'Hide games' : `${f.count} game${f.count === 1 ? '' : 's'}`}
       </button>
     </td>
   );
@@ -315,7 +311,6 @@ const NoveltyFinder = ({ currentUser, onOpenInBoard, onOpenInGraph }: NoveltyFin
               onClick={handleChesscomImport}
               disabled={importing}
             >
-              <Icon src={downloadGlyph} size={16} />
               Import Chess.com
             </button>
 
@@ -324,7 +319,6 @@ const NoveltyFinder = ({ currentUser, onOpenInBoard, onOpenInGraph }: NoveltyFin
               onClick={handleLichessImport}
               disabled={importing}
             >
-              <Icon src={downloadGlyph} size={16} />
               Import Lichess
             </button>
           </div>
@@ -398,7 +392,6 @@ const NoveltyFinder = ({ currentUser, onOpenInBoard, onOpenInGraph }: NoveltyFin
             </table>
           ) : (
             <div className={shared.emptyState}>
-              <img alt="" src={deviationsIcon} className={shared.emptyIcon} />
               <span className={shared.emptyTitle}>No deviations found yet</span>
               <span className={shared.emptyHint}>
                 Moves where you left a prepared line will be collected
@@ -426,7 +419,6 @@ const NoveltyFinder = ({ currentUser, onOpenInBoard, onOpenInGraph }: NoveltyFin
             </table>
           ) : (
             <div className={shared.emptyState}>
-              <img alt="" src={ideaIcon} className={shared.emptyIcon} />
               <span className={shared.emptyTitle}>No novelties found yet</span>
               <span className={shared.emptyHint}>
                 Opponent moves your repertoire doesn't cover, and the next move after a line
